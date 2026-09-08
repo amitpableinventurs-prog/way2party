@@ -3,3 +3,8 @@
 *.scss linguist-vendored
 *.js linguist-vendored
 CHANGELOG.md export-ignore
+
+# Deploy/CI scripts must stay LF — they run on Linux (cPanel + GitHub runners)
+.cpanel.yml text eol=lf
+*.sh text eol=lf
+/.github/**/*.yml text eol=lf

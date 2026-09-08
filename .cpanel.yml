@@ -1,0 +1,56 @@
+---
+# =============================================================================
+#  cPanel Git™ Version Control — deployment tasks
+# =============================================================================
+#  Runs on the LIVE server every time cPanel deploys the HEAD commit
+#  (triggered automatically by .github/workflows/deploy.yml, or manually via
+#  cPanel  ->  Git Version Control  ->  Manage  ->  "Deploy HEAD Commit").
+#
+#  Working directory for every task = the repository checkout that cPanel
+#  manages. Point the domain's Document Root at  <that checkout>/public .
+#  All tasks run in ONE shell, so `export` and `cd` persist between lines.
+#
+#  >>> EDIT THE TWO PATHS BELOW to match this cPanel account <<<
+#     PHP        - `which php` on the server, or the MultiPHP binary
+#                  (e.g. /opt/cpanel/ea-php83/root/usr/bin/php)
+#     COMPOSER   - usually /opt/cpanel/composer/bin/composer, else ~/composer.phar
+# =============================================================================
+deployment:
+  tasks:
+    - export PHP="/usr/local/bin/php"
+    - export COMPOSER="/opt/cpanel/composer/bin/composer"
+
+    # --- 1. PHP dependencies (production only) --------------------------------
+    - $PHP -d memory_limit=-1 $COMPOSER install --no-dev --prefer-dist --optimize-autoloader --no-interaction
+
+    # --- 2. Database migrations ---------------------------------------------
+    #  Remove --force-guarded `|| true` once you trust the migrations.
+    - $PHP artisan migrate --force
+
+    # --- 3. Rebuild caches -------------------------------------------------
+    #  optimize:clear runs FIRST so a previous bad cache can never wedge the
+    #  site: just re-deploy and it self-heals.
+    - $PHP artisan optimize:clear
+    - $PHP artisan config:cache
+    - $PHP artisan route:cache
+    - $PHP artisan view:cache
+    - $PHP artisan event:cache || true
+
+    # --- 4. One-time-safe housekeeping (idempotent) ----------------------
+    - $PHP artisan storage:link || true
+    - test -f storage/oauth-private.key || $PHP artisan passport:keys --force
+
+    # --- 5. Compiled front-end assets --------------------------------------
+    #  Assets are built by GitHub Actions and committed to the repo, so there
+    #  is nothing to build here. IF your cPanel has Node.js available and you
+    #  prefer building on the server, delete the deploy.yml build step and
+    #  uncomment:
+    # - export PATH="$HOME/.nvm/versions/node/$(cat .nvmrc 2>/dev/null || echo v20)/bin:$PATH"
+    # - npm ci --no-audit --no-fund
+    # - npm run prod
+
+    # --- 6. If the repo checkout is NOT itself the docroot ----------------
+    #  (i.e. you clone to ~/repositories/way2party and serve from
+    #  ~/public_html) then uncomment and set DEPLOYPATH:
+    # - export DEPLOYPATH="/home/CPANELUSER/public_html"
+    # - rsync -a --delete --exclude='.git' --exclude='.env' --exclude='storage/' --exclude='node_modules/' ./ "$DEPLOYPATH/"

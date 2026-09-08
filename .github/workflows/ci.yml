@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'public/js/**'
+      - 'public/css/**'
+      - 'public/mix-manifest.json'
+      - '**.md'
+
+jobs:
+  php:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, pdo, pdo_mysql, bcmath, gd, zip, intl, exif, curl
+          coverage: none
+
+      - name: Validate composer.json
+        run: composer validate --strict --no-check-publish
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Prepare .env
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: PHP syntax check (app / config / routes / database)
+        run: |
+          find app config routes database -name '*.php' -print0 \
+            | xargs -0 -n1 -P4 php -l > /dev/null
+
+      - name: Boot check
+        run: php artisan about --only=environment
+
+  assets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci --no-audit --no-fund
+      - run: npm run prod
