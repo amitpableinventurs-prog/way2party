@@ -1,206 +1,194 @@
-# Deployment — GitHub → cPanel (Git Version Control)
+# Deployment — GitHub → live server (way2party.com)
 
-Every push to `main` runs this pipeline:
+No cPanel API token needed. The live server pulls from GitHub itself on a cron.
 
 ```
 push to main
    │
    ▼
-GitHub Actions  (.github/workflows/deploy.yml)
-   │  1. npm ci && npm run prod        → build public/js, public/css, mix-manifest.json
-   │  2. commit compiled assets back to main   ([skip ci], won't re-trigger)
-   │  3. call cPanel UAPI  VersionControlDeployment::create
+GitHub Actions  (.github/workflows/build-assets.yml)
+   │  npm ci && npm run prod  →  compile public/js, public/css, mix-manifest.json
+   │  commit the built files back to main   ([skip ci] — no loop)
    ▼
-cPanel  pulls HEAD  →  runs .cpanel.yml on the live server
+main branch now has code + built assets
+   │
+   ▼
+Live server cron, every 5 min  (deploy/server-pull.sh)
+   │  new commit on origin/main?  no → exit
+   │  yes ↓
+   │  git reset --hard origin/main         (.env, storage/, Modules/, uploads untouched)
    │  composer install --no-dev
    │  php artisan migrate --force
-   │  php artisan optimize:clear + config/route/view/event cache
-   │  storage:link, passport:keys (only if missing)
+   │  php artisan optimize:clear + config/route/view/event cache + storage:link
    ▼
 Live site updated
 ```
 
-`.github/workflows/ci.yml` additionally runs on every PR: composer validate, dependency
-install, `php -l` lint, an `artisan` boot check, and an asset build.
+`.github/workflows/ci.yml` runs on every PR: composer validate, install, `php -l` lint,
+an `artisan` boot check, and an asset build.
 
 ---
 
-## One-time setup
+## One-time setup (SSH)
 
-### 0. Server is ALREADY live (way2party.com) — connect the existing install
+### 1. Connect the existing live install to the repo
 
-The production code already exists on the server (installed, real `.env`, real DB,
-uploads in place). Do **not** wipe it — turn that directory into a git checkout of
-`origin/main` so future pushes deploy on top.
+The code already exists on the server (installed, real `.env`, real DB, uploads). Don't
+wipe it — turn that directory into a git checkout of `origin/main`.
 
-**What git will and won't touch** on first checkout:
+**What a checkout touches — and doesn't:**
 
-| Safe (git-ignored / untracked) | Overwritten by the checkout |
+| Safe — git-ignored / untracked | Replaced with the GitHub version |
 |---|---|
-| `.env` | source code (`app/`, `config/`, `routes/`, `resources/`, `database/`) |
-| `storage/app/**` uploads, `storage/logs/**` | compiled assets `public/js`, `public/css`, `mix-manifest.json` |
+| `.env` | source: `app/ config/ routes/ resources/ database/ bootstrap/app.php` |
+| `storage/app/**`, `storage/logs/**` | compiled `public/js`, `public/css`, `mix-manifest.json` |
 | `public/images/upload/**`, `public/storage` | `.htaccess` (root + `public/`) |
 | `Modules/**`, `public/modules/**` | `composer.json` / `composer.lock` |
-| `bootstrap/cache/*.php` | |
-| `storage/oauth-*.key` *(now git-ignored — server keeps its own)* | |
-
-Steps (SSH, or cPanel → **Terminal**):
+| `bootstrap/cache/*.php` | `artisan`, `deploy/server-pull.sh` |
+| `storage/oauth-*.key` (git-ignored — server keeps its own Passport keys) | |
 
 ```bash
-# locate the Laravel root (parent of the public/ that serves way2party.com)
+# find the Laravel root (parent of the public/ that serves way2party.com)
 find ~ -maxdepth 4 -name artisan -not -path '*/vendor/*'
 cd /home/CPUSER/…            # that directory
 
 php artisan down
 tar czf ~/way2party-backup-$(date +%F-%H%M).tar.gz --exclude=node_modules --exclude=vendor .
 
-# --- let the server read the private repo: add a deploy key ---
+# deploy key so the server can read the private repo
 ls ~/.ssh/id_ed25519.pub 2>/dev/null || ssh-keygen -t ed25519 -N '' -f ~/.ssh/id_ed25519
 cat ~/.ssh/id_ed25519.pub
-#   → paste into GitHub → repo → Settings → Deploy keys → Add (tick "Allow write access" only
-#     if you also want to push from the server)
+#   → GitHub → repo → Settings → Deploy keys → Add deploy key   (read-only is enough)
 
-# --- adopt this directory into git WITHOUT touching any file yet ---
+# adopt the directory into git WITHOUT changing any file yet
 git init
 git branch -m main
 git remote add origin git@github.com:amitpableinventurs-prog/way2party.git
 git fetch origin
 git reset origin/main        # HEAD + index = GitHub; working tree left exactly as-is
+```
 
-# --- DIAGNOSTIC: what does the live server have that GitHub doesn't (and vice-versa)? ---
+### 2. Diagnose — did anyone edit code directly on the server?
+
+```bash
 git status
 git diff --stat
 ```
 
-`git status` now tells you the truth:
+- **`modified:` under `app/ config/ routes/ resources/ database/`** → real server edits.
+  `git diff -- <path>` to read them. Keep anything real: copy it aside, commit it to
+  GitHub properly from your machine, then `git fetch origin` here again.
+- **`modified:` only `public/js/**`, `public/css/**`, `mix-manifest.json`, `.htaccess`**
+  → ignore; the GitHub version wins.
+- **`untracked:` `.env`, `storage/…`, `Modules/…`, `public/images/upload/…`** → expected.
+- **`deleted:`** → the server was missing files GitHub has.
 
-- **`modified:` tracked files** → someone edited code on the server. Inspect each with
-  `git diff -- path`. Anything worth keeping: copy it out, commit it to GitHub properly,
-  `git fetch` again. Throwaway/irrelevant diffs (compiled `public/js`, `public/css`,
-  `.htaccess`): `git checkout -- <path>` to take the GitHub version.
-- **`untracked:` `.env`, `storage/…`, `Modules/…`, `public/images/upload/…`** → expected,
-  leave them.
-- **`deleted:`** → files GitHub has that the server was missing; `git checkout -- <path>`.
+### 3. Align the working tree to GitHub
 
-Once `git status` shows only the expected ignored/untracked entries:
+Once `git status` shows nothing under `app/ config/ routes/ resources/ database/` that you
+still need:
 
 ```bash
-git checkout -- .            # align remaining tracked files to origin/main
+git checkout -- .
 git branch --set-upstream-to=origin/main main
+
 composer install --no-dev --prefer-dist --optimize-autoloader
 php artisan migrate --force
-php artisan optimize:clear && php artisan config:cache && php artisan route:cache && php artisan view:cache
+php artisan optimize:clear
+php artisan config:cache && php artisan route:cache && php artisan view:cache
 php artisan storage:link || true
 php artisan up
 ```
 
-Open way2party.com and confirm it still works (log in, load an organizer page). If the
-mobile apps / API log users out, the Passport keys changed — restore `storage/oauth-*.key`
-from the backup tarball and `php artisan config:clear`.
+Open way2party.com — log in, open an organizer page, check the mobile-app / API login.
+If API logins now fail, restore `storage/oauth-private.key` + `storage/oauth-public.key`
+from the backup tarball and run `php artisan config:clear`.
 
-Then register this same directory in cPanel Git Version Control:
+### 4. Point `deploy/server-pull.sh` at your paths
 
-cPanel → **Git™ Version Control** → **Create** → *Clone a Repository* **OFF** → set
-**Repository Path** to this existing directory (cPanel detects the `.git` you just made).
-Now skip to step **4** below (`.cpanel.yml` paths) and step **5** (GitHub secrets).
+```bash
+which php        # e.g. /usr/local/bin/php   or  /opt/cpanel/ea-php83/root/usr/bin/php
+which composer   # e.g. /opt/cpanel/composer/bin/composer
+```
 
-If you would rather deploy into a **fresh** directory and cut the docroot over once it is
-verified, use steps 1–6 instead and copy `.env` + `storage/` + `Modules/` across first.
+Either edit the `PHP=` / `COMPOSER=` defaults at the top of
+[`deploy/server-pull.sh`](deploy/server-pull.sh) and push the change, or pass them in the
+cron line (next step). `APP_DIR` auto-detects from the script's own location.
+
+Test it by hand first:
+
+```bash
+bash deploy/server-pull.sh          # prints nothing & exits 0 when already up to date
+```
+
+### 5. Add the cron job
+
+cPanel → **Cron Jobs** → add (every 5 minutes):
+
+```
+*/5 * * * * /home/CPUSER/way2party/deploy/server-pull.sh >> /home/CPUSER/way2party/storage/logs/deploy.log 2>&1
+```
+
+With explicit binaries if `which` above wasn't the default:
+
+```
+*/5 * * * * PHP=/opt/cpanel/ea-php83/root/usr/bin/php COMPOSER=/opt/cpanel/composer/bin/composer /home/CPUSER/way2party/deploy/server-pull.sh >> /home/CPUSER/way2party/storage/logs/deploy.log 2>&1
+```
+
+### 6. Verify end to end
+
+Make a trivial change on `main` (from your machine), push, then within ~5 min:
+
+```bash
+tail -f /home/CPUSER/way2party/storage/logs/deploy.log
+```
+
+You should see `deploying xxxxxxx -> yyyyyyy … done`.
 
 ---
 
-### 1. cPanel — create the repository
-
-cPanel → **Git™ Version Control** → **Create**
-
-| Field | Value |
-|---|---|
-| Clone URL | `https://github.com/amitpableinventurs-prog/way2party.git` |
-| Repository Path | e.g. `/home/CPUSER/repositories/way2party` |
-
-Private repo → cPanel needs read access to GitHub. Either:
-
-- **Deploy key (recommended):** `cat ~/.ssh/id_*.pub` on the server (or generate with
-  `ssh-keygen -t ed25519`), add it in GitHub → repo → *Settings → Deploy keys* (read-only),
-  and use the SSH clone URL `git@github.com:amitpableinventurs-prog/way2party.git`; **or**
-- **PAT in the URL:** `https://USERNAME:GITHUB_PAT@github.com/amitpableinventurs-prog/way2party.git`
-
-### 2. cPanel — point the domain at `public/`
-
-The Laravel front controller is in `public/`. Set the domain / subdomain **Document Root** to:
-
-```
-/home/CPUSER/repositories/way2party/public
-```
-
-(cPanel → *Domains* → edit → Document Root.) If your host forbids a docroot outside
-`public_html`, instead clone into `public_html` itself and set docroot to
-`public_html/public`, **or** use the `rsync` block at the bottom of `.cpanel.yml`.
-
-### 3. Live server — create `.env` (once)
-
-`.env` is **not** in git. On the server, in the repo root:
+## Day-to-day
 
 ```bash
-cp .env.example .env
-/usr/local/bin/php artisan key:generate
+# on your machine
+git add -A && git commit -m "…" && git push
 ```
 
-Then edit `.env`: set `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://yourdomain`,
-and the `DB_*` / `MAIL_*` / payment credentials. (Or run the web installer at
-`https://yourdomain/installer` once, which writes these for you.)
-
-### 4. Fix the paths in `.cpanel.yml`
-
-Confirm on the server via SSH:
-
-```bash
-which php            # → PHP=...    (or /opt/cpanel/ea-php83/root/usr/bin/php)
-which composer        # → COMPOSER=... (often /opt/cpanel/composer/bin/composer)
-```
-
-Edit the two `export` lines at the top of [`.cpanel.yml`](.cpanel.yml) and commit.
-
-### 5. GitHub — add repository secrets
-
-Repo → *Settings → Secrets and variables → Actions → New repository secret*:
-
-| Secret | Example | Where to get it |
-|---|---|---|
-| `CPANEL_HOST` | `server201.web-hosting.com` | cPanel sidebar "Server Information" — hostname only, no `https://`, no `:2083` |
-| `CPANEL_USER` | `cpuser` | cPanel account username |
-| `CPANEL_API_TOKEN` | `ABC123...` | cPanel → **Manage API Tokens** → Create |
-| `CPANEL_REPO_ROOT` | `/home/cpuser/repositories/way2party` | the Repository Path from step 1 |
-
-> If `2083` is blocked for outbound from GitHub runners, deployment step will time out.
-> Fallback: skip the trigger job and enable **cPanel → Git Version Control → Pull on push**
-> via a GitHub webhook, or click **Deploy HEAD Commit** manually.
-
-### 6. First deploy
-
-```bash
-git push -u origin main
-```
-
-Watch it in the repo's **Actions** tab, then verify the site. First deploy also needs the
-DB migrated — `.cpanel.yml` does that automatically with `migrate --force`.
-
----
+Assets rebuild in GitHub Actions; the server pulls within 5 minutes. Nothing else to do.
 
 ## Rollback
 
-cPanel → Git Version Control → **Manage** → *Pull or Deploy* shows commit history.
-Check out an older commit locally, `git revert`, and push — or in cPanel deploy a
-previous commit. `optimize:clear` runs at the start of every deploy, so a bad config
-cache never survives a re-deploy.
+```bash
+# from your machine
+git revert <bad-sha> && git push        # server rolls forward to the revert
+```
+
+Or on the server, pause the cron and `git reset --hard <good-sha>` + re-run the artisan
+cache steps. `optimize:clear` runs at the start of every deploy, so a broken config cache
+never survives the next pull.
+
+## Instant deploys (optional)
+
+The 5-minute cron delay is usually fine. For instant deploys, uncomment the `deploy:` job
+at the bottom of [`build-assets.yml`](.github/workflows/build-assets.yml) — it SSHes in and
+runs the same `server-pull.sh`. Needs `SSH_HOST` / `SSH_USER` / `SSH_KEY` / `SSH_PORT`
+repo secrets (a keypair you create; public half in the server's `~/.ssh/authorized_keys`).
+Keep the cron too, as a safety net.
+
+## cPanel Git Version Control (alternative to cron)
+
+If you prefer cPanel's UI: register the repo dir under cPanel → **Git™ Version Control**,
+and it will run [`.cpanel.yml`](.cpanel.yml) whenever you click **Deploy HEAD Commit** (or
+when triggered by its API). The cron approach above needs neither, so `.cpanel.yml` is just
+a convenience/fallback — keep its `PHP=` / `COMPOSER=` lines in sync with the cron.
 
 ## Troubleshooting
 
 | Symptom | Fix |
 |---|---|
-| White screen after deploy | SSH in, `php artisan optimize:clear`. If it stays broken, a package calls `env()` outside `config/*` — remove `config:cache` (and maybe `route:cache`) from `.cpanel.yml`. |
-| `498 / could not read Username` in cPanel pull | Deploy key not added to GitHub, or wrong (HTTPS vs SSH) clone URL. |
-| Actions deploy job: `cPanel API error` | Wrong `CPANEL_*` secret, expired API token, or `:2083` blocked. |
-| Assets 404 | `npm run prod` failed in Actions — check the build job log; confirm `public/mix-manifest.json` got committed. |
-| `Class "Modules\..." not found` | `/Modules` and `public/modules` are git-ignored. Commit needed modules or deploy them separately. |
-| Passport / login broken | `storage/oauth-*.key` mismatch. Delete both on the server and run `php artisan passport:keys`, then re-issue clients. |
+| `deploy.log`: `ABORT: uncommitted changes` | Someone edited files on the server. Commit them to GitHub (or `git checkout -- <path>` to discard), then it resumes. |
+| `deploy.log`: `Permission denied (publickey)` | Deploy key not added to GitHub, or the remote is the HTTPS URL — `git remote set-url origin git@github.com:amitpableinventurs-prog/way2party.git`. |
+| White screen after a deploy | `php artisan optimize:clear`. If it stays broken, a package calls `env()` outside `config/*` — drop `config:cache` (then `route:cache`) from `server-pull.sh`. |
+| Assets 404 / stale | The Actions "Build assets" run failed — check its log; confirm `public/mix-manifest.json` was committed. |
+| `Class "Modules\…" not found` | `/Modules` + `public/modules` are git-ignored — deploy modules separately or un-ignore them. |
+| Cron didn't run | cPanel Cron Jobs needs the full path; check the account's cron email / `deploy.log` mtime. |

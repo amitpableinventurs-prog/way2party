@@ -2,9 +2,11 @@
 # =============================================================================
 #  cPanel Git™ Version Control — deployment tasks
 # =============================================================================
-#  Runs on the LIVE server every time cPanel deploys the HEAD commit
-#  (triggered automatically by .github/workflows/deploy.yml, or manually via
-#  cPanel  ->  Git Version Control  ->  Manage  ->  "Deploy HEAD Commit").
+#  OPTIONAL / FALLBACK. The primary deploy path is deploy/server-pull.sh on a
+#  cron (see DEPLOYMENT.md) which needs no cPanel API token. This file is only
+#  used if you register the repo under cPanel -> Git Version Control and click
+#  "Deploy HEAD Commit" (or trigger it via the cPanel API). Keep PHP=/COMPOSER=
+#  in sync with deploy/server-pull.sh.
 #
 #  Working directory for every task = the repository checkout that cPanel
 #  manages. Point the domain's Document Root at  <that checkout>/public .
