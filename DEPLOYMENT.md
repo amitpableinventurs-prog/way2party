@@ -44,20 +44,49 @@ uploads in place). Do **not** wipe it — turn that directory into a git checkou
 | `bootstrap/cache/*.php` | |
 | `storage/oauth-*.key` *(now git-ignored — server keeps its own)* | |
 
-Steps (cPanel → **Terminal**, or SSH):
+Steps (SSH, or cPanel → **Terminal**):
 
 ```bash
-cd ~/path/to/live/app          # the dir whose /public is the way2party.com docroot
+# locate the Laravel root (parent of the public/ that serves way2party.com)
+find ~ -maxdepth 4 -name artisan -not -path '*/vendor/*'
+cd /home/CPUSER/…            # that directory
+
 php artisan down
+tar czf ~/way2party-backup-$(date +%F-%H%M).tar.gz --exclude=node_modules --exclude=vendor .
 
-# snapshot first — safety net
-tar czf ~/way2party-backup-$(date +%F).tar.gz --exclude=node_modules --exclude=vendor .
+# --- let the server read the private repo: add a deploy key ---
+ls ~/.ssh/id_ed25519.pub 2>/dev/null || ssh-keygen -t ed25519 -N '' -f ~/.ssh/id_ed25519
+cat ~/.ssh/id_ed25519.pub
+#   → paste into GitHub → repo → Settings → Deploy keys → Add (tick "Allow write access" only
+#     if you also want to push from the server)
 
+# --- adopt this directory into git WITHOUT touching any file yet ---
 git init
-git remote add origin https://github.com/amitpableinventurs-prog/way2party.git
+git branch -m main
+git remote add origin git@github.com:amitpableinventurs-prog/way2party.git
 git fetch origin
-git checkout -f -b main origin/main      # keeps .env, storage, uploads, Modules (all ignored)
+git reset origin/main        # HEAD + index = GitHub; working tree left exactly as-is
 
+# --- DIAGNOSTIC: what does the live server have that GitHub doesn't (and vice-versa)? ---
+git status
+git diff --stat
+```
+
+`git status` now tells you the truth:
+
+- **`modified:` tracked files** → someone edited code on the server. Inspect each with
+  `git diff -- path`. Anything worth keeping: copy it out, commit it to GitHub properly,
+  `git fetch` again. Throwaway/irrelevant diffs (compiled `public/js`, `public/css`,
+  `.htaccess`): `git checkout -- <path>` to take the GitHub version.
+- **`untracked:` `.env`, `storage/…`, `Modules/…`, `public/images/upload/…`** → expected,
+  leave them.
+- **`deleted:`** → files GitHub has that the server was missing; `git checkout -- <path>`.
+
+Once `git status` shows only the expected ignored/untracked entries:
+
+```bash
+git checkout -- .            # align remaining tracked files to origin/main
+git branch --set-upstream-to=origin/main main
 composer install --no-dev --prefer-dist --optimize-autoloader
 php artisan migrate --force
 php artisan optimize:clear && php artisan config:cache && php artisan route:cache && php artisan view:cache
@@ -66,8 +95,8 @@ php artisan up
 ```
 
 Open way2party.com and confirm it still works (log in, load an organizer page). If the
-mobile apps / API log users out, the Passport keys differ — that only happens if the old
-keys were lost; restore `storage/oauth-*.key` from the backup.
+mobile apps / API log users out, the Passport keys changed — restore `storage/oauth-*.key`
+from the backup tarball and `php artisan config:clear`.
 
 Then register this same directory in cPanel Git Version Control:
 
