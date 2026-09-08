@@ -27,6 +27,59 @@ install, `php -l` lint, an `artisan` boot check, and an asset build.
 
 ## One-time setup
 
+### 0. Server is ALREADY live (way2party.com) — connect the existing install
+
+The production code already exists on the server (installed, real `.env`, real DB,
+uploads in place). Do **not** wipe it — turn that directory into a git checkout of
+`origin/main` so future pushes deploy on top.
+
+**What git will and won't touch** on first checkout:
+
+| Safe (git-ignored / untracked) | Overwritten by the checkout |
+|---|---|
+| `.env` | source code (`app/`, `config/`, `routes/`, `resources/`, `database/`) |
+| `storage/app/**` uploads, `storage/logs/**` | compiled assets `public/js`, `public/css`, `mix-manifest.json` |
+| `public/images/upload/**`, `public/storage` | `.htaccess` (root + `public/`) |
+| `Modules/**`, `public/modules/**` | `composer.json` / `composer.lock` |
+| `bootstrap/cache/*.php` | |
+| `storage/oauth-*.key` *(now git-ignored — server keeps its own)* | |
+
+Steps (cPanel → **Terminal**, or SSH):
+
+```bash
+cd ~/path/to/live/app          # the dir whose /public is the way2party.com docroot
+php artisan down
+
+# snapshot first — safety net
+tar czf ~/way2party-backup-$(date +%F).tar.gz --exclude=node_modules --exclude=vendor .
+
+git init
+git remote add origin https://github.com/amitpableinventurs-prog/way2party.git
+git fetch origin
+git checkout -f -b main origin/main      # keeps .env, storage, uploads, Modules (all ignored)
+
+composer install --no-dev --prefer-dist --optimize-autoloader
+php artisan migrate --force
+php artisan optimize:clear && php artisan config:cache && php artisan route:cache && php artisan view:cache
+php artisan storage:link || true
+php artisan up
+```
+
+Open way2party.com and confirm it still works (log in, load an organizer page). If the
+mobile apps / API log users out, the Passport keys differ — that only happens if the old
+keys were lost; restore `storage/oauth-*.key` from the backup.
+
+Then register this same directory in cPanel Git Version Control:
+
+cPanel → **Git™ Version Control** → **Create** → *Clone a Repository* **OFF** → set
+**Repository Path** to this existing directory (cPanel detects the `.git` you just made).
+Now skip to step **4** below (`.cpanel.yml` paths) and step **5** (GitHub secrets).
+
+If you would rather deploy into a **fresh** directory and cut the docroot over once it is
+verified, use steps 1–6 instead and copy `.env` + `storage/` + `Modules/` across first.
+
+---
+
 ### 1. cPanel — create the repository
 
 cPanel → **Git™ Version Control** → **Create**

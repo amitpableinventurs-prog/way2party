@@ -3,7 +3,9 @@
 /public/storage
 /public/images/brands
 # /public/images/upload
-# /storage/*.key
+/storage/*.key
+/storage/oauth-*.key
+.rnd
 /vendor
 /vendor_old
 # composer.lock
