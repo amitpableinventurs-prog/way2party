@@ -1,0 +1,17 @@
+ALTER TABLE `payment_setting`
+  ADD `raveWebhookSecretHash` varchar(255) DEFAULT NULL AFTER `raveSecretKey`;
+CREATE TABLE `event_faqs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `event_id` int(11) NOT NULL,
+  `question` varchar(255) NOT NULL,
+  `answer` text DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+-- Forign key for event_faqs table
+ALTER TABLE `event_faqs`
+  ADD CONSTRAINT `event_faqs_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `general_settng`
+    ADD `show_event_report_form` TINYINT NULL DEFAULT '1' AFTER `help_center`;
+ALTER TABLE `language`
+  ADD `code` varchar(10) COLLATE 'utf8mb4_unicode_ci' DEFAULT 'en' AFTER `name`;

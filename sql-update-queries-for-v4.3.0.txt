@@ -1,0 +1,7 @@
+INSERT INTO `currency` (`country`, `currency`, `code`, `symbol`) VALUES
+('Algeria', 'Algerian Dinar', 'DZD', 'دج');
+
+ALTER TABLE general_settng
+  ADD COLUMN `openai_switch` TINYINT(1) NOT NULL DEFAULT '1' AFTER `appstore_link`,
+  ADD COLUMN `openai_key` VARCHAR(255) NULL DEFAULT 'ENTER_YOUR_KEY_HERE' AFTER `openai_switch`,
+  ADD COLUMN `openai_selected_model` VARCHAR(80) NOT NULL DEFAULT 'gpt-4.1-nano' AFTER `openai_key`;

@@ -1,0 +1,1 @@
+INSERT INTO `currency` (`country`, `currency`, `code`, `symbol`) VALUES ('Kenya', 'Shillings', 'KES', 'Ksh');

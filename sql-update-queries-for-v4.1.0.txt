@@ -1,0 +1,30 @@
+CREATE TABLE `brands` (
+    `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `name` varchar(20) DEFAULT NULL,
+    `url` varchar(255) DEFAULT NULL,
+    `logo_image` varchar(255) DEFAULT NULL,
+    `status` tinyint(1) NOT NULL DEFAULT 1,
+    `created_at` datetime NOT NULL,
+    `updated_at` datetime NOT NULL
+);
+
+INSERT INTO `brands` (`name`, `url`, `logo_image`, `status`, `created_at`, `updated_at`) VALUES
+('Brand 1', 'https://example.com', NULL, 1, NOW(), NOW()),
+('Brand 2', 'https://example.com', NULL, 1, NOW(), NOW()),
+('Brand 3', 'https://example.com', NULL, 1, NOW(), NOW()),
+('Brand 4', 'https://example.com', NULL, 1, NOW(), NOW()),
+('Brand 5', 'https://example.com', NULL, 1, NOW(), NOW()),
+('Brand 6', 'https://example.com', NULL, 1, NOW(), NOW()),
+('Brand 7', 'https://example.com', NULL, 1, NOW(), NOW());
+
+ALTER TABLE `general_settng`
+    ADD COLUMN `show_brands_carousel` tinyint(1) NOT NULL DEFAULT 1 AFTER `show_link_banner`;
+
+ALTER TABLE `general_settng`
+    ADD COLUMN `enable_google_signin` tinyint(1) NOT NULL DEFAULT 0 AFTER `enable_vonage`,
+    ADD COLUMN `google_client_id` varchar(255) DEFAULT NULL AFTER `enable_google_signin`,
+    ADD COLUMN `google_client_secret` varchar(255) DEFAULT NULL AFTER `google_client_id`;
+
+ALTER TABLE `users`
+    ADD COLUMN `provider` varchar(15) DEFAULT 'LOCAL' AFTER `device_token`,
+    ADD COLUMN `provider_token` varchar(255) DEFAULT 'LOCAL' AFTER `provider`;

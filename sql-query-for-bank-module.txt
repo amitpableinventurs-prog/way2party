@@ -1,0 +1,1 @@
+INSERT INTO `module` (`id`, `module`, `is_enable`, `is_install`, `updated_at`, `created_at`) VALUES (NULL, 'BankPayout', '0', '0', current_timestamp(), current_timestamp());

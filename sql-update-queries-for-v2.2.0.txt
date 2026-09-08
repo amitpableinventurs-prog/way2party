@@ -1,0 +1,6 @@
+ ALTER TABLE `general_settng` CHANGE `googleplay_link` `googleplay_link` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
+ ALTER TABLE `general_settng` CHANGE `appstore_link` `appstore_link` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
+ ALTER TABLE `general_settng` CHANGE `terms_services` `terms_services` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
+ ALTER TABLE `general_settng` CHANGE `privacy_policy_organizer` `privacy_policy_organizer` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
+ ALTER TABLE `general_settng` CHANGE `terms_use_organizer` `terms_use_organizer` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
+ ALTER TABLE `general_settng` CHANGE `appuser_privacy_policy` `appuser_privacy_policy` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
