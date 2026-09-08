@@ -60,6 +60,20 @@
                                                 <div class="invalid-feedback block">{{ $message }}</div>
                                             @enderror
                                         </div>
+                                        <div class="form-group">
+                                            <label>{{ __('City') }}</label>
+                                            <select name="city_id" class="form-control select2">
+                                                <option value="">{{ __('Select City') }}</option>
+                                                @foreach ($city as $item)
+                                                    <option value="{{ $item->id }}"
+                                                        {{ $item->id == old('city_id') ? 'Selected' : '' }}>
+                                                        {{ $item->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            @error('city_id')
+                                                <div class="invalid-feedback block">{{ $message }}</div>
+                                            @enderror
+                                        </div>
                                     </div>
                                 </div>
 

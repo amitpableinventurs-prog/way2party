@@ -62,6 +62,13 @@
                     </a>
                 </li>
             @endcan
+            @can('city_access')
+                <li class="{{ request()->is('city*') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ url('city') }}">
+                        <i class="fas fa-city"></i> <span>{{ __('City') }}</span>
+                    </a>
+                </li>
+            @endcan
             @if(Auth::user()->hasRole('admin'))
                 <li class="{{ request()->is('get-notification*') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ url('get-notification') }}">

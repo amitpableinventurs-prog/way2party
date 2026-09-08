@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\Category;
+use App\Models\City;
 use App\Models\Ticket;
 use App\Models\Order;
 use App\Models\Setting;
@@ -104,6 +105,7 @@ class EventController extends Controller
     {
         abort_if(Gate::denies('event_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $category = Category::where('status', 1)->orderBy('id', 'DESC')->get();
+        $city = City::where('status', 1)->orderBy('name')->get();
         $users = User::role('Organizer')->orderBy('id', 'DESC')->get();
         if (Auth::user()->hasRole('admin')) {
             $scanner = User::role('scanner')->orderBy('id', 'DESC')->get();
@@ -111,7 +113,7 @@ class EventController extends Controller
             $scanner = User::role('scanner')->where('org_id', Auth::user()->id)->orderBy('id', 'DESC')->get();
         }
         $openai_switch = Setting::first()->openai_switch;
-        return view('admin.event.create', compact('category', 'users', 'scanner', 'openai_switch'));
+        return view('admin.event.create', compact('category', 'city', 'users', 'scanner', 'openai_switch'));
     }
 
     public function store(Request $request)
@@ -122,6 +124,8 @@ class EventController extends Controller
             'start_time' => 'bail|required',
             'end_time' => 'bail|required|after:start_time',
             'category_id' => 'bail|required',
+            // change to 'bail|required|exists:city,id' once cities have been added in admin
+            'city_id' => 'bail|nullable|exists:city,id',
             'type' => 'bail|required',
             'address' => 'bail|required_if:type,offline',
             'lat' => 'bail|required_if:type,offline',
@@ -170,13 +174,14 @@ class EventController extends Controller
     {
         abort_if(Gate::denies('event_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $category =  Category::where('status', 1)->orderBy('id', 'DESC')->get();
+        $city = City::where('status', 1)->orderBy('name')->get();
         $users = User::role('Organizer')->orderBy('id', 'DESC')->get();
         if (Auth::user()->hasRole('admin')) {
             $scanner = User::role('scanner')->orderBy('id', 'DESC')->get();
         } else if (Auth::user()->hasRole('Organizer')) {
             $scanner = User::role('scanner')->where('org_id', Auth::user()->id)->orderBy('id', 'DESC')->get();
         }
-        return view('admin.event.edit', compact('event', 'category', 'users', 'scanner'));
+        return view('admin.event.edit', compact('event', 'category', 'city', 'users', 'scanner'));
     }
 
     public function update(Request $request, Event $event)
@@ -187,6 +192,7 @@ class EventController extends Controller
             'start_time' => 'bail|required',
             'end_time' => 'bail|required|after:start_time',
             'category_id' => 'bail|required',
+            'city_id' => 'bail|nullable|exists:city,id',
             'type' => 'bail|required',
             'address' => 'bail|required_if:type,offline',
             'lat' => 'bail|required_if:type,offline',

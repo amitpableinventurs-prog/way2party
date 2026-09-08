@@ -2659,3 +2659,24 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+-- --------------------------------------------------------
+-- City: admin-managed lookup, feeds the Add/Edit Event dropdown (like `category`)
+-- --------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `city` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `status` int(11) NOT NULL DEFAULT 1,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `events` ADD COLUMN `city_id` int(11) DEFAULT NULL AFTER `category_id`;
+
+INSERT INTO `permissions` (`id`, `name`, `guard_name`, `created_at`, `updated_at`) VALUES
+(71, 'city_access', 'web', NOW(), NOW()),
+(72, 'city_create', 'web', NOW(), NOW()),
+(73, 'city_edit', 'web', NOW(), NOW()),
+(74, 'city_delete', 'web', NOW(), NOW());

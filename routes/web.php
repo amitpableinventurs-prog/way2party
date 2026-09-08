@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CityController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\TicketController;
@@ -195,6 +196,7 @@ Route::group(['middleware' => ['auth']], function () {
         'feedback' =>  FeedbackController::class,
         'coupon' =>  CouponController::class,
         'category' =>  CategoryController::class,
+        'city' =>  CityController::class,
         // 'location' =>  LocationController::class,
         'events' =>  EventController::class,
         'notification-template' =>  NotificationTemplateController::class,

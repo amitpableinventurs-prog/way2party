@@ -15,6 +15,7 @@ class Event extends Model
         'type',
         'address',
         'category_id',
+        'city_id',
         'start_time',
         'end_time',
         'image',
@@ -42,6 +43,11 @@ class Event extends Model
     public function category()
     {
         return $this->hasOne('App\Models\Category', 'id', 'category_id');
+    }
+
+    public function city()
+    {
+        return $this->hasOne('App\Models\City', 'id', 'city_id');
     }
 
     public function organization()
