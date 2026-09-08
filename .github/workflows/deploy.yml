@@ -1,0 +1,74 @@
+name: Build & Deploy
+
+# On every push to main:
+#   1. compile the front-end and commit the built files back to main
+#   2. SSH into the live server and run deploy/server-pull.sh
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'public/js/**'
+      - 'public/css/**'
+      - 'public/mix-manifest.json'
+      - '**.md'
+  workflow_dispatch: {}
+
+concurrency:
+  group: deploy-live
+  cancel-in-progress: false
+
+jobs:
+  build-assets:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install JS deps
+        run: npm ci --no-audit --no-fund
+
+      - name: Build production assets
+        run: npm run prod
+
+      - name: Commit compiled assets (if changed)
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f public/js public/css public/mix-manifest.json
+          if git diff --cached --quiet; then
+            echo "No asset changes."
+          else
+            git commit -m "chore(build): compile front-end assets [skip ci]"
+            git push origin HEAD:main
+          fi
+
+  deploy:
+    needs: build-assets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run server-pull.sh on the live server
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host:     ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key:      ${{ secrets.SSH_KEY }}
+          port:     ${{ secrets.SSH_PORT }}
+          command_timeout: 15m
+          script: |
+            set -e
+            cd "${{ secrets.DEPLOY_PATH }}"
+            bash deploy/server-pull.sh
+
+# Requires repo SECRETS (Settings ▸ Secrets and variables ▸ Actions ▸ Secrets tab —
+# NOT the Variables tab; SSH_KEY must never be a variable):
+#   SSH_HOST      3.0.159.67
+#   SSH_USER      way2party
+#   SSH_PORT      22
+#   SSH_KEY       -----BEGIN OPENSSH PRIVATE KEY----- …   (private half; public half in
+#                 the server's ~/.ssh/authorized_keys)
+#   DEPLOY_PATH   /home/way2party/…   (the Laravel root on the server)

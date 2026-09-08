@@ -1,28 +1,28 @@
 # Deployment — GitHub → live server (way2party.com)
 
-No cPanel API token needed. The live server pulls from GitHub itself on a cron.
+No cPanel API token needed. GitHub Actions builds the assets and then SSHes into the
+server to deploy.
 
 ```
 push to main
    │
    ▼
-GitHub Actions  (.github/workflows/build-assets.yml)
-   │  npm ci && npm run prod  →  compile public/js, public/css, mix-manifest.json
-   │  commit the built files back to main   ([skip ci] — no loop)
+GitHub Actions  (.github/workflows/deploy.yml)
+   │  job build-assets:  npm ci && npm run prod  →  compile public/js, public/css,
+   │                     mix-manifest.json,  commit back to main  ([skip ci] — no loop)
+   │  job deploy:        ssh way2party@SSH_HOST  ->  bash deploy/server-pull.sh
    ▼
-main branch now has code + built assets
-   │
-   ▼
-Live server cron, every 5 min  (deploy/server-pull.sh)
-   │  new commit on origin/main?  no → exit
-   │  yes ↓
+server-pull.sh on the live server
    │  git reset --hard origin/main         (.env, storage/, Modules/, uploads untouched)
    │  composer install --no-dev
    │  php artisan migrate --force
    │  php artisan optimize:clear + config/route/view/event cache + storage:link
    ▼
-Live site updated
+Live site updated  (~2–3 min after the push)
 ```
+
+A cron running the same `deploy/server-pull.sh` every 5 min is an optional safety net
+(see "Cron backup" below) in case an Actions run is skipped or fails.
 
 `.github/workflows/ci.yml` runs on every PR: composer validate, install, `php -l` lint,
 an `artisan` boot check, and an asset build.
@@ -111,39 +111,57 @@ which php        # e.g. /usr/local/bin/php   or  /opt/cpanel/ea-php83/root/usr/b
 which composer   # e.g. /opt/cpanel/composer/bin/composer
 ```
 
-Either edit the `PHP=` / `COMPOSER=` defaults at the top of
-[`deploy/server-pull.sh`](deploy/server-pull.sh) and push the change, or pass them in the
-cron line (next step). `APP_DIR` auto-detects from the script's own location.
+Edit the `PHP=` / `COMPOSER=` defaults at the top of
+[`deploy/server-pull.sh`](deploy/server-pull.sh) and push the change. `APP_DIR`
+auto-detects from the script's own location.
 
-Test it by hand first:
+Test it by hand:
 
 ```bash
 bash deploy/server-pull.sh          # prints nothing & exits 0 when already up to date
 ```
 
-### 5. Add the cron job
+### 5. GitHub — repo secrets + Actions permission
 
-cPanel → **Cron Jobs** → add (every 5 minutes):
+**Settings ▸ Actions ▸ General ▸ Workflow permissions** → **Read and write permissions** → Save.
 
-```
-*/5 * * * * /home/CPUSER/way2party/deploy/server-pull.sh >> /home/CPUSER/way2party/storage/logs/deploy.log 2>&1
-```
+**Settings ▸ Secrets and variables ▸ Actions ▸ `Secrets` tab** (the *Secrets* tab, **not**
+Variables — `SSH_KEY` is a private key and must be masked):
 
-With explicit binaries if `which` above wasn't the default:
+| Secret | Value |
+|---|---|
+| `SSH_HOST` | `3.0.159.67` |
+| `SSH_USER` | `way2party` |
+| `SSH_PORT` | `22` |
+| `SSH_KEY` | the **private** key (`-----BEGIN OPENSSH PRIVATE KEY-----` …) whose public half is in the server's `~/.ssh/authorized_keys` |
+| `DEPLOY_PATH` | the Laravel root on the server, e.g. `/home/way2party/public_html` |
 
-```
-*/5 * * * * PHP=/opt/cpanel/ea-php83/root/usr/bin/php COMPOSER=/opt/cpanel/composer/bin/composer /home/CPUSER/way2party/deploy/server-pull.sh >> /home/CPUSER/way2party/storage/logs/deploy.log 2>&1
+Generate the Actions keypair (on your machine or the server), then:
+
+```bash
+ssh-keygen -t ed25519 -f way2party_ci -N ''
+cat way2party_ci.pub   >> ~/.ssh/authorized_keys   # ON THE SERVER
+cat way2party_ci        # → paste as the SSH_KEY secret, then delete both local files
 ```
 
 ### 6. Verify end to end
 
-Make a trivial change on `main` (from your machine), push, then within ~5 min:
+Make a trivial change on `main`, push, then watch the repo **Actions** tab: `build-assets`
+then `deploy` should both go green. Confirm on the server:
 
 ```bash
-tail -f /home/CPUSER/way2party/storage/logs/deploy.log
+tail -n 20 storage/logs/deploy.log     # "deploying xxxxxxx -> yyyyyyy … done"
+git -C "$DEPLOY_PATH" log -1 --oneline
 ```
 
-You should see `deploying xxxxxxx -> yyyyyyy … done`.
+### Cron backup (optional)
+
+cPanel → **Cron Jobs**, every 5 min — runs the same script, so a missed/failed Actions
+run still lands within 5 minutes:
+
+```
+*/5 * * * * /home/way2party/public_html/deploy/server-pull.sh >> /home/way2party/public_html/storage/logs/deploy.log 2>&1
+```
 
 ---
 
@@ -154,41 +172,35 @@ You should see `deploying xxxxxxx -> yyyyyyy … done`.
 git add -A && git commit -m "…" && git push
 ```
 
-Assets rebuild in GitHub Actions; the server pulls within 5 minutes. Nothing else to do.
+GitHub Actions builds the assets and deploys over SSH. Live in ~2–3 min. Nothing else to do.
 
 ## Rollback
 
 ```bash
 # from your machine
-git revert <bad-sha> && git push        # server rolls forward to the revert
+git revert <bad-sha> && git push        # Actions redeploys the revert
 ```
 
-Or on the server, pause the cron and `git reset --hard <good-sha>` + re-run the artisan
-cache steps. `optimize:clear` runs at the start of every deploy, so a broken config cache
-never survives the next pull.
+Or on the server: `git reset --hard <good-sha>` + re-run the artisan cache steps.
+`optimize:clear` runs at the start of every deploy, so a broken config cache never
+survives the next deploy.
 
-## Instant deploys (optional)
-
-The 5-minute cron delay is usually fine. For instant deploys, uncomment the `deploy:` job
-at the bottom of [`build-assets.yml`](.github/workflows/build-assets.yml) — it SSHes in and
-runs the same `server-pull.sh`. Needs `SSH_HOST` / `SSH_USER` / `SSH_KEY` / `SSH_PORT`
-repo secrets (a keypair you create; public half in the server's `~/.ssh/authorized_keys`).
-Keep the cron too, as a safety net.
-
-## cPanel Git Version Control (alternative to cron)
+## cPanel Git Version Control (alternative to the SSH deploy)
 
 If you prefer cPanel's UI: register the repo dir under cPanel → **Git™ Version Control**,
-and it will run [`.cpanel.yml`](.cpanel.yml) whenever you click **Deploy HEAD Commit** (or
-when triggered by its API). The cron approach above needs neither, so `.cpanel.yml` is just
-a convenience/fallback — keep its `PHP=` / `COMPOSER=` lines in sync with the cron.
+and it will run [`.cpanel.yml`](.cpanel.yml) whenever you click **Deploy HEAD Commit**. The
+`deploy.yml` SSH job needs neither, so `.cpanel.yml` is just a convenience/fallback — keep
+its `PHP=` / `COMPOSER=` lines in sync with `deploy/server-pull.sh`.
 
 ## Troubleshooting
 
 | Symptom | Fix |
 |---|---|
+| Actions `deploy` job: `ssh: handshake failed` / `Permission denied (publickey)` | `SSH_KEY` secret is the wrong key / has literal `\n` / its public half isn't in the server's `~/.ssh/authorized_keys`; or the server firewall blocks GitHub runners on port 22. |
+| Actions `deploy` job: `Host key verification failed` | first connection — the action accepts new host keys by default; if not, add `fingerprint` input or pre-seed `known_hosts`. |
 | `deploy.log`: `ABORT: uncommitted changes` | Someone edited files on the server. Commit them to GitHub (or `git checkout -- <path>` to discard), then it resumes. |
-| `deploy.log`: `Permission denied (publickey)` | Deploy key not added to GitHub, or the remote is the HTTPS URL — `git remote set-url origin git@github.com:amitpableinventurs-prog/way2party.git`. |
+| `deploy.log`: `Permission denied (publickey)` on `git fetch` | server's **deploy key** not added to GitHub, or the remote is the HTTPS URL — `git remote set-url origin git@github.com:amitpableinventurs-prog/way2party.git`. |
+| `build-assets` job: `Permission denied` on `git push` | Settings ▸ Actions ▸ General ▸ Workflow permissions not set to **Read and write**. |
 | White screen after a deploy | `php artisan optimize:clear`. If it stays broken, a package calls `env()` outside `config/*` — drop `config:cache` (then `route:cache`) from `server-pull.sh`. |
-| Assets 404 / stale | The Actions "Build assets" run failed — check its log; confirm `public/mix-manifest.json` was committed. |
+| Assets 404 / stale | The `build-assets` job failed — check its log; confirm `public/mix-manifest.json` was committed. |
 | `Class "Modules\…" not found` | `/Modules` + `public/modules` are git-ignored — deploy modules separately or un-ignore them. |
-| Cron didn't run | cPanel Cron Jobs needs the full path; check the account's cron email / `deploy.log` mtime. |
