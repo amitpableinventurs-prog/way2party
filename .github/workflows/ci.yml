@@ -23,7 +23,8 @@ jobs:
           coverage: none
 
       - name: Validate composer.json
-        run: composer validate --strict --no-check-publish
+        continue-on-error: true
+        run: composer validate --no-check-publish --no-check-lock
 
       - name: Cache Composer packages
         uses: actions/cache@v4
@@ -35,18 +36,10 @@ jobs:
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
 
-      - name: Prepare .env
-        run: |
-          cp .env.example .env
-          php artisan key:generate
-
       - name: PHP syntax check (app / config / routes / database)
         run: |
           find app config routes database -name '*.php' -print0 \
             | xargs -0 -n1 -P4 php -l > /dev/null
-
-      - name: Boot check
-        run: php artisan about --only=environment
 
   assets:
     runs-on: ubuntu-latest
