@@ -1,16 +1,13 @@
 # Deployment — GitHub → live server (way2party.com)
 
-No cPanel API token needed. GitHub Actions builds the assets and then SSHes into the
-server to deploy.
+No cPanel API token needed. GitHub Actions SSHes into the server and deploys.
 
 ```
 push to main
    │
    ▼
 GitHub Actions  (.github/workflows/deploy.yml)
-   │  job build-assets:  npm ci && npm run prod  →  compile public/js, public/css,
-   │                     mix-manifest.json,  commit back to main  ([skip ci] — no loop)
-   │  job deploy:        ssh way2party@SSH_HOST  ->  bash deploy/server-pull.sh
+   │  job deploy:  ssh way2party@SSH_HOST  ->  bash deploy/server-pull.sh
    ▼
 server-pull.sh on the live server
    │  git reset --hard origin/main         (.env, storage/, Modules/, uploads untouched)
@@ -18,14 +15,24 @@ server-pull.sh on the live server
    │  php artisan migrate --force
    │  php artisan optimize:clear + config/route/view/event cache + storage:link
    ▼
-Live site updated  (~2–3 min after the push)
+Live site updated  (~1–2 min after the push)
 ```
 
 A cron running the same `deploy/server-pull.sh` every 5 min is an optional safety net
 (see "Cron backup" below) in case an Actions run is skipped or fails.
 
-`.github/workflows/ci.yml` runs on every PR: composer validate, install, `php -l` lint,
-an `artisan` boot check, and an asset build.
+**Front-end assets are not built by the pipeline.** Whatever is committed under
+`public/js`, `public/css`, `public/mix-manifest.json` is what ships. If you touch anything
+in `resources/js` or `resources/css`:
+
+```bash
+npm ci          # first time only
+npm run prod
+git add public/js public/css public/mix-manifest.json && git commit && git push
+```
+
+`.github/workflows/ci.yml` runs on every push/PR: `composer validate`, install, `php -l`
+lint, and an asset compile check (so a broken build is caught even though it isn't shipped).
 
 ---
 
@@ -121,9 +128,7 @@ Test it by hand:
 bash deploy/server-pull.sh          # prints nothing & exits 0 when already up to date
 ```
 
-### 5. GitHub — repo secrets + Actions permission
-
-**Settings ▸ Actions ▸ General ▸ Workflow permissions** → **Read and write permissions** → Save.
+### 5. GitHub — repo secrets
 
 **Settings ▸ Secrets and variables ▸ Actions ▸ `Secrets` tab** (the *Secrets* tab, **not**
 Variables — `SSH_KEY` is a private key and must be masked):
@@ -145,12 +150,12 @@ cat way2party_ci        # → paste as the SSH_KEY secret, then delete both loca
 ```
 
 Finally, **Variables tab** → add variable `DEPLOY_ENABLED` = `true`. Until this is set the
-`deploy` job is skipped (so the workflow stays green while only assets build).
+`deploy` job is skipped (workflow stays green).
 
 ### 6. Verify end to end
 
-Make a trivial change on `main`, push, then watch the repo **Actions** tab: `build-assets`
-then `deploy` should both go green. Confirm on the server:
+Make a trivial change on `main`, push, then watch the repo **Actions** tab: the `deploy`
+job should go green. Confirm on the server:
 
 ```bash
 tail -n 20 storage/logs/deploy.log     # "deploying xxxxxxx -> yyyyyyy … done"
@@ -175,7 +180,8 @@ run still lands within 5 minutes:
 git add -A && git commit -m "…" && git push
 ```
 
-GitHub Actions builds the assets and deploys over SSH. Live in ~2–3 min. Nothing else to do.
+GitHub Actions deploys over SSH. Live in ~1–2 min. (Rebuild + commit `public/js|css` too
+if you changed anything in `resources/js|css`.)
 
 ## Rollback
 
@@ -203,7 +209,7 @@ its `PHP=` / `COMPOSER=` lines in sync with `deploy/server-pull.sh`.
 | Actions `deploy` job: `Host key verification failed` | first connection — the action accepts new host keys by default; if not, add `fingerprint` input or pre-seed `known_hosts`. |
 | `deploy.log`: `ABORT: uncommitted changes` | Someone edited files on the server. Commit them to GitHub (or `git checkout -- <path>` to discard), then it resumes. |
 | `deploy.log`: `Permission denied (publickey)` on `git fetch` | server's **deploy key** not added to GitHub, or the remote is the HTTPS URL — `git remote set-url origin git@github.com:amitpableinventurs-prog/way2party.git`. |
-| `build-assets` job: `Permission denied` on `git push` | Settings ▸ Actions ▸ General ▸ Workflow permissions not set to **Read and write**. |
+| `deploy` job skipped every run | repo variable `DEPLOY_ENABLED` is not `true`. |
 | White screen after a deploy | `php artisan optimize:clear`. If it stays broken, a package calls `env()` outside `config/*` — drop `config:cache` (then `route:cache`) from `server-pull.sh`. |
-| Assets 404 / stale | The `build-assets` job failed — check its log; confirm `public/mix-manifest.json` was committed. |
+| Assets 404 / stale | You changed `resources/js|css` but didn't `npm run prod` + commit `public/js|css|mix-manifest.json`. |
 | `Class "Modules\…" not found` | `/Modules` + `public/modules` are git-ignored — deploy modules separately or un-ignore them. |

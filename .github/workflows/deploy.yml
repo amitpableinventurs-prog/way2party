@@ -1,17 +1,15 @@
-name: Build & Deploy
+name: Deploy
 
-# On every push to main:
-#   1. try to compile the front-end and commit the built files back to main
-#      (a build failure is a warning, never a blocker — the assets committed in
-#       the repo stay valid)
-#   2. SSH into the live server and run deploy/server-pull.sh
+# On every push to main: SSH into the live server and run deploy/server-pull.sh
+# (git reset --hard origin/main + composer install + migrate --force + cache rebuild).
+#
+# Front-end assets are NOT rebuilt here — whatever is committed under public/js,
+# public/css, public/mix-manifest.json is what ships. If you change anything under
+# resources/js or resources/css, run `npm run prod` locally and commit the result.
 on:
   push:
     branches: [main]
     paths-ignore:
-      - 'public/js/**'
-      - 'public/css/**'
-      - 'public/mix-manifest.json'
       - '**.md'
   workflow_dispatch: {}
 
@@ -20,42 +18,11 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build-assets:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install JS deps
-        run: npm ci --no-audit --no-fund
-
-      - name: Build & commit compiled assets
-        run: |
-          if ! npm run prod; then
-            echo "::warning::Asset build failed — the committed assets will be deployed unchanged."
-            exit 0
-          fi
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f public/js public/css public/mix-manifest.json
-          if git diff --cached --quiet; then
-            echo "No asset changes."
-          else
-            git commit -m "chore(build): compile front-end assets [skip ci]"
-            git push origin HEAD:main
-          fi
-
   deploy:
-    needs: build-assets
     # Runs only once the server is wired up. Set repo variable DEPLOY_ENABLED=true
     # (Settings ▸ Secrets and variables ▸ Actions ▸ Variables) after adding the
-    # SSH_* / DEPLOY_PATH secrets. Until then this job is skipped (workflow stays green).
-    if: ${{ always() && vars.DEPLOY_ENABLED == 'true' }}
+    # SSH_* / DEPLOY_PATH secrets. Until then this job is skipped (workflow green).
+    if: ${{ vars.DEPLOY_ENABLED == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Run server-pull.sh on the live server
@@ -80,5 +47,4 @@ jobs:
 #                 the server's ~/.ssh/authorized_keys)
 #   DEPLOY_PATH   /home/way2party/…   (the Laravel root on the server)
 # and one repo VARIABLE (Variables tab):
-#   DEPLOY_ENABLED   true   (flip on once the secrets above are set and the server
-#                            directory is a git checkout of origin/main)
+#   DEPLOY_ENABLED   true
