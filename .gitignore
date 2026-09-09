@@ -6,6 +6,7 @@
 /storage/*.key
 /storage/oauth-*.key
 .rnd
+/deploy/.deploy-env
 /vendor
 /vendor_old
 # composer.lock
