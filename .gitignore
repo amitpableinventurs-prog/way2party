@@ -7,6 +7,10 @@
 /storage/oauth-*.key
 .rnd
 /deploy/.deploy-env
+
+# server-specific — each environment keeps its own (see deploy/server-pull.sh PRESERVE)
+/.htaccess
+/installer/.lic
 /vendor
 /vendor_old
 # composer.lock
