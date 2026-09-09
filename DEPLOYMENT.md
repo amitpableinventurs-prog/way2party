@@ -144,6 +144,9 @@ cat way2party_ci.pub   >> ~/.ssh/authorized_keys   # ON THE SERVER
 cat way2party_ci        # → paste as the SSH_KEY secret, then delete both local files
 ```
 
+Finally, **Variables tab** → add variable `DEPLOY_ENABLED` = `true`. Until this is set the
+`deploy` job is skipped (so the workflow stays green while only assets build).
+
 ### 6. Verify end to end
 
 Make a trivial change on `main`, push, then watch the repo **Actions** tab: `build-assets`
