@@ -1,5 +1,83 @@
 @extends('master')
 
+@section('css')
+    <style>
+        .home-upcoming-event .upcoming-event {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            margin-bottom: 1.5rem;
+        }
+
+        .home-upcoming-event .date-left {
+            position: relative;
+            flex: 0 0 58px;
+            width: 58px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--light_primary_color);
+            border: 1px solid var(--primary_color);
+            border-radius: 16px;
+            padding: 10px 4px 14px;
+        }
+
+        .home-upcoming-event .date-left h3 {
+            margin: 0;
+            font-size: 22px;
+            line-height: 1;
+            font-weight: 700;
+            color: var(--primary_color);
+            white-space: nowrap;
+        }
+
+        .home-upcoming-event .date-left p {
+            margin: 2px 0 0;
+            font-size: 13px;
+            line-height: 1;
+            font-weight: 700;
+            color: #333;
+            white-space: nowrap;
+        }
+
+        .home-upcoming-event .date-left::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: -6px;
+            transform: translateX(-50%);
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--primary_color);
+            border: 3px solid #fff;
+        }
+
+        .home-upcoming-event .event-right {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        .home-upcoming-event .event-right p {
+            color: #999;
+            margin-bottom: 2px;
+        }
+
+        .home-upcoming-event .event-right p.name {
+            font-weight: 700;
+            color: #555;
+            font-size: 15px;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .home-upcoming-event .event-right p span {
+            float: right;
+        }
+    </style>
+@endsection
+
 @section('content')
 
     <section class="section">
@@ -167,14 +245,12 @@
                                     </div>
                                 @else
                                     @foreach ($monthEvent as $item)
-                                        <div class="row mb-4">
-                                            <div class="col-3">
-                                                <div class="date-left">
-                                                    <h3 class="mb-0">{{ $item->start_time->format('d') }}</h3>
-                                                    <p class="mb-0">{{ $item->start_time->format('D') }}</p>
-                                                </div>
+                                        <div class="upcoming-event">
+                                            <div class="date-left">
+                                                <h3 class="mb-0">{{ $item->start_time->format('d') }}</h3>
+                                                <p class="mb-0">{{ $item->start_time->format('D') }}</p>
                                             </div>
-                                            <div class="col-9 event-right">
+                                            <div class="event-right">
                                                 <p class="mb-0 name">{{ $item->name }}</p>
                                                 <p class="mb-0">{{ __('Ticket Sold') }}
                                                     <span>{{ $item->sold_ticket }}/{{ $item->tickets }}</span></p>
