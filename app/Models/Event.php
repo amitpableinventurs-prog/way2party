@@ -26,6 +26,8 @@ class Event extends Model
         'description',
         'security',
         'status',
+        'is_featured',
+        'featured_order',
         'event_status',
         'is_deleted',
         'scanner_id',
@@ -37,6 +39,8 @@ class Event extends Model
     protected $casts = [
         'start_time' => 'datetime',
         'end_time' => 'datetime',
+        'is_featured' => 'boolean',
+        'featured_order' => 'integer',
     ];
     protected $appends = ['imagePath', 'rate', 'totalTickets', 'soldTickets'];
 
@@ -109,6 +113,22 @@ class Event extends Model
     {
         $data =  $query->whereBetween('start_time', [$start,  $end]);
         return $data;
+    }
+
+    /**
+     * Live, upcoming events that an admin/organizer has marked as featured.
+     */
+    public function scopeFeatured($query)
+    {
+        return $query->where([['is_featured', 1], ['status', 1], ['is_deleted', 0], ['event_status', 'Pending']]);
+    }
+
+    /**
+     * Highest priority first (admin-set), then soonest starting event.
+     */
+    public function scopeOrderByFeatured($query)
+    {
+        return $query->orderByDesc('featured_order')->orderBy('start_time', 'asc');
     }
 
     /**

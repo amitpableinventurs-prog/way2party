@@ -131,6 +131,8 @@ class EventController extends Controller
             'lat' => 'bail|required_if:type,offline',
             'lang' => 'bail|required_if:type,offline',
             'status' => 'bail|required',
+            'is_featured' => 'bail|nullable|boolean',
+            'featured_order' => 'bail|nullable|integer|min:0',
             'url' => 'bail|required_if:type,online',
             'description' => 'bail|required',
             'scanner_id' => 'bail|required_if:type,offline',
@@ -146,6 +148,8 @@ class EventController extends Controller
         } else {
             $data['scanner_id'] = NULL;
         }
+        $data['is_featured'] = $request->boolean('is_featured');
+        $data['featured_order'] = $data['is_featured'] ? intval($request->featured_order) : 0;
         $data['security'] = 1;
         if ($request->hasFile('image')) {
 
@@ -198,6 +202,8 @@ class EventController extends Controller
             'lat' => 'bail|required_if:type,offline',
             'lang' => 'bail|required_if:type,offline',
             'status' => 'bail|required',
+            'is_featured' => 'bail|nullable|boolean',
+            'featured_order' => 'bail|nullable|integer|min:0',
             'url' => 'bail|required_if:type,online',
             'description' => 'bail|required',
             'scanner_id' => 'bail|required_if:type,offline',
@@ -211,6 +217,8 @@ class EventController extends Controller
         if($request->type == 'offline'){
             $data['scanner_id'] = implode(',', $request->scanner_id);
         }
+        $data['is_featured'] = $request->boolean('is_featured');
+        $data['featured_order'] = $data['is_featured'] ? intval($request->featured_order) : 0;
         if ($request->hasFile('image')) {
             (new AppHelper)->deleteFile($event->image);
             $data['image'] = (new AppHelper)->saveImage($request);
@@ -230,6 +238,20 @@ class EventController extends Controller
         } catch (Throwable $th) {
             return response('Data is Connected with other Data', 400);
         }
+    }
+
+    /**
+     * Quick toggle of the "featured" flag from the events list.
+     * Organizers may only toggle their own events.
+     */
+    public function toggleFeatured(Event $event)
+    {
+        abort_if(Gate::denies('event_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        if (Auth::user()->hasRole('Organizer') && $event->user_id != Auth::user()->id) {
+            abort(Response::HTTP_FORBIDDEN, '403 Forbidden');
+        }
+        $event->update(['is_featured' => !$event->is_featured]);
+        return redirect()->back()->withStatus(__($event->is_featured ? 'Event marked as featured.' : 'Event removed from featured.'));
     }
 
     public function getMonthEvent(Request $request)

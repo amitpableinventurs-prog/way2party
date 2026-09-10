@@ -13,6 +13,7 @@ use App\Models\Tax;
 use App\Models\OrderTax;
 use App\Models\AppUser;
 use App\Models\Category;
+use App\Models\City;
 use App\Models\Blog;
 use App\Models\Faq;
 use Twilio\Rest\Client;
@@ -123,11 +124,18 @@ class FrontendController extends Controller
                 ->orderBy('start_time', 'desc')->get();
             $organizer = User::role('Organizer')->orderBy('id', 'DESC')->get();
             $category = Category::where('status', 1)->orderBy('id', 'DESC')->get();
+            $cities = City::where('status', 1)->orderBy('name')->get();
             $blog = Blog::with(['category:id,name'])->where('status', 1)->orderBy('id', 'DESC')->get();
             foreach ($events as $value) {
                 $value->total_ticket = Ticket::where([['event_id', $value->id], ['is_deleted', 0], ['status', 1]])->sum('quantity');
                 $value->sold_ticket = Order::where('event_id', $value->id)->sum('quantity');
                 $value->available_ticket = $value->total_ticket - $value->sold_ticket;
+                $value->append('auto_generated_tag');
+            }
+            $featuredEvents = Event::with(['category:id,name'])->featured()
+                ->where('end_time', '>', $date->format('Y-m-d H:i:s'))
+                ->orderByFeatured()->take(8)->get();
+            foreach ($featuredEvents as $value) {
                 $value->append('auto_generated_tag');
             }
             $banner = Banner::with('event')->where('status', 1)->get();
@@ -139,7 +147,7 @@ class FrontendController extends Controller
             } else {
                 $brands = [];
             }
-            return view('frontend.home', compact('events', 'organizer', 'category', 'blog', 'banner', 'user','showLinkBanner', 'brands'));
+            return view('frontend.home', compact('events', 'featuredEvents', 'organizer', 'category', 'cities', 'blog', 'banner', 'user','showLinkBanner', 'brands'));
         }
     }
     public function login()
@@ -792,6 +800,13 @@ class FrontendController extends Controller
         if ($request->has('type') && $request->type != null) {
             $chip['type'] = $request->type;
             $events = $events->where('type', $request->type);
+        }
+        if ($request->filled('city')) {
+            $city = City::find($request->city);
+            if ($city) {
+                $chip['city'] = $city->name;
+                $events = $events->where('city_id', $request->city);
+            }
         }
         if ($request->has('category') && $request->category != null) {
             $chip['category'] = Category::find($request->category)->name;

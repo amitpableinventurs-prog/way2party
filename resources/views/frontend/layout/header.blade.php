@@ -77,20 +77,6 @@
                     </ul>
                 </div>
                 <div class="sm:flex sm:gap-3 sm:items-center">
-                    <div>
-                        <form action="{{ url('user/search_event') }}" method="post">
-                            @csrf
-                            <div class="relative">
-                                <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
-                                    <img src="{{ asset('images/search.svg') }}" class="w-5 h-5" alt="">
-                                </div>
-                                <input type="search" id="default-search" name="search"
-                                    class="block p-2 pl-10 text-gray bg-white border border-gray-light text-left font-poppins font-normal
-                            text-base leading-6 rounded-md mx-1 focus:outline-none xxsm:w-full sm:w-48 lg:w-50"
-                                    placeholder="{{ __('Search..') }}" required>
-                            </div>
-                        </form>
-                    </div>
                     @if (Auth::guard('appuser')->check())
                         <div class="flex justify-center relative dropdownScreenButton cursor-pointer">
                             <div class="pt-3 mr-5">
@@ -298,23 +284,9 @@
                 </li>
             </ul>
         </div>
-        {{-- Search Button and Login button --}}
+        {{-- Login button --}}
         <div class="">
             <div class="flex justify-between sm:space-x-6 xxsm:flex-col sm:flex-row">
-                <div>
-                    <form action="{{ url('user/search_event') }}" method="post">
-                        @csrf
-                        <div class="relative">
-                            <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
-                                <img src="{{ asset('images/search.svg') }}" class="w-5 h-5" alt="">
-                            </div>
-                            <input type="search" id="default-search" name="search"
-                                class="block p-2 pl-10 text-gray bg-white border border-gray-light text-left font-poppins font-normal
-                                text-base leading-6 rounded-md mx-1 focus:outline-none xxsm:w-full sm:w-48 lg:w-72"
-                                placeholder="{{ __('Search..') }}" required>
-                        </div>
-                    </form>
-                </div>
                 @if (Auth::guard('appuser')->check())
                     <div class="flex justify-end mt-2 dropdownScreenButton">
                         <div class="pt-3 mr-5">

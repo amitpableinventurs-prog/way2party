@@ -160,6 +160,33 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label>{{ __('Featured Event') }}</label>
+                                            <select name="is_featured" id="is_featured" class="form-control select2">
+                                                <option value="0" {{ old('is_featured') ? '' : 'selected' }}>{{ __('No') }}</option>
+                                                <option value="1" {{ old('is_featured') ? 'selected' : '' }}>{{ __('Yes') }}</option>
+                                            </select>
+                                            <small class="text-muted">{{ __('Featured events are highlighted on the home page.') }}</small>
+                                            @error('is_featured')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label>{{ __('Featured Priority') }}</label>
+                                            <input type="number" min="0" name="featured_order" id="featured_order"
+                                                value="{{ old('featured_order', 0) }}" placeholder="0"
+                                                class="form-control @error('featured_order')? is-invalid @enderror">
+                                            <small class="text-muted">{{ __('Higher number shows first in the Featured Events section.') }}</small>
+                                            @error('featured_order')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="form-group">
                                     <label>{{ __('Tags') }}</label>
                                     <input type="text" name="tags" value="{{ old('tags') }}"

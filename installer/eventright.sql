@@ -2680,3 +2680,10 @@ INSERT INTO `permissions` (`id`, `name`, `guard_name`, `created_at`, `updated_at
 (72, 'city_create', 'web', NOW(), NOW()),
 (73, 'city_edit', 'web', NOW(), NOW()),
 (74, 'city_delete', 'web', NOW(), NOW());
+
+-- --------------------------------------------------------
+-- Featured events: home-page highlight + admin-set priority ordering
+-- --------------------------------------------------------
+
+ALTER TABLE `events` ADD COLUMN `is_featured` tinyint(1) NOT NULL DEFAULT 0 AFTER `status`;
+ALTER TABLE `events` ADD COLUMN `featured_order` int(11) NOT NULL DEFAULT 0 AFTER `is_featured`;

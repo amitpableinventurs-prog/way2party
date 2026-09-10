@@ -78,20 +78,19 @@
                             </div>
                             <div class="xmd:w-1/2 md:w-full sm:w-full msm:w-full xsm:w-full xxsm:w-full">
                                 <div class="flex">
-                                    <label for="event"
-                                        class="font-poppins font-medium text-lg leading-4 text-black">{{ __('Event Type') }}</label>
+                                    <label for="city"
+                                        class="font-poppins font-medium text-lg leading-4 text-black">{{ __('Location') }}</label>
                                 </div>
                                 <div class="pt-3 ">
-                                    <select id="event" name="type" class="select2 z-20 w-full">
+                                    <select id="city" name="city" class="select2 z-20 w-full">
                                         <option class="font-poppins font-normal text-sm text-black leading-6" selected
                                             value="">
-                                            {{ __('All') }}</option>
-                                        <option class="font-poppins font-normal text-sm text-black leading-6"
-                                            value="online">
-                                            {{ __('Online') }}</option>
-                                        <option class="font-poppins font-normal text-sm text-black leading-6"
-                                            value="offline">
-                                            {{ __('Venue') }}</option>
+                                            {{ __('All Locations') }}</option>
+                                        @foreach ($cities as $city)
+                                            <option class="font-poppins font-normal text-sm text-black leading-6"
+                                                value="{{ $city->id }}">
+                                                {{ $city->name }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>
@@ -157,6 +156,72 @@
             {{-- main --}}
             <div
                 class="xxmd:mt-20 3xl:mx-52 2xl:mx-28 1xl:mx-28 xl:mx-36 xlg:mx-32 lg:mx-36 xxmd:mx-24 xmd:mx-32 md:mx-28 sm:mx-20 msm:mx-16 xsm:mx-10 xxsm:mx-5  xxmd:pt-0  z-10 relative">
+                {{-- Featured Events --}}
+                @if (count($featuredEvents) > 0)
+                    <div
+                        class="absolute bg-primary blur-3xl opacity-10 s:bg-opacity-10 3xl:w-[370px] 3xl:h-[370px] 2xl:w-[300px] 2xl:h-[300px] 1xl:w-[300px] xmd:w-[300px] xmd:h-[300px] sm:w-[200px] sm:h-[300px] xxsm:w-[300px] xxsm:h-[300px] rounded-full -mt-5 2xl:-ml-20 1xl:-ml-20 sm:ml-2 xxsm:-ml-7">
+                    </div>
+                    <div
+                        class="flex sm:flex-wrap msm:flex-wrap xsm:flex-wrap xxsm:flex-wrap justify-between pt-20 mx-5 z-10">
+                        <div class="">
+                            <p
+                                class="font-poppins font-semibold md:text-5xl xxsm:text-2xl xsm:text-2xl sm:text-2xl text-primary leading-1 ">
+                                {{ __('Featured Events') }}</p>
+                        </div>
+                        <div class=" xxsm:max-sm:hidden">
+                            <a type="button" href="{{ url('/all-events') }}"
+                                class="px-10 py-3 text-primary border border-primary text-center font-poppins font-normal text-base leading-6 rounded-md flex">{{ __('See all') }}
+                                <img src="{{ url('images/right.png') }}" alt="" class="w-3 h-3 mt-1.5 ml-2"></a>
+                        </div>
+                    </div>
+                    <div
+                        class=" grid gap-x-7 3xl:grid-cols-4 xl:grid-cols-4 xlg:grid-cols-2 xxmd:grid-cols-2 xxmd:gap-y-7 xmd:gap-y-7 xxsm:gap-y-7 sm:grid-cols-1 sm:gap-y-7 msm:grid-cols-1 xxsm:grid-cols-1 justify-between pt-10">
+                        @foreach ($featuredEvents as $item)
+                            <div
+                                class="shadow-lg p-5 rounded-lg bg-white hover:scale-110 transition-all duration-500 cursor-pointer">
+                                <div class="relative overflow-hidden">
+                                    <a href="{{ url('event/' . $item->id . '/' . Str::slug($item->name)) }}">
+                                        <div class="relative capitalize">
+                                            <img src="{{ url('images/upload/' . $item->image) }}" alt=""
+                                                class="h-40 rounded-lg w-full object-cover bg-cover ">
+                                            <span
+                                                class="bg-primary text-center text-sm text-white py-1 px-2 rounded-bl-lg rounded-tr-lg absolute top-0 right-0">
+                                                {{ __('Featured') }}
+                                            </span>
+                                        </div>
+                                        <p class="font-popping font-semibold text-xl leading-8 pt-2 w-[90%] truncate">
+                                            {{ $item->name }}
+                                        </p>
+                                        <p class="font-poppins  font-normal text-base leading-6 text-gray pt-1">
+                                            {{ Carbon\Carbon::parse($item->start_time)->format('d M Y') }} -
+                                            {{ Carbon\Carbon::parse($item->end_time)->format('d M Y') }}
+                                        </p>
+                                    </a>
+                                    <div class="flex justify-between mt-7">
+                                        @if (Auth::guard('appuser')->user())
+                                            @if (Str::contains($user->favorite, $item->id))
+                                                <a href="javascript:void(0);" class="like"
+                                                    onclick="addFavorite('{{ $item->id }}','{{ 'event' }}')"><img
+                                                        src="{{ url('images/heart-fill.svg') }}" alt=""
+                                                        class="object-cover bg-cover fillLike bg-white-light p-2 rounded-lg"></a>
+                                            @else
+                                                <a href="javascript:void(0);" class="like"
+                                                    onclick="addFavorite('{{ $item->id }}','{{ 'event' }}')"><img
+                                                        src="{{ url('images/heart.svg') }}" alt=""
+                                                        class="object-cover bg-cover fillLike bg-white-light p-2 rounded-lg"></a>
+                                            @endif
+                                        @endif
+                                        <a type="button"
+                                            href="{{ url('event/' . $item->id . '/' . Str::slug($item->name)) }}"
+                                            class=" text-primary text-center font-poppins font-medium text-base leading-7 flex">{{ __('View Details') }}
+                                            <i class="fa-solid fa-arrow-right w-3 h-3 mt-1.5 ml-2"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
                 {{-- Latest Events --}}
                 <div
                     class="absolute bg-blue blur-3xl opacity-10 s:bg-opacity-10 3xl:w-[370px] 3xl:h-[370px] 2xl:w-[300px] 2xl:h-[300px] 1xl:w-[300px] xmd:w-[300px] xmd:h-[300px] sm:w-[200px] sm:h-[300px] xxsm:w-[300px] xxsm:h-[300px] rounded-full -mt-5 2xl:-ml-20 1xl:-ml-20 sm:ml-2 xxsm:-ml-7">

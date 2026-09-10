@@ -47,6 +47,9 @@
                                                 <th>{{ __('Organization') }}</th>
                                             @endif
                                             <th>{{ __('Status') }}</th>
+                                            @if (Gate::check('event_edit'))
+                                                <th>{{ __('Featured') }}</th>
+                                            @endif
                                             @if (Gate::check('event_edit') || Gate::check('event_delete'))
                                                 <th>{{ __('Action') }}</th>
                                             @endif
@@ -84,6 +87,21 @@
                                                             class="badge {{ $item->status == '1' ? 'badge-success' : 'badge-warning' }}  m-1">{{ $item->status == '1' ? 'Publish' : 'Draft' }}</span>
                                                     </h5>
                                                 </td>
+                                                @if (Gate::check('event_edit'))
+                                                    <td>
+                                                        <a href="{{ route('events.toggleFeatured', $item->id) }}"
+                                                            title="{{ $item->is_featured ? __('Remove from featured') : __('Mark as featured') }}">
+                                                            <span
+                                                                class="badge {{ $item->is_featured ? 'badge-primary' : 'badge-light' }} m-1">
+                                                                <i class="fas fa-star"></i>
+                                                                {{ $item->is_featured ? __('Featured') : __('No') }}
+                                                                @if ($item->is_featured && $item->featured_order > 0)
+                                                                    &nbsp;&middot;&nbsp;{{ __('Priority') }} {{ $item->featured_order }}
+                                                                @endif
+                                                            </span>
+                                                        </a>
+                                                    </td>
+                                                @endif
                                                 @if (Gate::check('event_edit') || Gate::check('event_delete'))
                                                     <td>
                                                         <a href="{{ url('/events_details', $item->id) }}" title="View Event"

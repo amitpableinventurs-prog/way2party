@@ -184,6 +184,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/wallet-transactions', [WalletController::class, 'allTransactions'])->name('allTransactions');
     Route::any('/orders-create-for-user',[UserController::class,'orderCreateForUser'])->name('orderCreateForUser');
     Route::post('/get-tickets-details',[UserController::class,'getTicketsDetails'])->name('getTicketsDetails');
+    Route::get('/events/{event}/toggle-featured', [EventController::class, 'toggleFeatured'])
+        ->name('events.toggleFeatured');
     Route::resources([
 
         // 'roles' => RoleController::class, // Do not enable this
