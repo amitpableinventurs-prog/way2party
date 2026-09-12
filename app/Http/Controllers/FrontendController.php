@@ -859,7 +859,7 @@ class FrontendController extends Controller
         $currency = Setting::first(['currency_sybmol']);
         $data = Event::with(['category:id,name,image', 'organization:id,first_name,organization_name,bio,last_name,image'])->find($id);
         SEOMeta::setTitle($data->name)
-            ->setDescription($data->description)
+            ->setDescription(\App\Helpers\SeoHelper::excerpt($data->description))
             ->addMeta('event:category', $data->category->name, 'property')
             ->addKeyword([
                 $setting->app_name,
@@ -870,7 +870,7 @@ class FrontendController extends Controller
             ]);
 
         OpenGraph::setTitle($data->name)
-            ->setDescription($data->description)
+            ->setDescription(\App\Helpers\SeoHelper::excerpt($data->description))
             ->setUrl(url()->current())
             ->addImage($data->imagePath . $data->image)
             ->setArticle([
@@ -884,12 +884,12 @@ class FrontendController extends Controller
             ]);
 
         JsonLd::setTitle($data->name)
-            ->setDescription($data->description)
+            ->setDescription(\App\Helpers\SeoHelper::excerpt($data->description))
             ->setType('Article')
             ->addImage($data->imagePath . $data->image);
 
         SEOTools::setTitle($data->name);
-        SEOTools::setDescription($data->description);
+        SEOTools::setDescription(\App\Helpers\SeoHelper::excerpt($data->description));
         SEOTools::opengraph()->setUrl(url()->current());
         SEOTools::setCanonical(url()->current());
         SEOTools::opengraph()->addProperty('keywords', [
@@ -929,7 +929,7 @@ class FrontendController extends Controller
         $data = User::find($id);
 
         SEOMeta::setTitle(($data->first_name ?? '') . ' ' . ($data->last_name ?? ''))
-            ->setDescription($data->bio)
+            ->setDescription(\App\Helpers\SeoHelper::excerpt($data->bio))
             ->addKeyword([
                 $setting->app_name,
                 $data->name,
@@ -937,7 +937,7 @@ class FrontendController extends Controller
             ]);
 
         OpenGraph::setTitle(($data->first_name ?? '') . ' ' . $data->last_name ?? '')
-            ->setDescription($data->bio)
+            ->setDescription(\App\Helpers\SeoHelper::excerpt($data->bio))
             ->setType('profile')
             ->setUrl(url()->current())
             ->addImage($data->imagePath . $data->image)
@@ -951,12 +951,12 @@ class FrontendController extends Controller
             ]);
 
         JsonLd::setTitle(($data->first_name ?? '') . ' ' . ($data->last_name ?? ''))
-            ->setDescription($data->bio)
+            ->setDescription(\App\Helpers\SeoHelper::excerpt($data->bio))
             ->setType('Profile')
             ->addImage($data->imagePath . $data->image);
 
         SEOTools::setTitle(($data->first_name ?? '') . ' ' . ($data->last_name ?? ''));
-        SEOTools::setDescription($data->bio);
+        SEOTools::setDescription(\App\Helpers\SeoHelper::excerpt($data->bio));
         SEOTools::opengraph()->setUrl(url()->current());
         SEOTools::setCanonical(url()->current());
         SEOTools::opengraph()->addProperty('keywords', [
@@ -993,7 +993,7 @@ class FrontendController extends Controller
         $setting = Setting::first();
 
         SEOMeta::setTitle($data->name)
-            ->setDescription($data->description)
+            ->setDescription(\App\Helpers\SeoHelper::excerpt($data->description))
             ->addKeyword([
                 $setting->app_name,
                 $data->name,
@@ -1002,14 +1002,14 @@ class FrontendController extends Controller
             ]);
 
         OpenGraph::setTitle($data->name)
-            ->setDescription($data->description)
+            ->setDescription(\App\Helpers\SeoHelper::excerpt($data->description))
             ->setUrl(url()->current());
 
         JsonLd::setTitle($data->name)
-            ->setDescription($data->description);
+            ->setDescription(\App\Helpers\SeoHelper::excerpt($data->description));
 
         SEOTools::setTitle($data->name);
-        SEOTools::setDescription($data->description);
+        SEOTools::setDescription(\App\Helpers\SeoHelper::excerpt($data->description));
         SEOTools::opengraph()->setUrl(url()->current());
         SEOTools::setCanonical(url()->current());
         SEOTools::opengraph()->addProperty('keywords', [
@@ -1500,13 +1500,13 @@ class FrontendController extends Controller
         $data->category = Category::find($data->category_id);
         $tags = explode(',', $data->tags);
         SEOMeta::setTitle($data->title);
-        SEOMeta::setDescription($data->description);
+        SEOMeta::setDescription(\App\Helpers\SeoHelper::excerpt($data->description));
         SEOMeta::addMeta('blog:published_time', $data->created_at->toW3CString(), 'property');
         SEOMeta::addMeta('blog:category', $data->category->name, 'property');
         SEOMeta::addKeyword($data->tags);
 
         OpenGraph::setTitle($data->title)
-            ->setDescription($data->description)
+            ->setDescription(\App\Helpers\SeoHelper::excerpt($data->description))
             ->setType('blog')
             ->addImage($data->imagePath . $data->image)
             ->setArticle([
@@ -1517,7 +1517,7 @@ class FrontendController extends Controller
             ]);
 
         JsonLd::setTitle($data->title);
-        JsonLd::setDescription($data->description);
+        JsonLd::setDescription(\App\Helpers\SeoHelper::excerpt($data->description));
         JsonLd::setType('Blog');
         JsonLd::addImage($data->imagePath . $data->image);
         $user = Auth::guard('appuser')->user();

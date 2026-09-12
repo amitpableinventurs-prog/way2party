@@ -259,7 +259,7 @@ class UserController extends Controller
 
 
         SEOMeta::setTitle($data->name)
-            ->setDescription($data->description)
+            ->setDescription(\App\Helpers\SeoHelper::excerpt($data->description))
             ->addKeyword([
                 $setting->app_name,
                 $data->name,
@@ -268,14 +268,14 @@ class UserController extends Controller
             ]);
 
         OpenGraph::setTitle($data->name)
-            ->setDescription($data->description)
+            ->setDescription(\App\Helpers\SeoHelper::excerpt($data->description))
             ->setUrl(url()->current());
 
         JsonLd::setTitle($data->name)
-            ->setDescription($data->description);
+            ->setDescription(\App\Helpers\SeoHelper::excerpt($data->description));
 
         SEOTools::setTitle($data->name);
-        SEOTools::setDescription($data->description);
+        SEOTools::setDescription(\App\Helpers\SeoHelper::excerpt($data->description));
         SEOTools::opengraph()->setUrl(url()->current());
         SEOTools::setCanonical(url()->current());
         SEOTools::opengraph()->addProperty('keywords', [

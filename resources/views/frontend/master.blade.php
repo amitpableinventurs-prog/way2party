@@ -9,7 +9,15 @@
     <link href="{{ $favicon ? url('images/upload/' . $favicon) : asset('/images/logo.png') }}" rel="icon"
         type="image/png">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>{{ \App\Models\Setting::find(1)->app_name }} | @yield('title')</title>
+    @php
+        // SEOMeta::generate() is the single source of the page <title> tag; if a controller
+        // didn't call SEOMeta::setTitle(), fall back to the page's own @section('title').
+        if (!SEOMeta::getTitle()) {
+            $siteName = \App\Models\Setting::find(1)->app_name ?? config('app.name');
+            $yieldedTitle = trim($__env->yieldContent('title'));
+            SEOMeta::setTitle($yieldedTitle ? $siteName . ' | ' . $yieldedTitle : $siteName);
+        }
+    @endphp
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <input type="hidden" name="base_url" id="base_url" value="{{ url('/') }}">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">

@@ -25,6 +25,7 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\SitemapController;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -45,6 +46,9 @@ use Illuminate\Support\Facades\Http;
 
 Auth::routes();
 Auth::routes(['verify' => true]);
+
+Route::get('/sitemap.xml', [SitemapController::class, 'index']);
+Route::get('/robots.txt', [SitemapController::class, 'robots']);
 
 Route::get('/login', function () {
     if (Auth::check()) {
