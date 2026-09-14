@@ -28,8 +28,13 @@ class CityController extends Controller
         $request->validate([
             'name' => 'bail|required',
             'status' => 'bail|required',
+            'image' => 'bail|nullable|image|mimes:jpeg,png,jpg,gif|max:3048',
         ]);
-        City::create($request->only('name', 'status'));
+        $data = $request->only('name', 'status');
+        if ($request->hasFile('image')) {
+            $data['image'] = (new AppHelper)->saveImage($request);
+        }
+        City::create($data);
         return redirect()->route('city.index')->withStatus(__('City has added successfully.'));
     }
 
@@ -45,8 +50,14 @@ class CityController extends Controller
         $request->validate([
             'name' => 'bail|required',
             'status' => 'bail|required',
+            'image' => 'bail|nullable|image|mimes:jpeg,png,jpg,gif|max:3048',
         ]);
-        $city->update($request->only('name', 'status'));
+        $data = $request->only('name', 'status');
+        if ($request->hasFile('image')) {
+            (new AppHelper)->deleteFile($city->image);
+            $data['image'] = (new AppHelper)->saveImage($request);
+        }
+        $city->update($data);
         return redirect()->route('city.index')->withStatus(__('City has updated successfully.'));
     }
 }

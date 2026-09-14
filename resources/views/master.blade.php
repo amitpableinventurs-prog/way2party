@@ -87,6 +87,12 @@
     <div id="app">
         @if (Auth::check())
             <div class="main-wrapper">
+                @if (Auth::guard('organizer_impersonate')->check())
+                    <div class="alert alert-warning text-center mb-0" style="border-radius:0;">
+                        {{ __('Impersonating') }} {{ Auth::guard('organizer_impersonate')->user()->first_name }} {{ Auth::guard('organizer_impersonate')->user()->last_name }} &mdash;
+                        <a href="{{ route('impersonate.exit') }}">{{ __('Exit to Admin') }}</a>
+                    </div>
+                @endif
                 @include('admin.layout.header')
 
 

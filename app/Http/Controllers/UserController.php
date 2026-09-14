@@ -80,8 +80,19 @@ class UserController extends Controller
     {
         abort_if(Gate::denies('user_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $users = User::with(['roles:id,name'])->get();
-        $debugMode = env('APP_DEBUG');
-        return view('admin.user.index', compact('users', 'debugMode'));
+        return view('admin.user.index', compact('users'));
+    }
+
+    /**
+     * Way2Party only needs a handful of organizers, so public organizer
+     * self-registration is disabled. Admins generate this private, expiring
+     * link instead and share it manually with a prospective organizer.
+     */
+    public function generateOrganizerInviteLink()
+    {
+        abort_if(!Auth::user()->hasRole('admin'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $link = \Illuminate\Support\Facades\URL::temporarySignedRoute('organizer.invite', now()->addDays(7));
+        return redirect()->route('users.index')->with(['orgInviteLink' => $link]);
     }
 
     public function create()
@@ -473,6 +484,9 @@ class UserController extends Controller
     public function editProfile(Request $request)
     {
         $data = $request->all();
+        if (Auth::user()->hasRole('Organizer')) {
+            $data['is_profile_private'] = $request->boolean('is_profile_private');
+        }
         if ($request->hasFile('image')) {
             $request->validate([
                 'image' => 'required|mimes:jpeg,png,jpg,gif,svg|max:3048',

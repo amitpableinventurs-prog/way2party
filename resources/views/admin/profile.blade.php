@@ -156,6 +156,21 @@
                                     </div>
                                 </div>
                                 @endif
+                                @if(Auth::user()->hasRole('Organizer'))
+                                <div class="row">
+                                    <div class="form-group col-md-12 col-12">
+                                        <div class="custom-checkbox custom-control">
+                                            <input type="checkbox" name="is_profile_private" value="1"
+                                                id="is_profile_private" class="custom-control-input"
+                                                {{ Auth::user()->is_profile_private ? 'checked' : '' }}>
+                                            <label class="custom-control-label" for="is_profile_private">
+                                                {{ __('Make my public profile private') }}
+                                            </label>
+                                        </div>
+                                        <small class="text-muted">{{ __('When enabled, your organizer profile page is hidden from listings and search, and only reachable via a direct link if you already have one shared.') }}</small>
+                                    </div>
+                                </div>
+                                @endif
                                 <div class="form-group">
                                     <label>{{ __('Language') }}</label>
                                     <select name="language" class="form-control" required>

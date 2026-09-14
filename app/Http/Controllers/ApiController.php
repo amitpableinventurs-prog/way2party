@@ -197,7 +197,7 @@ class ApiController extends Controller
 
     public function organization()
     {
-        $users = User::role('Organizer')->where('status', 1)->orderBy('id', 'DESC')->get()->makeHidden(['created_at', 'updated_at']);
+        $users = User::role('Organizer')->where('status', 1)->where('is_profile_private', 0)->orderBy('id', 'DESC')->get()->makeHidden(['created_at', 'updated_at']);
 
         foreach ($users as $value) {
             if (Auth::check()) {

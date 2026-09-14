@@ -31,6 +31,8 @@ class Order extends Model
         'checkins_count',
         'seat_details',
         'book_seats',
+        'cancelled_at',
+        'cancellation_charge_applied',
     ];
 
     protected $table = 'orders';

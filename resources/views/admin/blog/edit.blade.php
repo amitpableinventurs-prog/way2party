@@ -45,9 +45,9 @@
                                 <div class="row">
                                     <div class="col-lg-6">
                                         <div class="form-group">
-                                            <label>{{__('Category')}}</label>
+                                            <label>{{__('Party Type')}}</label>
                                             <select name="category_id" class="form-control select2">
-                                                <option value="">{{ __('Select Category') }}</option>
+                                                <option value="">{{ __('Select Party Type') }}</option>
                                                 @foreach ($category as $item)
                                                     <option value="{{$item->id}}"  {{$blog->category_id==$item->id?'selected':''}}>{{$item->name}}</option>
                                                 @endforeach

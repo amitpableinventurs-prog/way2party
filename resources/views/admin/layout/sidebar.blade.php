@@ -58,7 +58,7 @@
             @can('category_access')
                 <li class="{{ request()->is('category*') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ url('category') }}">
-                        <i class="fas fa-glass-cheers"></i> <span>{{ __('Category') }}</span>
+                        <i class="fas fa-glass-cheers"></i> <span>{{ __('Party Type') }}</span>
                     </a>
                 </li>
             @endcan
@@ -89,6 +89,22 @@
                     <i class="fas fa-users"></i> <span>{{ __('App Users') }}</span>
                 </a>
             </li>
+            <li class="{{ request()->is('support-desk*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ url('support-desk') }}">
+                    <i class="fas fa-headset"></i> <span>{{ __('Support Tickets') }}</span>
+                    @php
+                        $openSupportTicketCount = \App\Models\SupportTicket::where('status', 'open')->count();
+                    @endphp
+                    @if ($openSupportTicketCount > 0)
+                        <span class="badge badge-primary">{{ $openSupportTicketCount }}</span>
+                    @endif
+                </a>
+            </li>
+            <li class="{{ request()->is('membership-plan*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ url('membership-plan') }}">
+                    <i class="fas fa-id-badge"></i> <span>{{ __('Membership Plans') }}</span>
+                </a>
+            </li>
             @endif
             @if (!Auth::user()->hasRole('Organizer'))
             <li class="{{ request()->is('wallet-transactions*') ? 'active' : '' }}">
@@ -108,6 +124,22 @@
                 <li class="{{ request()->is('organization/income') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ url('/organization/income') }}">
                         <i class="fa-solid fa-money-bill-wave"></i> <span>{{ __('Income') }}</span>
+                    </a>
+                </li>
+                <li class="{{ request()->is('organization/messages*') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ url('/organization/messages') }}">
+                        <i class="fas fa-envelope"></i> <span>{{ __('Messages') }}</span>
+                        @php
+                            $orgUnreadMsgCount = \App\Models\Conversation::where('user_id', Auth::user()->id)->whereHas('messages', function ($q) { $q->where('sender_type', 'app_user')->whereNull('read_at'); })->count();
+                        @endphp
+                        @if ($orgUnreadMsgCount > 0)
+                            <span class="badge badge-primary">{{ $orgUnreadMsgCount }}</span>
+                        @endif
+                    </a>
+                </li>
+                <li class="{{ request()->is('organization/support-tickets*') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ url('/organization/support-tickets') }}">
+                        <i class="fas fa-headset"></i> <span>{{ __('Support Tickets') }}</span>
                     </a>
                 </li>
             @endif

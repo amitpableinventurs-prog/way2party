@@ -10,7 +10,7 @@
           <div class="col-md-12 mb-2">
             <?php $cat = App\Models\Category::where('status',1)->orderBy('id','DESC')->get(); ?>
             <div class="form-group">
-              <label class="pb-2">{{__('Category')}}</label>
+              <label class="pb-2">{{__('Party Type')}}</label>
               <select class="form-control select2" name="category">
                 <option value="">{{__('All')}}</option>
                 @foreach ($cat as $item)

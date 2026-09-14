@@ -19,8 +19,7 @@ class AppUserController extends Controller
     public function index()
     {
         $users = AppUser::OrderBy('id', 'DESC')->get();
-        $debugMode = env('APP_DEBUG');
-        return view('admin.appUser.index', compact('users','debugMode'));
+        return view('admin.appUser.index', compact('users'));
     }
 
     public function create()

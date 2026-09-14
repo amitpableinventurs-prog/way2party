@@ -2,6 +2,73 @@
 
 @section('css')
     <style>
+        /* Top stat-card row (Total Orders / Customers / Organizations). The shared
+           .card-hero style (also used on the event and organizer dashboards, left
+           untouched) draws a giant 88px faded watermark icon behind the number via
+           float+opacity, and puts the label on position:absolute with no top/left -
+           fragile, and visually inconsistent with the "Total Orders" card next to
+           it. Restyled here (scoped to this page only) as a small solid icon badge
+           + stacked number/label, with a fixed min-height so all three cards in
+           the row line up evenly. */
+        .dashboard-stats-row {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .dashboard-stats-row > [class*="col-"] {
+            display: flex;
+        }
+
+        .dashboard-stats-row .card {
+            width: 100%;
+            margin-bottom: 24px;
+        }
+
+        .dashboard-stats-row .card.card-hero .card-header {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 26px 28px;
+            min-height: 168px;
+        }
+
+        .dashboard-stats-row .card.card-hero .card-header .card-icon {
+            float: none;
+            opacity: 1;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.18);
+            margin-bottom: 18px;
+        }
+
+        .dashboard-stats-row .card.card-hero .card-header .card-icon .fas {
+            font-size: 20px;
+            color: #fff;
+        }
+
+        .dashboard-stats-row .card.card-hero .card-header h4 {
+            margin: 0 0 6px;
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .dashboard-stats-row .card.card-hero .card-header .card-description {
+            position: static;
+            margin-top: 0;
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: .2px;
+            opacity: .9;
+        }
+
+        .dashboard-stats-row .card.card-statistic-2 {
+            min-height: 168px;
+        }
+
         .home-upcoming-event .upcoming-event {
             display: flex;
             align-items: flex-start;
@@ -87,7 +154,7 @@
         </div>
 
         <div class="section-body">
-            <div class="row">
+            <div class="row dashboard-stats-row">
                 <div class="col-lg-4 col-md-4 col-sm-12">
                     <div class="card card-statistic-2">
                         <div class="card-stats">

@@ -3,15 +3,15 @@
 @section('content')
     <section class="section">
         @include('admin.layout.breadcrumbs', [
-            'title' => __('Edit Category'),
-            'headerData' => __('Category'),
+            'title' => __('Edit Party Type'),
+            'headerData' => __('Party Type'),
             'url' => 'category',
         ])
 
         <div class="section-body">
             <div class="row">
                 <div class="col-lg-8">
-                    <h2 class="section-title"> {{ __('Edit Category') }}</h2>
+                    <h2 class="section-title"> {{ __('Edit Party Type') }}</h2>
                 </div>
             </div>
 

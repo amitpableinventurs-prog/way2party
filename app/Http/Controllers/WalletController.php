@@ -6,11 +6,13 @@ use App\Models\AppUser;
 use App\Models\PaymentSetting;
 use App\Models\Setting;
 use App\Models\Transaction;
+use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Stripe\Stripe;
+use Throwable;
 
 
 class WalletController extends Controller
@@ -129,6 +131,57 @@ class WalletController extends Controller
     {
         return redirect()->back();
     }
+
+    public function sendFundsForm()
+    {
+        $wallet = PaymentSetting::first()->wallet;
+        if ($wallet == 0) {
+            return redirect()->back();
+        }
+        $user = AppUser::find(Auth::guard('appuser')->user()->id);
+        $balance = $user->balance;
+        return view('frontend.wallet.send', compact('balance'));
+    }
+
+    public function sendFunds(Request $request)
+    {
+        $request->validate([
+            'recipient_type' => 'bail|required|in:customer,organizer',
+            'recipient_email' => 'bail|required|email',
+            'amount' => 'bail|required|numeric|min:1',
+            'note' => 'bail|nullable|string|max:255',
+        ]);
+
+        $sender = AppUser::find(Auth::guard('appuser')->user()->id);
+        if ($sender->balance < $request->amount) {
+            return redirect()->back()->with('error_msg', __('Insufficient wallet balance.'));
+        }
+
+        if ($request->recipient_type === 'customer') {
+            $recipient = AppUser::where('email', $request->recipient_email)->first();
+            if ($recipient && $recipient->id == $sender->id) {
+                return redirect()->back()->with('error_msg', __('You cannot send funds to yourself.'));
+            }
+        } else {
+            $recipient = User::role('Organizer')->where('email', $request->recipient_email)->first();
+        }
+
+        if (!$recipient) {
+            return redirect()->back()->with('error_msg', __('Recipient not found.'));
+        }
+
+        try {
+            $sender->transfer($recipient, $request->amount, [
+                'note' => $request->note,
+                'sent_by' => $sender->id,
+            ]);
+        } catch (Throwable $th) {
+            return redirect()->back()->with('error_msg', __('Unable to send funds. Please try again.'));
+        }
+
+        return redirect()->route('myWallet')->with('success', __('Funds sent successfully.'));
+    }
+
     // Admin
 
     public function allTransactions()

@@ -42,7 +42,7 @@
                                             <th>{{ __('Name') }}</th>
                                             <th>{{ __('Start Date') }}</th>
                                             <th>{{ __('Number of People') }}</th>
-                                            <th>{{ __('Category') }}</th>
+                                            <th>{{ __('Party Type') }}</th>
                                             @if (Auth::user()->hasRole('admin'))
                                                 <th>{{ __('Organization') }}</th>
                                             @endif

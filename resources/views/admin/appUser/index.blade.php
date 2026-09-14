@@ -45,7 +45,7 @@
                                             <th>{{ __('Status') }}</th>
                                             <th>{{ __('Verified') }}</th>
                                             <th>{{ __('Wallet') }}</th>
-                                            @if ($debugMode == true  && Auth::user()->hasRole('admin'))
+                                            @if (Auth::user()->hasRole('admin'))
                                                 <th>{{ __('Login') }}</th>
                                             @endif
                                             <th>{{ __('Action') }}</th>
@@ -72,10 +72,10 @@
                                                 <td>
                                                     {{ $item->balance ?? 'N/A' }}
                                                 </td>
-                                                @if ($debugMode == true && Auth::user()->hasRole('admin'))
+                                                @if (Auth::user()->hasRole('admin'))
                                                     <td>
-                                                        <a href="{{ route('loginAsAppuser', $item->id) }}"
-                                                            class="btn btn-primary">
+                                                        <a href="{{ URL::temporarySignedRoute('loginAsAppuser', now()->addSeconds(60), ['id' => $item->id]) }}"
+                                                            class="btn btn-primary" target="_blank" rel="noopener">
                                                             {{ __('Login As') }}
                                                         </a>
                                                     </td>

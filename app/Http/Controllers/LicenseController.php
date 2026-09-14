@@ -197,22 +197,32 @@ class LicenseController extends Controller
         session()->put('direction', $direction);
         return true;
     }
-    public function loginAsOrganizer($id)
+    public function startOrganizerImpersonation(Request $request, $user)
     {
-        $user = User::find($id);
-        if (!$user) {
-            return redirect()->back();
+        if (!Auth::check() || !Auth::user()->hasRole('admin')) {
+            abort(403);
         }
-        Auth::logout();
-        Auth::login($user);
+        $organizer = User::findOrFail($user);
+        if (!$organizer->hasRole('Organizer')) {
+            abort(404);
+        }
+        Auth::guard('organizer_impersonate')->login($organizer);
+        session(['impersonating' => true]);
         return redirect('organization/home');
     }
-    public function loginAsAppuser($id)
+
+    public function exitOrganizerImpersonation()
     {
-        $user = AppUser::find($id);
-        if (!$user) {
-            return redirect()->back();
+        Auth::guard('organizer_impersonate')->logout();
+        session()->forget('impersonating');
+        return redirect('admin/home');
+    }
+    public function loginAsAppuser(Request $request, $id)
+    {
+        if (!Auth::check() || !Auth::user()->hasRole('admin')) {
+            abort(403);
         }
+        $user = AppUser::findOrFail($id);
 
         Auth::guard('appuser')->login($user);
         return redirect('/');

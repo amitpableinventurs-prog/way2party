@@ -207,6 +207,10 @@ return [
             'driver' => 'session',
             'provider' => 'appuser',
         ],
+        'organizer_impersonate' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
 
     ],
 

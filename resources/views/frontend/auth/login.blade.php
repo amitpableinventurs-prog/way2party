@@ -252,7 +252,7 @@
                         class="text-base text-primary text-medium">{{ __('Create Account') }}</a>
                 </h1>
             </div>
-            <div class="text-base text-center text-primary font-medium mt-3"><a href="{{ url('/admin/login') }}">Admin Login</a></div>
+
         </div>
     </div>
 </body>

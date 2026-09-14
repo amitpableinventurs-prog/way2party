@@ -69,6 +69,7 @@ class Kernel extends HttpKernel
         'appuser' => \App\Http\Middleware\AppUser::class,
         'checkStatus' => \App\Http\Middleware\CheckStatus::class,
         'XSS'=> \App\Http\Middleware\XSS::class,
+        'preferImpersonatedOrganizer' => \App\Http\Middleware\PreferImpersonatedOrganizer::class,
 
     ];
 }

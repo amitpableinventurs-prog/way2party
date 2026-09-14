@@ -67,8 +67,11 @@ Route::get('/order-invoice-print/{id}', [OrderController::class, 'orderInvoicePr
 Route::get('/change-language/{lang}', [UserController::class, 'changeLanguage']);
 Route::get('/maintain', [SettingController::class, 'maintain']);
 Route::get('/send-mail/{id}', [OrderController::class, 'sendMail']);
-Route::get('/login-as-organizer/{id}',[LicenseController::class,'loginAsOrganizer'])->name('loginAsOrganizer');
-Route::get('/login-as-appuser/{id}',[LicenseController::class,'loginAsAppuser'])->name('loginAsAppuser');
+Route::get('/login-as-appuser/{id}',[LicenseController::class,'loginAsAppuser'])->name('loginAsAppuser')->middleware(['auth', 'signed']);
+Route::get('/impersonate/organizer/{user}', [LicenseController::class, 'startOrganizerImpersonation'])
+    ->name('impersonate.organizer')->middleware(['auth', 'signed']);
+Route::get('/impersonate/exit', [LicenseController::class, 'exitOrganizerImpersonation'])
+    ->name('impersonate.exit');
 Route::get('/generate-login-token/{id}',[UserController::class,'generateLoginTokenForAppUser'])->name('generateLoginToken')->middleware('auth');
 Route::get('/generate-login-token-user/{id}',[UserController::class,'generateLoginTokenForUser'])->name('generateLoginTokenUser')->middleware('auth');
 
@@ -80,10 +83,31 @@ Route::get('/generate-login-token-user/{id}',[UserController::class,'generateLog
 // You can comment the following route to block installer route after site goes live
 Route::any('installer', [LicenseController::class, 'installer'])->name('installer');
 
-Route::group(['middleware' => ['auth']], function () {
+// Scanner Portal - a separate, self-contained web UI for scanner-role staff
+// to check in tickets at the door. Session-based (shares the 'web' guard
+// with admin/organizer since scanners are User rows too), but its own
+// login and layout so scanners never see the admin panel.
+Route::prefix('scanner-panel')->name('scannerPanel.')->group(function () {
+    Route::get('/login', [\App\Http\Controllers\ScannerPanelController::class, 'showLogin'])->name('login');
+    Route::post('/login', [\App\Http\Controllers\ScannerPanelController::class, 'login'])->name('login.post');
+    Route::get('/logout', [\App\Http\Controllers\ScannerPanelController::class, 'logout'])->name('logout');
+    Route::get('/events', [\App\Http\Controllers\ScannerPanelController::class, 'events'])->name('events');
+    Route::get('/events/{id}', [\App\Http\Controllers\ScannerPanelController::class, 'showEvent'])->name('event');
+    Route::post('/events/{id}/scan', [\App\Http\Controllers\ScannerPanelController::class, 'scan'])->name('scan');
+    Route::get('/events/{id}/history', [\App\Http\Controllers\ScannerPanelController::class, 'history'])->name('history');
+});
+
+Route::group(['middleware' => ['auth', 'preferImpersonatedOrganizer']], function () {
 
     Route::get('/admin/home', [UserController::class, 'adminDashboard']);
     Route::get('/organization/home', [UserController::class, 'organizationDashboard']);
+    Route::get('/generate-organizer-invite', [UserController::class, 'generateOrganizerInviteLink'])->name('generateOrganizerInvite');
+    Route::get('/organization/messages', [\App\Http\Controllers\MessageController::class, 'index'])->name('orgMessages');
+    Route::get('/organization/messages/{id}', [\App\Http\Controllers\MessageController::class, 'show']);
+    Route::post('/organization/messages/{id}', [\App\Http\Controllers\MessageController::class, 'store']);
+    Route::get('/organization/support-tickets', [\App\Http\Controllers\SupportTicketController::class, 'organizerIndex'])->name('orgSupportTickets');
+    Route::get('/organization/support-tickets/{id}', [\App\Http\Controllers\SupportTicketController::class, 'organizerShow'])->name('orgSupportTicketShow');
+    Route::get('/message-customer/{id}', [\App\Http\Controllers\MessageController::class, 'startWithCustomer']);
     Route::get('/{id}/{name}/tickets', [TicketController::class, 'index']);
     Route::get('/organizer/{id}/{name}', [UserController::class, 'organizerEventDetails']);
     Route::get('/organizerCheckout/{id}', [UserController::class, 'organizerCheckout']);
@@ -186,6 +210,12 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/payment-save', [SettingController::class, 'organizer_payment_save']);
     Route::post('/save-debug',[SettingController::class,'saveDebug']);
     Route::get('/wallet-transactions', [WalletController::class, 'allTransactions'])->name('allTransactions');
+    Route::get('/support-desk', [\App\Http\Controllers\SupportTicketController::class, 'adminIndex'])->name('adminSupportTickets');
+    Route::get('/support-desk/{id}', [\App\Http\Controllers\SupportTicketController::class, 'adminShow'])->name('adminSupportTicketShow');
+    Route::post('/support-desk/{id}/reply', [\App\Http\Controllers\SupportTicketController::class, 'adminReply'])->name('adminSupportTicketReply');
+    Route::post('/support-desk/{id}/status', [\App\Http\Controllers\SupportTicketController::class, 'updateStatus'])->name('supportTicketStatus');
+    Route::post('/membership-feature', [\App\Http\Controllers\MembershipFeatureController::class, 'store'])->name('membership-feature.store');
+    Route::delete('/membership-feature/{membershipFeature}', [\App\Http\Controllers\MembershipFeatureController::class, 'destroy'])->name('membership-feature.destroy');
     Route::any('/orders-create-for-user',[UserController::class,'orderCreateForUser'])->name('orderCreateForUser');
     Route::post('/get-tickets-details',[UserController::class,'getTicketsDetails'])->name('getTicketsDetails');
     Route::get('/events/{event}/toggle-featured', [EventController::class, 'toggleFeatured'])
@@ -208,6 +238,7 @@ Route::group(['middleware' => ['auth']], function () {
         'notification-template' =>  NotificationTemplateController::class,
         'language' => LanguageController::class,
         'module' => ModuleController::class,
+        'membership-plan' => \App\Http\Controllers\MembershipPlanController::class,
 
     ]);
     Route::post('/events/description', [EventController::class, 'generateDescription'])

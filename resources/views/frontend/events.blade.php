@@ -83,6 +83,19 @@
                                         {{ Carbon\Carbon::parse($item->end_time)->format('d M Y') }}
                                     </p>
                                 </a>
+                                <div class="flex items-center gap-2 mt-2 flex-wrap">
+                                    @if ($item->city)
+                                        <a href="{{ url('/events-city/' . $item->city_id . '/' . Str::slug($item->city->name)) }}"
+                                            class="px-3 py-1 text-xs font-poppins text-primary bg-primary-light rounded-full hover:underline">
+                                            {{ $item->city->name }}
+                                        </a>
+                                    @endif
+                                    @if ($item->category)
+                                        <span class="px-3 py-1 text-xs font-poppins text-success bg-success-light rounded-full">
+                                            {{ $item->category->name }}
+                                        </span>
+                                    @endif
+                                </div>
                                 <div class="flex justify-between mt-7">
                                     @if (Auth::guard('appuser')->user())
                                         @if (Str::contains($user->favorite, $item->id))
@@ -123,6 +136,19 @@
                                             {{ Carbon\Carbon::parse($item->start_time)->format('d M Y') }} -
                                             {{ Carbon\Carbon::parse($item->end_time)->format('d M Y') }}</p>
                                     </a>
+                                    <div class="flex items-center gap-2 mt-2 flex-wrap">
+                                        @if ($item->city)
+                                            <a href="{{ url('/events-city/' . $item->city_id . '/' . Str::slug($item->city->name)) }}"
+                                                class="px-3 py-1 text-xs font-poppins text-primary bg-primary-light rounded-full hover:underline">
+                                                {{ $item->city->name }}
+                                            </a>
+                                        @endif
+                                        @if ($item->category)
+                                            <span class="px-3 py-1 text-xs font-poppins text-success bg-success-light rounded-full">
+                                                {{ $item->category->name }}
+                                            </span>
+                                        @endif
+                                    </div>
                                     <div class="flex justify-between mt-7">
                                         @if (Auth::guard('appuser')->user())
                                             @if (Str::contains($user->favorite, $item->id))
@@ -165,6 +191,19 @@
                                         {{ Carbon\Carbon::parse($item->end_time)->format('d M Y') }}
                                     </p>
                                 </a>
+                                <div class="flex items-center gap-2 mt-2 flex-wrap">
+                                    @if ($item->city)
+                                        <a href="{{ url('/events-city/' . $item->city_id . '/' . Str::slug($item->city->name)) }}"
+                                            class="px-3 py-1 text-xs font-poppins text-primary bg-primary-light rounded-full hover:underline">
+                                            {{ $item->city->name }}
+                                        </a>
+                                    @endif
+                                    @if ($item->category)
+                                        <span class="px-3 py-1 text-xs font-poppins text-success bg-success-light rounded-full">
+                                            {{ $item->category->name }}
+                                        </span>
+                                    @endif
+                                </div>
                                 <div class="flex justify-between mt-7">
                                     @if (Auth::guard('appuser')->user())
                                         @if (Str::contains($user->favorite, $item->id))

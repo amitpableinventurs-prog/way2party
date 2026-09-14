@@ -33,7 +33,7 @@
                             <div class="relative inline-block text-left">
                                 <a href="#"
                                     class="nav-link md:px-1 capitalize font-poppins font-normal text-base leading-6 text-gray flex focus:outline-none categories"
-                                    id="">{{ __('Categories') }}
+                                    id="">{{ __('Party Types') }}
                                     <img src="{{ asset('images/dropdown.png') }}" alt=""
                                         class=" ml-1 h-2 w-3 mt-2">
                                 </a>
@@ -56,7 +56,7 @@
                                             @endif
                                             <div class="flex items-left justify-left">
                                                 <a href="{{ url('/all-category') }}"
-                                                    class="flex items-left text-base font-poppins font-normal leading-5 {{ $catactive == 'all' ? 'text-primary capitalize p-2 bg-primary-light' : ' ' }} capitalize p-2 hover:bg-primary-light rounded-md w-full">{{ __('All categories') }}
+                                                    class="flex items-left text-base font-poppins font-normal leading-5 {{ $catactive == 'all' ? 'text-primary capitalize p-2 bg-primary-light' : ' ' }} capitalize p-2 hover:bg-primary-light rounded-md w-full">{{ __('All Party Types') }}
                                                     <img src="{{ asset('images/right-dropdown.png') }}" alt=""
                                                         class=" ml-2 h-2 w-2 mt-2">
                                                 </a>
@@ -103,6 +103,17 @@
                                                             </a>
                                                         </li>
                                                         <li>
+                                                            <a href="{{ url('/messages') }}"
+                                                                class="flex items-center font-normal font-poppins leading-6 text-black text-base capitalize">{{ __('Messages') }}
+                                                                @php
+                                                                    $unreadMsgCount = Auth::guard('appuser')->user() ? \App\Models\Conversation::where('app_user_id', Auth::guard('appuser')->user()->id)->whereHas('messages', function ($q) { $q->where('sender_type', 'user')->whereNull('read_at'); })->count() : 0;
+                                                                @endphp
+                                                                @if ($unreadMsgCount > 0)
+                                                                    <span class="ml-2 text-xs text-white bg-primary px-2 py-0.5 rounded-full">{{ $unreadMsgCount }}</span>
+                                                                @endif
+                                                            </a>
+                                                        </li>
+                                                        <li>
                                                             <a href="{{ url('/user/profile') }}"
                                                                 class="flex items-center font-normal font-poppins leading-6 text-black text-base capitalize">{{ __('Profile') }}
                                                             </a>
@@ -112,10 +123,25 @@
                                                                 class="flex items-center font-normal font-poppins leading-6 text-black text-base capitalize">{{ __('Change password') }}
                                                             </a>
                                                         </li>
+                                                        <li>
+                                                            <a href="{{ route('mySupportTickets') }}"
+                                                                class="flex items-center font-normal font-poppins leading-6 text-black text-base capitalize">{{ __('Support Tickets') }}
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="{{ route('myMembership') }}"
+                                                                class="flex items-center font-normal font-poppins leading-6 text-black text-base capitalize">{{ __('Membership') }}
+                                                            </a>
+                                                        </li>
                                                         @if ($wallet == 1)
                                                             <li>
                                                                 <a href="{{ route('myWallet') }}"
                                                                     class="flex items-center font-normal font-poppins leading-6 text-black text-base capitalize">{{ __('My Wallet') }}
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{{ route('sendFunds') }}"
+                                                                    class="flex items-center font-normal font-poppins leading-6 text-black text-base capitalize">{{ __('Send Funds') }}
                                                                 </a>
                                                             </li>
                                                         @endif
@@ -162,7 +188,7 @@
                     <li class="mt-2 nav-item {{ Request::is('all-category') ? 'active' : '' }} ">
                         <div class="relative inline-block text-left">
                             <a type="button" href="#"
-                                class="nav-link md:px-1 capitalize font-poppins font-normal text-base leading-6 text-gray flex focus:outline-none categories">{{ __('Categories') }}
+                                class="nav-link md:px-1 capitalize font-poppins font-normal text-base leading-6 text-gray flex focus:outline-none categories">{{ __('Party Types') }}
                                 <img src="{{ asset('images/dropdown.png') }}" alt=""
                                     class=" ml-1 h-2 w-3 mt-2">
                             </a>
@@ -186,7 +212,7 @@
                                     @endif
                                     <div class="flex items-left justify-left">
                                         <a href="{{ url('/all-category') }}"
-                                            class="flex items-left text-base font-poppins font-normal leading-5 {{ $catactive == 'all' ? 'text-primary capitalize p-2 bg-primary-light' : ' ' }} capitalize p-2 hover:bg-primary-light rounded-md w-full">{{ __('All categories') }}
+                                            class="flex items-left text-base font-poppins font-normal leading-5 {{ $catactive == 'all' ? 'text-primary capitalize p-2 bg-primary-light' : ' ' }} capitalize p-2 hover:bg-primary-light rounded-md w-full">{{ __('All Party Types') }}
                                             <img src="{{ asset('images/right-dropdown.png') }}" alt=""
                                                 class=" ml-2 h-2 w-2 mt-2">
                                         </a>
@@ -242,7 +268,7 @@
                     <div class="relative inline-block text-left">
                         <a type="button" href="#" id="showcattab"
                             class="nav-link md:px-1 capitalize font-poppins font-normal text-base leading-6 text-gray flex focus:outline-none categories"
-                            id="categories">{{ __('Categories') }}
+                            id="categories">{{ __('Party Types') }}
                             <img src="{{ asset('images/dropdown.png') }}" alt="" class=" ml-1 h-2 w-3 mt-2">
                         </a>
                     </div>
@@ -265,7 +291,7 @@
                                 @endif
                                 <div class="flex items-left justify-left">
                                     <a href="{{ url('/all-category') }}"
-                                        class="flex items-left text-base font-poppins font-normal leading-5 {{ $catactive == 'all' ? 'text-primary capitalize p-2 bg-primary-light' : ' ' }} capitalize p-2 hover:bg-primary-light rounded-md w-full">{{ __('All categories') }}
+                                        class="flex items-left text-base font-poppins font-normal leading-5 {{ $catactive == 'all' ? 'text-primary capitalize p-2 bg-primary-light' : ' ' }} capitalize p-2 hover:bg-primary-light rounded-md w-full">{{ __('All Party Types') }}
                                         <img src="{{ asset('images/right-dropdown.png') }}" alt=""
                                             class=" ml-2 h-2 w-2 mt-2">
                                     </a>
@@ -313,6 +339,17 @@
                                                         </a>
                                                     </li>
                                                     <li>
+                                                        <a href="{{ url('/messages') }}"
+                                                            class="flex items-center font-normal font-poppins leading-6 text-black text-base capitalize">{{ __('Messages') }}
+                                                            @php
+                                                                $unreadMsgCountMobile = Auth::guard('appuser')->user() ? \App\Models\Conversation::where('app_user_id', Auth::guard('appuser')->user()->id)->whereHas('messages', function ($q) { $q->where('sender_type', 'user')->whereNull('read_at'); })->count() : 0;
+                                                            @endphp
+                                                            @if ($unreadMsgCountMobile > 0)
+                                                                <span class="ml-2 text-xs text-white bg-primary px-2 py-0.5 rounded-full">{{ $unreadMsgCountMobile }}</span>
+                                                            @endif
+                                                        </a>
+                                                    </li>
+                                                    <li>
                                                         <a href="{{ url('/user/profile') }}"
                                                             class="flex items-center font-normal font-poppins leading-6 text-black text-base capitalize">{{ __('Profile') }}
                                                         </a>
@@ -322,10 +359,25 @@
                                                             class="flex items-center font-normal font-poppins leading-6 text-black text-base capitalize">{{ __('Change password') }}
                                                         </a>
                                                     </li>
+                                                    <li>
+                                                        <a href="{{ route('mySupportTickets') }}"
+                                                            class="flex items-center font-normal font-poppins leading-6 text-black text-base capitalize">{{ __('Support Tickets') }}
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ route('myMembership') }}"
+                                                            class="flex items-center font-normal font-poppins leading-6 text-black text-base capitalize">{{ __('Membership') }}
+                                                        </a>
+                                                    </li>
                                                     @if ($wallet == 1)
                                                         <li>
                                                             <a href="{{ route('myWallet') }}"
                                                                 class="flex items-center font-normal font-poppins leading-6 text-black text-base capitalize">{{ __('My Wallet') }}
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="{{ route('sendFunds') }}"
+                                                                class="flex items-center font-normal font-poppins leading-6 text-black text-base capitalize">{{ __('Send Funds') }}
                                                             </a>
                                                         </li>
                                                     @endif

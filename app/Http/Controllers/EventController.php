@@ -126,16 +126,17 @@ class EventController extends Controller
             'category_id' => 'bail|required',
             // change to 'bail|required|exists:city,id' once cities have been added in admin
             'city_id' => 'bail|nullable|exists:city,id',
-            'type' => 'bail|required',
-            'address' => 'bail|required_if:type,offline',
-            'lat' => 'bail|required_if:type,offline',
-            'lang' => 'bail|required_if:type,offline',
+            'address' => 'bail|required',
+            'lat' => 'bail|required',
+            'lang' => 'bail|required',
             'status' => 'bail|required',
             'is_featured' => 'bail|nullable|boolean',
             'featured_order' => 'bail|nullable|integer|min:0',
-            'url' => 'bail|required_if:type,online',
+            'visibility' => 'bail|required|in:everyone,members_only,previously_attended,hidden',
+            'cancellation_allowed' => 'bail|nullable|boolean',
+            'cancellation_charges' => 'bail|nullable|numeric|min:0',
             'description' => 'bail|required',
-            'scanner_id' => 'bail|required_if:type,offline',
+            'scanner_id' => 'bail|required',
             'people' => 'bail|required',
             'tags' => 'regex:/^[a-zA-Z0-9\s,]+$/',
         ],
@@ -143,13 +144,12 @@ class EventController extends Controller
             'tags.regex' => 'Tags should not contain any special characters'
         ]);
         $data = $request->all();
-        if($request->type == 'offline'){
-            $data['scanner_id'] = implode(',', $request->scanner_id);
-        } else {
-            $data['scanner_id'] = NULL;
-        }
+        $data['type'] = 'offline';
+        $data['scanner_id'] = implode(',', $request->scanner_id);
         $data['is_featured'] = $request->boolean('is_featured');
         $data['featured_order'] = $data['is_featured'] ? intval($request->featured_order) : 0;
+        $data['cancellation_allowed'] = $request->boolean('cancellation_allowed');
+        $data['cancellation_charges'] = $data['cancellation_allowed'] ? floatval($request->cancellation_charges) : 0;
         $data['security'] = 1;
         if ($request->hasFile('image')) {
 
@@ -197,16 +197,17 @@ class EventController extends Controller
             'end_time' => 'bail|required|after:start_time',
             'category_id' => 'bail|required',
             'city_id' => 'bail|nullable|exists:city,id',
-            'type' => 'bail|required',
-            'address' => 'bail|required_if:type,offline',
-            'lat' => 'bail|required_if:type,offline',
-            'lang' => 'bail|required_if:type,offline',
+            'address' => 'bail|required',
+            'lat' => 'bail|required',
+            'lang' => 'bail|required',
             'status' => 'bail|required',
             'is_featured' => 'bail|nullable|boolean',
             'featured_order' => 'bail|nullable|integer|min:0',
-            'url' => 'bail|required_if:type,online',
+            'visibility' => 'bail|required|in:everyone,members_only,previously_attended,hidden',
+            'cancellation_allowed' => 'bail|nullable|boolean',
+            'cancellation_charges' => 'bail|nullable|numeric|min:0',
             'description' => 'bail|required',
-            'scanner_id' => 'bail|required_if:type,offline',
+            'scanner_id' => 'bail|required',
             'people' => 'bail|required',
             'tags' => 'regex:/^[a-zA-Z0-9\s,]+$/',
         ],
@@ -214,11 +215,12 @@ class EventController extends Controller
             'tags.regex' => 'Tags should not contain any special characters'
         ]);
         $data = $request->all();
-        if($request->type == 'offline'){
-            $data['scanner_id'] = implode(',', $request->scanner_id);
-        }
+        $data['type'] = 'offline';
+        $data['scanner_id'] = implode(',', $request->scanner_id);
         $data['is_featured'] = $request->boolean('is_featured');
         $data['featured_order'] = $data['is_featured'] ? intval($request->featured_order) : 0;
+        $data['cancellation_allowed'] = $request->boolean('cancellation_allowed');
+        $data['cancellation_charges'] = $data['cancellation_allowed'] ? floatval($request->cancellation_charges) : 0;
         if ($request->hasFile('image')) {
             (new AppHelper)->deleteFile($event->image);
             $data['image'] = (new AppHelper)->saveImage($request);

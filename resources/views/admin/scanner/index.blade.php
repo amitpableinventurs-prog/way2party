@@ -19,6 +19,11 @@
                     @endif
                 </div>
                 <div class="col-12">
+                    <div class="alert alert-info">
+                        {{ __('Scanner staff check in tickets from their own portal, separate from this admin panel:') }}
+                        <a href="{{ route('scannerPanel.login') }}" target="_blank" rel="noopener">{{ route('scannerPanel.login') }}</a>
+                        {{ __('Share this link with each scanner along with their email and password.') }}
+                    </div>
                     <div class="card">
                         <div class="card-body">
                             <div class="row mb-4 mt-2">

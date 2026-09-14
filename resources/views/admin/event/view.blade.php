@@ -60,16 +60,39 @@
                                         </div>
                                         <div class="col-9">
                                             <p class="mb-0">{{__('Location')}}</p>
-                                            @if($event->type=="offline")
-                                            <span> {{$event->address}} </span>
-                                            @else
-                                            <span> {{__('Online Event')}} </span>
-                                            @endif
+                                            <span> {{ $event->address }} </span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <div class="row ml-0 mr-0 mt-4">
+                            <div class="col-12">
+                                <div class="card single-card-light">
+                                    <p class="mb-2">{{ __('Share this event') }}</p>
+                                    <div class="d-flex flex-wrap" style="gap:8px;">
+                                        <input type="text" readonly id="orgEventShareUrl"
+                                            value="{{ url('/event/' . $event->id . '/' . \Illuminate\Support\Str::slug($event->name)) }}"
+                                            class="form-control" style="max-width:320px;" onclick="this.select();">
+                                        <button type="button" class="btn btn-primary" onclick="copyOrgEventShareUrl()">{{ __('Copy Link') }}</button>
+                                        <a class="btn btn-info text-white" target="_blank" rel="noopener noreferrer"
+                                            href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url('/event/' . $event->id . '/' . \Illuminate\Support\Str::slug($event->name))) }}">Facebook</a>
+                                        <a class="btn btn-dark" target="_blank" rel="noopener noreferrer"
+                                            href="https://twitter.com/intent/tweet?url={{ urlencode(url('/event/' . $event->id . '/' . \Illuminate\Support\Str::slug($event->name))) }}&text={{ urlencode($event->name) }}">Twitter</a>
+                                        <a class="btn btn-success" target="_blank" rel="noopener noreferrer"
+                                            href="https://api.whatsapp.com/send?text={{ urlencode($event->name . ' ' . url('/event/' . $event->id . '/' . \Illuminate\Support\Str::slug($event->name))) }}">WhatsApp</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <script>
+                            function copyOrgEventShareUrl() {
+                                var input = document.getElementById('orgEventShareUrl');
+                                input.select();
+                                input.setSelectionRange(0, 99999);
+                                navigator.clipboard.writeText(input.value);
+                            }
+                        </script>
                      </div>
                 </div>
                 <h2 class="section-title"> {{__('Recent Sales')}}</h2>

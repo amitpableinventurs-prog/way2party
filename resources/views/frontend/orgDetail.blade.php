@@ -22,8 +22,8 @@
                         <p class="font-poppins font-semibold text-4xl leading-7 text-black">{{ ($data->first_name ?? '') . ' ' .( $data->last_name ?? '')}}</p>
                         <div class="flex flex-col mt-8 xl:flex-row xxsm:w-[99%] md:w-full">
                             <div class="mb-4 sm:mb-0">
-                                <p class="font-poppins font-normal text-lg leading-7 text-gray-200">{{ __('Phone Number') }}</p>
-                                <p class="font-poppins font-medium text-xl leading-7 text-black">{{ $data->phone }}</p>
+                                <p class="font-poppins font-normal text-lg leading-7 text-gray-200">{{ __('Past Events Organized') }}</p>
+                                <p class="font-poppins font-medium text-xl leading-7 text-black">{{ $data->past_events_count }}</p>
                             </div>
                             @if ($data->country)
                                 <div class="sm:mx-10 sm:border-l sm:border-r sm:border-gray-light sm:px-10 w-full sm:w-auto mb-4 sm:mb-0">
@@ -34,8 +34,14 @@
                                 <div class="sm:mx-10 sm:border-l sm:border-gray-light w-full sm:w-auto mb-4 sm:mb-0"></div>
                             @endif
                             <div class="">
-                                <p class="font-poppins font-normal text-lg leading-7 text-gray-200 md:mt-5 xl:mt-0">{{ __('Email address') }}</p>
-                                <p class="font-poppins font-medium text-xl leading-7 text-black break-all"><a href="mailto:{{ $data->email }}">{{ $data->email }}</a></p>
+                                <p class="font-poppins font-normal text-lg leading-7 text-gray-200 md:mt-5 xl:mt-0">{{ __('Rating') }}</p>
+                                <p class="font-poppins font-medium text-xl leading-7 text-black">
+                                    @if ($data->avg_rating)
+                                        {{ $data->avg_rating }} / 5 <span class="text-gray-200 text-base">({{ count($data->reviews) }} {{ __('reviews') }})</span>
+                                    @else
+                                        {{ __('No ratings yet') }}
+                                    @endif
+                                </p>
                             </div>
                         </div>
                         @if ( $data->bio)
@@ -46,13 +52,60 @@
                         @endif
                     </div>
                     @if (Auth::guard('appuser')->user())
-                        <div class="">
+                        <div class="flex flex-col space-y-2">
                             <button type="button" onclick="follow({{ $data->id }})"
                                 class="px-10 py-3 text-white bg-primary text-center font-poppins font-normal text-base leading-6 rounded-md">{{ in_array($data->id, array_filter(explode(',', Auth::guard('appuser')->user()->following))) == true ? __('Unfollow') : __('Follow') . ' +' }}</button>
+                            <a href="{{ url('/message-organizer/' . $data->id) }}"
+                                class="px-10 py-3 text-primary border border-primary text-center font-poppins font-normal text-base leading-6 rounded-md">{{ __('Message') }}</a>
                         </div>
                     @endif
                 </div>
-
+                <div class="px-4 pb-2 pt-4 w-full">
+                    <p class="font-poppins font-normal text-sm leading-5 text-gray-200 pb-2">{{ __('Share this organizer') }}</p>
+                    <div class="flex items-center space-x-2 flex-wrap">
+                        <input type="text" readonly id="orgShareUrl" value="{{ url()->current() }}"
+                            class="text-xs font-poppins text-gray-300 border border-gray-light rounded-md px-3 py-2 w-64 max-w-full"
+                            onclick="this.select();">
+                        <button type="button" onclick="copyOrgShareUrl()"
+                            class="px-3 py-2 text-xs text-white bg-primary rounded-md font-poppins">{{ __('Copy Link') }}</button>
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}"
+                            target="_blank" rel="noopener noreferrer"
+                            class="px-3 py-2 text-xs text-white bg-blue rounded-md font-poppins">Facebook</a>
+                        <a href="https://twitter.com/intent/tweet?url={{ urlencode(url()->current()) }}&text={{ urlencode(($data->first_name ?? '') . ' ' . ($data->last_name ?? '')) }}"
+                            target="_blank" rel="noopener noreferrer"
+                            class="px-3 py-2 text-xs text-white bg-black rounded-md font-poppins">Twitter</a>
+                        <a href="https://api.whatsapp.com/send?text={{ urlencode(($data->first_name ?? '') . ' ' . ($data->last_name ?? '') . ' ' . url()->current()) }}"
+                            target="_blank" rel="noopener noreferrer"
+                            class="px-3 py-2 text-xs text-white bg-success rounded-md font-poppins">WhatsApp</a>
+                    </div>
+                    <script>
+                        function copyOrgShareUrl() {
+                            var input = document.getElementById('orgShareUrl');
+                            input.select();
+                            input.setSelectionRange(0, 99999);
+                            navigator.clipboard.writeText(input.value);
+                        }
+                    </script>
+                </div>
+            </div>
+            {{-- Reviews --}}
+            <p class="font-poppins font-semibold text-2xl leading-6 text-black pt-5">{{ __('Reviews') }}&nbsp;( {{ count($data->reviews) }} )</p>
+            <div class="mt-5">
+                @forelse ($data->reviews as $review)
+                    <div class="shadow-2xl p-5 rounded-lg bg-white mb-4">
+                        <div class="flex items-center justify-between">
+                            <p class="font-poppins font-semibold text-lg leading-6 text-black">{{ $review->user->name ?? '' }} {{ $review->user->last_name ?? '' }}</p>
+                            <p class="font-poppins font-medium text-base leading-6 text-black">{{ $review->rate }} / 5</p>
+                        </div>
+                        @if ($review->message)
+                            <p class="font-poppins font-normal text-base leading-6 text-gray pt-2">{{ $review->message }}</p>
+                        @endif
+                    </div>
+                @empty
+                    <div class="font-poppins font-medium text-lg leading-4 text-black capitalize">
+                        {{ __('No reviews yet') }}
+                    </div>
+                @endforelse
             </div>
             {{-- Latest Events --}}
             <p class="font-poppins font-semibold text-2xl leading-6 text-black pt-10">{{ __('Events') }}&nbsp;( {{count($data->events)}} )</p>

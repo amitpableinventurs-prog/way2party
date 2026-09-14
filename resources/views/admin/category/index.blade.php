@@ -3,7 +3,7 @@
 @section('content')
     <section class="section">
         @include('admin.layout.breadcrumbs', [
-            'title' => __('Category'),
+            'title' => __('Party Type'),
         ])
 
         <div class="section-body">
@@ -24,7 +24,7 @@
                         <div class="card-body">
                             <div class="row mb-4 mt-2">
                                 <div class="col-lg-8">
-                                    <h2 class="section-title mt-0"> {{ __('View Category') }}</h2>
+                                    <h2 class="section-title mt-0"> {{ __('View Party Type') }}</h2>
                                 </div>
                                 <div class="col-lg-4 text-right">
                                     @can('category_create')

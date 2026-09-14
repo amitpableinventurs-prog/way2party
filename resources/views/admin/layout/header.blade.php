@@ -45,19 +45,17 @@
                     @else
                         <div class="dropdown-list-content dropdown-list-icons">
                             @foreach ($notification as $item)
-                                @if ($item->user != null)
-                                    @if ($loop->iteration <= 3)
-                                        <a href="#" class="dropdown-item">
-                                            <div class="dropdown-item-icon bg-danger text-white">
-                                                <img class="avatar"
-                                                    src="{{ url('images/upload/' . $item->user->image) }}">
-                                            </div>
-                                            <div class="dropdown-item-desc">
-                                                {{ $item->message }}
-                                                <div class="time">{{ $item->created_at->diffForHumans() }}</div>
-                                            </div>
-                                        </a>
-                                    @endif
+                                @if ($loop->iteration <= 3)
+                                    <a href="{{ $item->link ?? '#' }}" class="dropdown-item">
+                                        <div class="dropdown-item-icon bg-danger text-white">
+                                            <img class="avatar"
+                                                src="{{ url('images/upload/' . ($item->user->image ?? 'defaultuser.png')) }}">
+                                        </div>
+                                        <div class="dropdown-item-desc">
+                                            {{ $item->message }}
+                                            <div class="time">{{ $item->created_at->diffForHumans() }}</div>
+                                        </div>
+                                    </a>
                                 @endif
                             @endforeach
                         </div>

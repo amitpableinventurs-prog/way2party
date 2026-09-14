@@ -830,18 +830,6 @@ $(document).ready(function () {
         ]
     });
 
-    $('.event-form input[type=radio][name=type]').change(function () {
-        if (this.value == 'online') {
-            $('.location-detail').hide(500);
-            $('.scanner').hide(500);
-            $('.url').show(500);
-        } else if (this.value == 'offline') {
-            $('.location-detail').show(500);
-            $('.scanner').show(500);
-            $('.url').hide(500);
-        }
-    });
-
     $('.ticket-form input[type=radio][name=type]').change(function () {
         if (this.value == 'free') {
             $('.ticket-form #price').prop('disabled', true);

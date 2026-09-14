@@ -47,9 +47,9 @@
                                             @enderror
                                         </div>
                                         <div class="form-group">
-                                            <label>{{ __('Category') }}</label>
+                                            <label>{{ __('Party Type') }}</label>
                                             <select name="category_id" class="form-control select2">
-                                                <option value="">{{ __('Select Category') }}</option>
+                                                <option value="">{{ __('Select Party Type') }}</option>
                                                 @foreach ($category as $item)
                                                     <option value="{{ $item->id }}"
                                                         {{ $item->id == old('category') ? 'Selected' : '' }}>
@@ -187,6 +187,47 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label>{{ __('Visibility') }}</label>
+                                            <select name="visibility" id="visibility" class="form-control select2">
+                                                <option value="everyone" {{ old('visibility', 'everyone') == 'everyone' ? 'selected' : '' }}>{{ __('Visible to Everyone') }}</option>
+                                                <option value="members_only" {{ old('visibility') == 'members_only' ? 'selected' : '' }}>{{ __('Members Only') }}</option>
+                                                <option value="previously_attended" {{ old('visibility') == 'previously_attended' ? 'selected' : '' }}>{{ __('Previously Attended Users Only') }}</option>
+                                                <option value="hidden" {{ old('visibility') == 'hidden' ? 'selected' : '' }}>{{ __('Hidden from Everyone') }}</option>
+                                            </select>
+                                            @error('visibility')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label>{{ __('Ticket Cancellation') }}</label>
+                                            <select name="cancellation_allowed" id="cancellation_allowed" class="form-control select2">
+                                                <option value="0" {{ old('cancellation_allowed') ? '' : 'selected' }}>{{ __('Not Allowed') }}</option>
+                                                <option value="1" {{ old('cancellation_allowed') ? 'selected' : '' }}>{{ __('Allowed') }}</option>
+                                            </select>
+                                            @error('cancellation_allowed')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label>{{ __('Cancellation Charge') }}</label>
+                                            <input type="number" min="0" step="0.01" name="cancellation_charges" id="cancellation_charges"
+                                                value="{{ old('cancellation_charges', 0) }}" placeholder="0"
+                                                class="form-control @error('cancellation_charges')? is-invalid @enderror">
+                                            @error('cancellation_charges')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="form-group">
                                     <label>{{ __('Tags') }}</label>
                                     <input type="text" name="tags" value="{{ old('tags') }}"
@@ -215,22 +256,7 @@
                                     @enderror
                                 </div>
                                 <h6 class="text-muted mt-4 mb-4">{{ __('Location Detail') }}</h6>
-                                <div class="form-group">
-                                    <div class="selectgroup">
-                                        <label class="selectgroup-item">
-                                            <input type="radio" name="type"
-                                                {{ old('type') == 'online' ? '' : 'checked' }} checked value="offline"
-                                                class="selectgroup-input" checked="">
-                                            <span class="selectgroup-button">{{ __('Venue') }}</span>
-                                        </label>
-                                        <label class="selectgroup-item">
-                                            <input type="radio" {{ old('type') == 'online' ? 'checked' : '' }}
-                                                name="type" value="online" class="selectgroup-input">
-                                            <span class="selectgroup-button">{{ __('Online Event') }}</span>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="location-detail {{ old('type') == 'online' ? 'hide' : '' }}">
+                                <div class="location-detail">
                                     <div class="form-group">
                                         <label>{{ __('Event Address') }}</label>
                                         <input type="text" name="address" id="address"
@@ -264,18 +290,6 @@
                                                 @enderror
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="url hide  {{ old('type') == 'online' ? 'block' : '' }}">
-                                    <div class="form-group">
-                                        <label>{{ __('Event url') }}</label>
-                                        <input type="link" name="url" id="url"
-                                            placeholder="{{ __('Event url') }}"
-                                            class="form-control @error('url')? is-invalid @enderror">
-                                        @error('url')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -332,7 +346,7 @@
                 const tags        = $('input[name="tags"]').val().trim();
 
                 if (!name)        missing.push('Name');
-                if (!category_id) missing.push('Category');
+                if (!category_id) missing.push('Party Type');
                 if (!start_time || !end_time) missing.push('Start / End time');
                 if (!tags)        missing.push('Tags');
 

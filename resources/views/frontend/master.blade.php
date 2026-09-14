@@ -113,6 +113,16 @@
             @include('frontend.layout.header')
             <div class="min-h-screen flex flex-col">
                 <main class="flex-grow">
+                    @if (session('success'))
+                        <div class="fixed top-5 right-5 z-50 bg-green-100 text-green-700 border border-green-300 rounded-md px-5 py-3 font-poppins text-sm shadow-lg">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+                    @if (session('error_msg'))
+                        <div class="fixed top-5 right-5 z-50 bg-red-100 text-red-700 border border-red-300 rounded-md px-5 py-3 font-poppins text-sm shadow-lg">
+                            {{ session('error_msg') }}
+                        </div>
+                    @endif
                     @yield('content')
                 </main>
                 <footer class="mt-auto">

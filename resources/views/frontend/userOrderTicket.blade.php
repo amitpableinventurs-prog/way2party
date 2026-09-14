@@ -230,6 +230,26 @@
                                     src="{{ asset('image/printer.png') }}" alt=""
                                     class="">{{ __('Print') }}</a>
                         </div>
+                        @if ($order->event->cancellation_allowed && $order->order_status != 'Cancelled' && now()->lt($order->event->start_time))
+                            <div class="flex justify-between xxsm:flex-wrap sm:flex-nowrap pt-3">
+                                <form method="post" action="{{ route('cancelTicket', $order->id) }}"
+                                    onsubmit="return confirm('{{ __('Cancelling will deduct a charge of') }} {{ $order->event->cancellation_charges }}. {{ __('Continue?') }}');"
+                                    class="w-full">
+                                    @csrf
+                                    <button type="submit"
+                                        class="font-poppins font-normal text-sm leading-5 text-danger rounded-md px-4 py-2 bg-danger-light w-full">
+                                        {{ __('Cancel Ticket') }}
+                                        @if ($order->event->cancellation_charges > 0)
+                                            ({{ __('Charge') }}: {{ $order->event->cancellation_charges }})
+                                        @endif
+                                    </button>
+                                </form>
+                            </div>
+                        @elseif ($order->order_status == 'Cancelled')
+                            <div class="flex justify-between xxsm:flex-wrap sm:flex-nowrap pt-3">
+                                <p class="font-poppins font-medium text-sm leading-5 text-danger">{{ __('This ticket has been cancelled.') }}</p>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

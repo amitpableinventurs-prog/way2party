@@ -3,7 +3,7 @@
 @section('content')
 
     <div class="Card-sc-8zkhaa-0 card-register styled__StyledCard-mxvrth-1 fogDtz">
-        <form action="{{url('user/org-register')}}" method="post">
+        <form action="{{ url()->full() }}" method="post">
         @csrf
             <p data-qa="title" class="Text-st1i2q-0 styled__Title-sc-1subqgs-0 jTZzYs">{{__('Sign up as organizer')}} </p>
             <input type="hidden" value="{{url()->previous()}}" name="url" >

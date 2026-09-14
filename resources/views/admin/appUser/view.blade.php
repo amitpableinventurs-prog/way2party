@@ -5,7 +5,11 @@
             'title' => __('Customer Detail'),
         ])
         <div class="section-body">
-            <h2 class="section-title">{{ $user->name . ' ' . $user->last_name }}</h2>
+            <h2 class="section-title">{{ $user->name . ' ' . $user->last_name }}
+                @if (Auth::user()->hasRole('Organizer'))
+                    <a href="{{ url('message-customer/' . $user->id) }}" class="btn btn-primary btn-sm">{{ __('Message') }}</a>
+                @endif
+            </h2>
             <div class="row mt-sm-4">
                 <div class="col-12">
                     @if (session('status'))

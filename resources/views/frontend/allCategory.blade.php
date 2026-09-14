@@ -1,5 +1,5 @@
 @extends('frontend.master', ['activePage' => 'category'])
-@section('title', __('All categories'))
+@section('title', __('All Party Types'))
 @section('content')
     <div class="pb-20 bg-scroll min-h-screen" style="background-image: url('{{ asset('images/events.png') }}')">
         {{-- scroll --}}
@@ -18,11 +18,11 @@
             <div class="flex justify-start pt-5 z-10">
                 <p
                     class="font-poppins font-semibold md:text-5xl xxsm:text-2xl xsm:text-2xl sm:text-2xl text-success leading-10 ">
-                    {{ __('Categories') }}</p>
+                    {{ __('Party Types') }}</p>
             </div>
             @if (count($data) == 0)
                 <div class="font-poppins font-medium text-lg leading-4 text-black mt-10  capitalize">
-                    {{ __('There are no Categories added yet') }}
+                    {{ __('There are no Party Types added yet') }}
                 </div>
             @endif
             <div

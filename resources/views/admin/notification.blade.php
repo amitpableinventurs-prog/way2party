@@ -33,40 +33,42 @@
                             </div>
                         @else
                             @foreach ($notification as $item)
-                                @if ($item->user != null)
-                                    <div class="activity">
-                                        <div class="activity-icon bg-primary text-white shadow-primary">
-                                            <img src="{{ url('images/upload/' . $item->user->image) }}" class="avatar">
-                                        </div>
-                                        <div class="activity-detail">
-                                            <div class="mb-2">
-                                                <span class="text-job text-primary">{{ $item->created_at->diffForHumans() }}</span>
-                                                <span class="bullet"></span>
+                                <div class="activity">
+                                    <div class="activity-icon bg-primary text-white shadow-primary">
+                                        <img src="{{ url('images/upload/' . ($item->user->image ?? 'defaultuser.png')) }}" class="avatar">
+                                    </div>
+                                    <div class="activity-detail">
+                                        <div class="mb-2">
+                                            <span class="text-job text-primary">{{ $item->created_at->diffForHumans() }}</span>
+                                            <span class="bullet"></span>
 
-                                                    <a class="text-job" target="blank" href="{{ url('view-user/'. $item->user->id) }}">{{ $item->user->name . ' ' . $item->user->last_name }}</a>
-                                                @if ($item->status == 1)
-                                                <span class="text-job text-success">{{ __('Unread') }}</span>
-                                                @endif
+                                            @if ($item->user != null)
+                                                <a class="text-job" target="blank" href="{{ url('view-user/'. $item->user->id) }}">{{ $item->user->name . ' ' . $item->user->last_name }}</a>
+                                            @else
+                                                <span class="text-job">{{ $item->title }}</span>
+                                            @endif
+                                            @if ($item->status == 1)
+                                            <span class="text-job text-success">{{ __('Unread') }}</span>
+                                            @endif
 
-                                                <div class="float-right dropdown">
-                                                    <a href="#" data-toggle="dropdown"><i
-                                                            class="fas fa-ellipsis-h"></i></a>
-                                                    <div class="dropdown-menu">
-                                                        <div class="dropdown-title">{{ __('Options') }}</div>
-                                                        <a href="{{ url('orders/' . $item->order_id.'/'. $item->id) }}"
-                                                            class="dropdown-item has-icon"><i class="fas fa-eye"></i>
-                                                            {{ __('View') }}</a>
-                                                        <div class="dropdown-divider"></div>
-                                                        <a href="{{ url('delete-notification/' . $item->id) }}"
-                                                            class="dropdown-item has-icon text-danger"><i
-                                                                class="fas fa-trash-alt"></i> {{ __('Archive') }}</a>
-                                                    </div>
+                                            <div class="float-right dropdown">
+                                                <a href="#" data-toggle="dropdown"><i
+                                                        class="fas fa-ellipsis-h"></i></a>
+                                                <div class="dropdown-menu">
+                                                    <div class="dropdown-title">{{ __('Options') }}</div>
+                                                    <a href="{{ $item->link ?? url('orders/' . $item->order_id . '/' . $item->id) }}"
+                                                        class="dropdown-item has-icon"><i class="fas fa-eye"></i>
+                                                        {{ __('View') }}</a>
+                                                    <div class="dropdown-divider"></div>
+                                                    <a href="{{ url('delete-notification/' . $item->id) }}"
+                                                        class="dropdown-item has-icon text-danger"><i
+                                                            class="fas fa-trash-alt"></i> {{ __('Archive') }}</a>
                                                 </div>
                                             </div>
-                                            <p>{{ $item->message }}</p>
                                         </div>
+                                        <p>{{ $item->message }}</p>
                                     </div>
-                                @endif
+                                </div>
                             @endforeach
                         @endif
 

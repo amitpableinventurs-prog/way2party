@@ -42,7 +42,11 @@ class AppUser extends Authenticatable implements Wallet
         'language',
         'deleted_at ',
         'is_verify',
-        'email_verified_at'
+        'email_verified_at',
+        'facebook_id',
+        'instagram_id',
+        'membership_plan_id',
+        'membership_expires_at',
     ];
 
     protected $hidden = [
@@ -52,6 +56,7 @@ class AppUser extends Authenticatable implements Wallet
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'membership_expires_at' => 'datetime',
     ];
 
     protected $table = 'app_user';
@@ -60,5 +65,20 @@ class AppUser extends Authenticatable implements Wallet
     public function getImagePathAttribute()
     {
         return url('images/upload') . '/';
+    }
+
+    public function gallery()
+    {
+        return $this->hasMany(AppUserGallery::class, 'app_user_id');
+    }
+
+    public function membershipPlan()
+    {
+        return $this->belongsTo(MembershipPlan::class, 'membership_plan_id');
+    }
+
+    public function supportTickets()
+    {
+        return $this->hasMany(SupportTicket::class, 'app_user_id');
     }
 }

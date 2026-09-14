@@ -9,10 +9,13 @@ use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
+use Bavix\Wallet\Interfaces\Wallet;
+use Bavix\Wallet\Traits\HasWallet;
 
-class User extends Authenticatable
+class User extends Authenticatable implements Wallet
 {
     use HasFactory, Notifiable, HasRoles, HasApiTokens;
+    use HasWallet;
 
     protected $guard_name = 'web';
 
@@ -38,6 +41,7 @@ class User extends Authenticatable
         'is_verify',
         'provider',
         'provider_token',
+        'is_profile_private',
     ];
 
     /**

@@ -28,6 +28,9 @@ class Event extends Model
         'status',
         'is_featured',
         'featured_order',
+        'visibility',
+        'cancellation_allowed',
+        'cancellation_charges',
         'event_status',
         'is_deleted',
         'scanner_id',
@@ -41,6 +44,8 @@ class Event extends Model
         'end_time' => 'datetime',
         'is_featured' => 'boolean',
         'featured_order' => 'integer',
+        'cancellation_allowed' => 'boolean',
+        'cancellation_charges' => 'decimal:2',
     ];
     protected $appends = ['imagePath', 'rate', 'totalTickets', 'soldTickets'];
 
@@ -129,6 +134,37 @@ class Event extends Model
     public function scopeOrderByFeatured($query)
     {
         return $query->orderByDesc('featured_order')->orderBy('start_time', 'asc');
+    }
+
+    /**
+     * Restricts a listing query to events the given customer (AppUser, or
+     * null for a guest) is allowed to see.
+     *
+     * 'everyone' (or unset, for legacy rows) is always visible. 'hidden' and
+     * 'members_only' are excluded from every public listing for now -
+     * 'members_only' enforcement is deferred until the membership system
+     * ships; treating it as hidden in the meantime is the safe default.
+     * 'previously_attended' is visible only to a customer with a past order
+     * for any past event by this event's organizer.
+     */
+    public function scopeVisibleTo($query, $appUser = null)
+    {
+        $appUserId = $appUser->id ?? null;
+        return $query->where(function ($q) use ($appUserId) {
+            $q->where('visibility', 'everyone')->orWhereNull('visibility');
+            if ($appUserId) {
+                $q->orWhere(function ($q2) use ($appUserId) {
+                    $q2->where('visibility', 'previously_attended')
+                        ->whereIn('user_id', function ($sub) use ($appUserId) {
+                            $sub->select('events.user_id')
+                                ->from('orders')
+                                ->join('events', 'orders.event_id', '=', 'events.id')
+                                ->where('orders.customer_id', $appUserId)
+                                ->where('events.end_time', '<', now());
+                        });
+                });
+            }
+        });
     }
 
     /**

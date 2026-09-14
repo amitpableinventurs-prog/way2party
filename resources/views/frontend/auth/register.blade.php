@@ -126,40 +126,12 @@
             </p>
             <form action="{{ url('user/register') }}" method="post">
                 @csrf
-                <div class="pt-12">
-                    <div
-                        class="flex sm:space-x-7 justify-center 1xl:mx-28 xl:mx-20 lg:mx-10 xmd:mx-10 sm:mx-10 msm:mx-10 xxsm:space-y-5 msm:space-y-0 msm:space-x-5 xsm:space-x-0 xxsm:space-x-0 xxsm:mx-10.0 xxsm:flex-wrap xsm:flex-wrap msm:flex-nowrap">
-                        <label for="default-radio-1" class="w-full">
-                            <div
-                                class="border border-gray-light py-3.5 px-5 rounded-lg text-gray-100 w-full font-normal font-poppins text-base leading-6 flex">
-                                <input id="default-radio-1" type="radio" value="user" checked name="user_type"
-                                    class="user h-5 w-5 mr-2 border border-gray-light  hover:border-gray-light focus:outline-none">
-                                <label for="default-radio-1">{{ __('User') }}
-                            </div>
-                        </label>
-                        <label for="default-radio-2" class="w-full">
-                            <div
-                                class="border border-gray-light py-3.5 px-5 rounded-lg text-gray-100  w-full font-normal font-poppins text-base leading-6 flex">
-                                <input id="default-radio-2" type="radio" value="organizer" name="user_type"
-                                    class="org w-5 h-5 mr-2 border border-gray-light hover:border-gray-light focus:outline-none">
-                                {{ __('Organizer') }}
-                            </div>
-                        </label>
-                    </div>
-                </div>
+                <input type="hidden" name="user_type" value="user">
                 <div class="grid grid-cols-2 gap-5 sm:grid-cols-2 msm:grid-cols-2 xxsm:grid-cols-1">
-                    <div class="pt-5 userInput">
+                    <div class="pt-5">
                         <label for="name"
                             class="font-poppins font-medium text-base leading-6 text-black">{{ __('First Name') }}</label>
                         <input type="text" name="name"
-                            class="w-full text-sm font-poppins font-normal text-black block p-3 z-20 rounded-lg border border-gray-light focus:outline-none"
-                            placeholder="{{ __('First Name') }}">
-                    </div>
-
-                    <div class="pt-5 orginput hidden">
-                        <label for="name"
-                            class="font-poppins font-medium text-base leading-6 text-black">{{ __('First Name') }}</label>
-                        <input type="text" name="first_name"
                             class="w-full text-sm font-poppins font-normal text-black block p-3 z-20 rounded-lg border border-gray-light focus:outline-none"
                             placeholder="{{ __('First Name') }}">
                     </div>
@@ -193,13 +165,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="orginput hidden">
-                        <label for="organization_name"
-                            class="font-poppins font-medium text-base leading-6 text-black">{{ __('Organization Name') }}</label>
-                        <input type="text" name="organization_name"
-                            class="w-full text-sm font-poppins font-normal text-black block p-3 z-20 rounded-lg border border-gray-light focus:outline-none"
-                            placeholder="{{ __('Organization Name') }}">
-                    </div>
                     <div class=" ">
                         <label for="email"
                             class="font-poppins font-medium text-base leading-6 text-black">{{ __('Email Address') }}</label>
@@ -232,6 +197,11 @@
                         class="text-primary text-medium text-base">{{ __('Login') }}</a>
                 </h1>
             </div>
+            <div class="pt-2 flex justify-center">
+                <p class="font-poppins text-sm leading-5 text-gray text-center">
+                    {{ __('Register as an organizer. Please contact org@way2party.com.') }}
+                </p>
+            </div>
         </div>
 
     </div>
@@ -247,14 +217,6 @@
             // toggle the eye / eye slash icon
             this.classList.toggle("fa-eye-slash");
         });
-    });
-    $('.user').on('click', function() {
-        $('.orginput').addClass('hidden')
-        $('.userInput').removeClass('hidden')
-    });
-    $('.org').on('click', function() {
-        $('.userInput').addClass('hidden')
-        $('.orginput').removeClass('hidden')
     });
 </script>
 <script>

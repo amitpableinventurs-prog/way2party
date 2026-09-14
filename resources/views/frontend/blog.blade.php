@@ -154,7 +154,7 @@
                             @endforeach
                             @if ($i == 0)
                                 <p class="font-poppins font-normal text-lg leading-7 text-gray-300 pt-5">
-                                    {{ __('There is no blog post available in this category') }}
+                                    {{ __('There is no blog post available in this party type') }}
                                 </p>
                             @endif
                         </div>

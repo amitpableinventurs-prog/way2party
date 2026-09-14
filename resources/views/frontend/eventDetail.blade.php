@@ -71,6 +71,33 @@
                                 </div>
                             </a>
                         </div>
+                        <div class="px-4 pb-2">
+                            <p class="font-poppins font-normal text-sm leading-5 text-gray-200 pb-2">{{ __('Share this event') }}</p>
+                            <div class="flex items-center space-x-2 flex-wrap">
+                                <input type="text" readonly id="eventShareUrl" value="{{ url()->current() }}"
+                                    class="text-xs font-poppins text-gray-300 border border-gray-light rounded-md px-3 py-2 w-64 max-w-full"
+                                    onclick="this.select();">
+                                <button type="button" onclick="copyEventShareUrl()"
+                                    class="px-3 py-2 text-xs text-white bg-primary rounded-md font-poppins">{{ __('Copy Link') }}</button>
+                                <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}"
+                                    target="_blank" rel="noopener noreferrer"
+                                    class="px-3 py-2 text-xs text-white bg-blue rounded-md font-poppins">Facebook</a>
+                                <a href="https://twitter.com/intent/tweet?url={{ urlencode(url()->current()) }}&text={{ urlencode($data->name) }}"
+                                    target="_blank" rel="noopener noreferrer"
+                                    class="px-3 py-2 text-xs text-white bg-black rounded-md font-poppins">Twitter</a>
+                                <a href="https://api.whatsapp.com/send?text={{ urlencode($data->name . ' ' . url()->current()) }}"
+                                    target="_blank" rel="noopener noreferrer"
+                                    class="px-3 py-2 text-xs text-white bg-success rounded-md font-poppins">WhatsApp</a>
+                            </div>
+                            <script>
+                                function copyEventShareUrl() {
+                                    var input = document.getElementById('eventShareUrl');
+                                    input.select();
+                                    input.setSelectionRange(0, 99999);
+                                    navigator.clipboard.writeText(input.value);
+                                }
+                            </script>
+                        </div>
                         <div class="px-4">
                             <div class="pt-4 flex space-x-6 md:flex-wrap sm:flex-wrap xxsm:flex-wrap xxsm:space-x-3 md:space-x-6">
                                 <img src="{{ asset('images/calender-icon.png') }}" alt=""

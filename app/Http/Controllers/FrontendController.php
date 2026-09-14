@@ -119,10 +119,11 @@ class FrontendController extends Controller
 
             $timezone = Setting::find(1)->timezone;
             $date = Carbon::now($timezone);
-            $events  = Event::with(['category:id,name'])
+            $events  = Event::with(['category:id,name', 'city:id,name'])
                 ->where([['status', 1], ['is_deleted', 0], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]])
+                ->visibleTo(Auth::guard('appuser')->user())
                 ->orderBy('start_time', 'desc')->get();
-            $organizer = User::role('Organizer')->orderBy('id', 'DESC')->get();
+            $organizer = User::role('Organizer')->where('is_profile_private', 0)->orderBy('id', 'DESC')->get();
             $category = Category::where('status', 1)->orderBy('id', 'DESC')->get();
             $cities = City::where('status', 1)->orderBy('name')->get();
             $blog = Blog::with(['category:id,name'])->where('status', 1)->orderBy('id', 'DESC')->get();
@@ -132,8 +133,9 @@ class FrontendController extends Controller
                 $value->available_ticket = $value->total_ticket - $value->sold_ticket;
                 $value->append('auto_generated_tag');
             }
-            $featuredEvents = Event::with(['category:id,name'])->featured()
+            $featuredEvents = Event::with(['category:id,name', 'city:id,name'])->featured()
                 ->where('end_time', '>', $date->format('Y-m-d H:i:s'))
+                ->visibleTo(Auth::guard('appuser')->user())
                 ->orderByFeatured()->take(8)->get();
             foreach ($featuredEvents as $value) {
                 $value->append('auto_generated_tag');
@@ -502,6 +504,9 @@ class FrontendController extends Controller
     {
         $verify = Setting::first()->user_verify == 1 ? 0 : 1;
         $data = $request->all();
+        if (($data['user_type'] ?? 'user') == 'organizer') {
+            return redirect('user/register')->with(['error' => 'Organizer registration is by invitation only. Please contact org@way2party.com.']);
+        }
         if($data['user_type'] == 'user') {
             $request->validate([
                 'name' => 'bail|required',
@@ -793,8 +798,9 @@ class FrontendController extends Controller
 
         $timezone = Setting::find(1)->timezone;
         $date = Carbon::now($timezone);
-        $events  = Event::with(['category:id,name'])
-            ->where([['status', 1], ['is_deleted', 0], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d')]]);
+        $events  = Event::with(['category:id,name', 'city:id,name'])
+            ->where([['status', 1], ['is_deleted', 0], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d')]])
+            ->visibleTo(Auth::guard('appuser')->user());
 
         $chip = array();
         if ($request->has('type') && $request->type != null) {
@@ -858,6 +864,9 @@ class FrontendController extends Controller
         $setting = Setting::first(['app_name', 'logo', 'show_event_report_form']);
         $currency = Setting::first(['currency_sybmol']);
         $data = Event::with(['category:id,name,image', 'organization:id,first_name,organization_name,bio,last_name,image'])->find($id);
+        if (!$data || !Event::where('id', $id)->visibleTo(Auth::guard('appuser')->user())->exists()) {
+            abort(404);
+        }
         SEOMeta::setTitle($data->name)
             ->setDescription(\App\Helpers\SeoHelper::excerpt($data->description))
             ->addMeta('event:category', $data->category->name, 'property')
@@ -971,6 +980,9 @@ class FrontendController extends Controller
         $date = Carbon::now($timezone);
         $data->total_event = Event::where([['status', 1], ['is_deleted', 0], ['user_id', $id], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]])->count();
         $data->events = Event::where([['status', 1], ['is_deleted', 0], ['user_id', $id], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]])->orderBy('start_time', 'ASC')->with('faqs')->get();
+        $data->past_events_count = Event::where([['is_deleted', 0], ['user_id', $id], ['end_time', '<=', $date->format('Y-m-d H:i:s')]])->count();
+        $data->avg_rating = round(Review::where('organization_id', $id)->where('status', 1)->avg('rate'), 1);
+        $data->reviews = Review::where('organization_id', $id)->where('status', 1)->orderBy('id', 'DESC')->get();
         return view('frontend.orgDetail', compact('data'));
     }
 
@@ -1350,8 +1362,9 @@ class FrontendController extends Controller
 
         $timezone = Setting::find(1)->timezone;
         $date = Carbon::now($timezone);
-        $events  = Event::with(['category:id,name'])
+        $events  = Event::with(['category:id,name', 'city:id,name'])
             ->where([['status', 1], ['is_deleted', 0], ['category_id', $id], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]])
+            ->visibleTo(Auth::guard('appuser')->user())
             ->orderBy('start_time', 'ASC')->get();
         $offlinecount = 0;
         $onlinecount = 0;
@@ -1366,6 +1379,63 @@ class FrontendController extends Controller
         $user = Auth::guard('appuser')->user();
         $catactive = $name;
         return view('frontend.events', compact('events', 'category', 'onlinecount', 'offlinecount', 'user', 'catactive'));
+    }
+
+    public function cityEvents($id, $name)
+    {
+        $setting = Setting::first(['app_name', 'logo']);
+        $city = City::find($id);
+
+        SEOMeta::setTitle($setting->app_name . '- Events' ?? env('APP_NAME'))
+            ->setDescription('This is city events page')
+            ->setCanonical(url()->current())
+            ->addKeyword([
+                'city event page',
+                $city->name . ' - Events',
+                $setting->app_name,
+                $setting->app_name . ' Events',
+                'events page',
+            ]);
+
+        OpenGraph::setTitle($setting->app_name . ' - Events' ?? env('APP_NAME'))
+            ->setDescription('This is city events page')
+            ->setUrl(url()->current());
+
+        JsonLdMulti::setTitle($setting->app_name . ' - Events' ?? env('APP_NAME'));
+        JsonLdMulti::setDescription('This is city events page');
+        JsonLdMulti::addImage($setting->imagePath . $setting->logo);
+
+        SEOTools::setTitle($setting->app_name . ' - Events' ?? env('APP_NAME'));
+        SEOTools::setDescription('This is city events page');
+        SEOTools::opengraph()->setUrl(url()->current());
+        SEOTools::setCanonical(url()->current());
+        SEOTools::opengraph()->addProperty('keywords', [
+            'city event page',
+            $city->name . ' - Events',
+            $setting->app_name,
+            $setting->app_name . ' Events',
+            'events page',
+        ]);
+        SEOTools::jsonLd()->addImage($setting->imagePath . $setting->logo);
+
+        $timezone = Setting::find(1)->timezone;
+        $date = Carbon::now($timezone);
+        $events  = Event::with(['category:id,name', 'city:id,name'])
+            ->where([['status', 1], ['is_deleted', 0], ['city_id', $id], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]])
+            ->visibleTo(Auth::guard('appuser')->user())
+            ->orderBy('start_time', 'ASC')->get();
+        $offlinecount = 0;
+        $onlinecount = 0;
+        foreach ($events as $key => $value) {
+            if ($value->type == 'online') {
+                $onlinecount += 1;
+            }
+            if ($value->type == 'offline') {
+                $offlinecount += 1;
+            }
+        }
+        $user = Auth::guard('appuser')->user();
+        return view('frontend.events', compact('events', 'city', 'onlinecount', 'offlinecount', 'user'));
     }
 
     public function eventType($type)
@@ -1584,16 +1654,56 @@ class FrontendController extends Controller
         $user =  Auth::guard('appuser')->user();
         $phone = Country::get();
         $languages = Language::where('status', 1)->get();
-        return view('frontend.user_profile', compact('user', 'languages', 'phone'));
+        $gallery = \App\Models\AppUserGallery::where('app_user_id', $user->id)->orderByDesc('id')->get();
+        return view('frontend.user_profile', compact('user', 'languages', 'phone', 'gallery'));
     }
 
     public function update_user_profile(Request $request)
     {
-        $data = $request->all();
         $user =  Auth::guard('appuser')->user();
+
+        $request->validate([
+            'name' => 'bail|required|string|max:50',
+            'last_name' => 'bail|nullable|string|max:50',
+            'email' => 'bail|required|email|unique:app_user,email,' . $user->id,
+            'phone' => 'bail|nullable|string|max:20',
+            'address' => 'bail|nullable|string',
+            'bio' => 'bail|nullable|string',
+            'facebook_id' => 'bail|nullable|string|max:191',
+            'instagram_id' => 'bail|nullable|string|max:191',
+            'password' => 'bail|nullable|string|min:6|confirmed',
+        ]);
+
+        $data = $request->only(['name', 'last_name', 'email', 'phone', 'address', 'bio', 'facebook_id', 'instagram_id']);
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+        }
+
+        $user = AppUser::find($user->id);
         $user->update($data);
         $this->setLanguage($user);
-        return redirect('/user/profile');
+        return redirect('/user/profile')->with('success', __('Profile updated successfully.'));
+    }
+
+    public function uploadGalleryImage(Request $request)
+    {
+        $request->validate([
+            'image' => 'bail|required|image|mimes:jpeg,png,jpg,gif|max:3048',
+        ]);
+        $imageName = (new AppHelper)->saveImage($request);
+        \App\Models\AppUserGallery::create([
+            'app_user_id' => Auth::guard('appuser')->user()->id,
+            'image' => $imageName,
+        ]);
+        return redirect('/user/profile')->with('success', __('Photo added to gallery.'));
+    }
+
+    public function deleteGalleryImage($id)
+    {
+        $image = \App\Models\AppUserGallery::where('app_user_id', Auth::guard('appuser')->user()->id)->findOrFail($id);
+        (new AppHelper)->deleteFile($image->image);
+        $image->delete();
+        return redirect('/user/profile')->with('success', __('Photo removed from gallery.'));
     }
 
     public function setLanguage($user)
@@ -1891,6 +2001,37 @@ class FrontendController extends Controller
         $review = Review::where('order_id', $order->id)->first();
         return view('frontend.userOrderTicket', compact('order', 'taxes', 'review', 'orderchild'));
     }
+
+    public function cancelTicket($id)
+    {
+        $order = Order::with('event')->find($id);
+        if (!$order || $order->customer_id != Auth::guard('appuser')->user()->id) {
+            abort(403);
+        }
+        if (!$order->event || !$order->event->cancellation_allowed) {
+            return redirect()->back()->with('error_msg', __('Cancellation is not allowed for this event.'));
+        }
+        if ($order->order_status == 'Cancelled') {
+            return redirect()->back()->with('error_msg', __('This booking is already cancelled.'));
+        }
+        if (now()->gte($order->event->start_time)) {
+            return redirect()->back()->with('error_msg', __('This event has already started.'));
+        }
+        if ($order->checkins_count > 0) {
+            return redirect()->back()->with('error_msg', __('This ticket has already been checked in.'));
+        }
+        $charge = $order->event->cancellation_charges;
+        $refund = max(0, $order->payment - $charge);
+        $order->order_status = 'Cancelled';
+        $order->cancelled_at = now();
+        $order->cancellation_charge_applied = $charge;
+        $order->save();
+        if ($refund > 0) {
+            Auth::guard('appuser')->user()->deposit($refund);
+        }
+        return redirect()->back()->with('success', __('Your ticket has been cancelled.'));
+    }
+
     public function  getOrder($id)
     {
         $data = Order::with(['event:id,name,image,start_time,type,end_time,address', 'ticket:id,ticket_number,name,price,type', 'organization:id,first_name,last_name,image'])->find($id);

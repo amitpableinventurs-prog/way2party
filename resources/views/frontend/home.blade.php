@@ -57,7 +57,7 @@
                                 class=" xmd:w-1/2 md:w-full sm:w-full msm:w-full xsm:w-full xxsm:w-full xmd:mx-0 xmd:py-3 xxmd:py-0 xxmd:mx-5 sm:py-3 msm:py-3 xsm:py-3 xxsm:py-3 md:mx-0 md:py-3 sm:mx-0 msm:mx-0 xsm:mx-0 xxsm:mx-0">
                                 <div class="flex">
                                     <label for="category"
-                                        class="font-poppins font-medium text-lg leading-4 text-black">{{ __('Category') }}</label>
+                                        class="font-poppins font-medium text-lg leading-4 text-black">{{ __('Party Type') }}</label>
                                 </div>
                                 <div class="pt-3">
                                     <form method="post" action="{{ url('all-events') }}">
@@ -197,6 +197,19 @@
                                             {{ Carbon\Carbon::parse($item->end_time)->format('d M Y') }}
                                         </p>
                                     </a>
+                                    <div class="flex items-center gap-2 mt-2 flex-wrap">
+                                        @if ($item->city)
+                                            <a href="{{ url('/events-city/' . $item->city_id . '/' . Str::slug($item->city->name)) }}"
+                                                class="px-3 py-1 text-xs font-poppins text-primary bg-primary-light rounded-full hover:underline">
+                                                {{ $item->city->name }}
+                                            </a>
+                                        @endif
+                                        @if ($item->category)
+                                            <span class="px-3 py-1 text-xs font-poppins text-success bg-success-light rounded-full">
+                                                {{ $item->category->name }}
+                                            </span>
+                                        @endif
+                                    </div>
                                     <div class="flex justify-between mt-7">
                                         @if (Auth::guard('appuser')->user())
                                             @if (Str::contains($user->favorite, $item->id))
@@ -285,6 +298,19 @@
                                         {{ Carbon\Carbon::parse($item->end_time)->format('d M Y') }}
                                     </p>
                                 </a>
+                                <div class="flex items-center gap-2 mt-2 flex-wrap">
+                                    @if ($item->city)
+                                        <a href="{{ url('/events-city/' . $item->city_id . '/' . Str::slug($item->city->name)) }}"
+                                            class="px-3 py-1 text-xs font-poppins text-primary bg-primary-light rounded-full hover:underline">
+                                            {{ $item->city->name }}
+                                        </a>
+                                    @endif
+                                    @if ($item->category)
+                                        <span class="px-3 py-1 text-xs font-poppins text-success bg-success-light rounded-full">
+                                            {{ $item->category->name }}
+                                        </span>
+                                    @endif
+                                </div>
                                 <div class="flex justify-between mt-7">
                                     @if (Auth::guard('appuser')->user())
                                         @if (Str::contains($user->favorite, $item->id))
@@ -325,7 +351,7 @@
                 <div class="">
                     <p
                         class="font-poppins font-semibold md:text-5xl xxsm:text-2xl xsm:text-2xl sm:text-2xl text-success leading-1 ">
-                        {{ __('Featured Categories') }}</p>
+                        {{ __('Featured Party Types') }}</p>
                 </div>
                 <div class=" xxsm:max-sm:hidden">
                     <a type="button" href="{{ url('/all-category') }}"
@@ -336,7 +362,7 @@
             </div>
             @if (count($category) == 0)
                 <div class="font-poppins font-medium text-lg leading-4 text-black mt-5 ml-5 capitalize">
-                    {{ __('There are no category added yet') }}
+                    {{ __('There are no party types added yet') }}
                 </div>
             @endif
             <div
@@ -363,6 +389,39 @@
                     class="px-10 py-3 text-success border border-success text-center font-poppins font-normal text-base leading-6 rounded-md flex">{{ __('See all') }}
                     <img src="{{ url('images/right-success.png') }}" alt=""
                         class="w-3 h-3 mt-1.5 ml-2"></a>
+            </div>
+        </div>
+
+        {{-- Cities --}}
+        <div
+            class="3xl:mx-52 2xl:mx-28 1xl:mx-28 xl:mx-36 xlg:mx-32 lg:mx-36 xxmd:mx-24 xmd:mx-32 md:mx-28 sm:mx-20 msm:mx-16 xsm:mx-10 xxsm:mx-5 z-10 relative">
+            <div class="flex sm:flex-wrap msm:flex-wrap xsm:flex-wrap xxsm:flex-wrap justify-between pt-20 mx-5 z-10">
+                <div class="">
+                    <p
+                        class="font-poppins font-semibold md:text-5xl xxsm:text-2xl xsm:text-2xl sm:text-2xl text-blue leading-1 ">
+                        {{ __('Cities') }}</p>
+                </div>
+            </div>
+            @if (count($cities) == 0)
+                <div class="font-poppins font-medium text-lg leading-4 text-black mt-5 ml-5 capitalize">
+                    {{ __('There are no cities added yet') }}
+                </div>
+            @endif
+            <div
+                class="grid gap-x-7 3xl:grid-cols-4 xl:grid-cols-4 xlg:grid-cols-2 xxmd:grid-cols-2 xxmd:gap-y-7 sm:grid-cols-1 sm:gap-y-7 msm:grid-cols-1 xxsm:grid-cols-1 msm:gapy-7 xxsm:gap-y-7 justify-between pt-10 z-10 relative">
+                @foreach ($cities as $item)
+                    <a href="{{ url('events-city/' . $item->id) . '/' . Str::slug($item->name) }}"
+                        class="shadow-lg bg-white p-5 rounded-lg hover:scale-110 transition-all duration-500 cursor-pointer block">
+                        <img src="{{ $item->image ? url('images/upload/' . $item->image) : asset('images/events.png') }}"
+                            alt="" class="rounded-lg w-full h-40 bg-cover object-cover">
+                        <p class="font-popping font-semibold text-xl leading-8 text-center pt-3">
+                            {{ $item->name }}
+                        </p>
+                    </a>
+                    @if ($loop->iteration == 4)
+                        @break
+                    @endif
+                @endforeach
             </div>
         </div>
 

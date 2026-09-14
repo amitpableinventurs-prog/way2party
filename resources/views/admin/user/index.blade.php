@@ -26,6 +26,16 @@
                             </button>
                         </div>
                     @endif
+                    @if (session('orgInviteLink'))
+                        <div class="alert alert-info alert-dismissible fade show" role="alert">
+                            {{ __('Share this private link with the prospective organizer (valid 7 days):') }}
+                            <input type="text" readonly value="{{ session('orgInviteLink') }}" onclick="this.select();"
+                                class="form-control d-inline-block" style="width:auto; max-width:70%;">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    @endif
                 </div>
                 <div class="col-12">
                     <div class="card">
@@ -35,6 +45,11 @@
                                     <h2 class="section-title mt-0"> {{ __('View Users') }}</h2>
                                 </div>
                                 <div class="col-lg-4 text-right">
+                                    @if (Auth::user()->hasRole('admin'))
+                                        <a href="{{ url('generate-organizer-invite') }}" class="btn btn-secondary">
+                                            {{ __('Generate Organizer Invite Link') }}
+                                        </a>
+                                    @endif
                                     @can('user_create')
                                         <button class="btn btn-primary add-button"><a href="{{ url('users/create') }}"><i
                                                     class="fas fa-plus"></i> {{ __('Add New') }}</a></button>
@@ -53,7 +68,7 @@
                                             <th>{{ __('Role') }}</th>
                                             <th>{{ __('Status') }}</th>
                                             <th>{{__('Verified')}}</th>
-                                            @if ($debugMode == true  && Auth::user()->hasRole('admin'))
+                                            @if (Auth::user()->hasRole('admin'))
                                                 <th>{{__('Login')}}</th>
                                             @endif
                                             @if (Gate::check('user_edit') || Gate::check('user_delete'))
@@ -99,10 +114,11 @@
                                                         class="badge {{ $item->is_verify == '1' ? 'badge-success' : 'badge-danger' }}  m-1">{{ $item->is_verify == '1' ? 'Verified' : 'Unverified' }}</span>
                                                 </h5>
                                                 </td>
-                                                @if ($debugMode == true  && Auth::user()->hasRole('admin'))
+                                                @if (Auth::user()->hasRole('admin'))
                                                     <td>
                                                         @if ($item->hasRole('Organizer'))
-                                                            <a href="{{route('loginAsOrganizer',$item->id)}}" class="btn btn-primary">
+                                                            <a href="{{ URL::temporarySignedRoute('impersonate.organizer', now()->addSeconds(60), ['user' => $item->id]) }}"
+                                                                class="btn btn-primary" target="_blank" rel="noopener">
                                                                 {{__('Login As')}}
                                                             </a>
                                                         @endif

@@ -12,6 +12,8 @@ class Notification extends Model
         'user_id',
         'organizer_id',
         'order_id',
+        'type',
+        'link',
         'title',
         'message',
     ];

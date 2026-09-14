@@ -49,9 +49,9 @@
                                             @enderror
                                         </div>
                                         <div class="form-group">
-                                            <label>{{ __('Category') }}</label>
+                                            <label>{{ __('Party Type') }}</label>
                                             <select name="category_id" class="form-control select2">
-                                                <option value="">{{ __('Select Category') }}</option>
+                                                <option value="">{{ __('Select Party Type') }}</option>
                                                 @foreach ($category as $item)
                                                     <option value="{{ $item->id }}"
                                                         {{ $item->id == $event->category_id ? 'Selected' : '' }}>
@@ -120,7 +120,7 @@
                                         @enderror
                                     </div>
                                 @endif
-                                <div class="scanner {{ $event->type == 'online' ? 'hide' : 'demo' }}">
+                                <div class="scanner demo">
                                     <div class="form-group">
                                         <label>{{ __('Scanner') }} {{ __('(Requierd)') }}</label>
                                         <select name="scanner_id[]" class="form-control scanner_id select2 selectpicker"
@@ -195,6 +195,47 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label>{{ __('Visibility') }}</label>
+                                            <select name="visibility" id="visibility" class="form-control select2">
+                                                <option value="everyone" {{ old('visibility', $event->visibility) == 'everyone' ? 'selected' : '' }}>{{ __('Visible to Everyone') }}</option>
+                                                <option value="members_only" {{ old('visibility', $event->visibility) == 'members_only' ? 'selected' : '' }}>{{ __('Members Only') }}</option>
+                                                <option value="previously_attended" {{ old('visibility', $event->visibility) == 'previously_attended' ? 'selected' : '' }}>{{ __('Previously Attended Users Only') }}</option>
+                                                <option value="hidden" {{ old('visibility', $event->visibility) == 'hidden' ? 'selected' : '' }}>{{ __('Hidden from Everyone') }}</option>
+                                            </select>
+                                            @error('visibility')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label>{{ __('Ticket Cancellation') }}</label>
+                                            <select name="cancellation_allowed" id="cancellation_allowed" class="form-control select2">
+                                                <option value="0" {{ $event->cancellation_allowed ? '' : 'selected' }}>{{ __('Not Allowed') }}</option>
+                                                <option value="1" {{ $event->cancellation_allowed ? 'selected' : '' }}>{{ __('Allowed') }}</option>
+                                            </select>
+                                            @error('cancellation_allowed')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label>{{ __('Cancellation Charge') }}</label>
+                                            <input type="number" min="0" step="0.01" name="cancellation_charges" id="cancellation_charges"
+                                                value="{{ old('cancellation_charges', $event->cancellation_charges) }}" placeholder="0"
+                                                class="form-control @error('cancellation_charges')? is-invalid @enderror">
+                                            @error('cancellation_charges')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="form-group">
                                     <label>{{ __('Tags') }}</label>
                                     <input type="text" name="tags" value="{{ $event->tags }}"
@@ -214,22 +255,7 @@
                                     @enderror
                                 </div>
                                 <h6 class="text-muted mt-4 mb-4">{{ __('Location Detail') }}</h6>
-                                <div class="form-group">
-                                    <div class="selectgroup">
-                                        <label class="selectgroup-item">
-                                            <input type="radio" name="type"
-                                                {{ $event->type == 'offline' ? 'checked' : '' }} checked value="offline"
-                                                class="selectgroup-input" checked="">
-                                            <span class="selectgroup-button">{{ __('Venue') }}</span>
-                                        </label>
-                                        <label class="selectgroup-item">
-                                            <input type="radio" {{ $event->type == 'online' ? 'checked' : '' }}
-                                                name="type" value="online" class="selectgroup-input">
-                                            <span class="selectgroup-button">{{ __('Online Event') }}</span>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="location-detail {{ $event->type == 'online' ? 'hide' : '' }}">
+                                <div class="location-detail">
                                     <div class="form-group">
                                         <label>{{ __('Event Address') }}</label>
                                         <input type="text" name="address" id="address"
@@ -262,18 +288,6 @@
                                                 @enderror
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="url {{ $event->type == 'offline' ? 'hide' : '' }}">
-                                    <div class="form-group">
-                                        <label>{{ __('Event url') }}</label>
-                                        <input type="link" value="{{ $event->url }}" name="url" id="url"
-                                            placeholder="{{ __('Event url') }}"
-                                            class="form-control @error('url')? is-invalid @enderror">
-                                        @error('url')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-
                                     </div>
                                 </div>
                                 <div class="form-group">
