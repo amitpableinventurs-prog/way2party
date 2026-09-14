@@ -12,6 +12,8 @@ use App\Models\Event;
 use App\Models\EventFaq;
 use App\Models\Faq;
 use App\Models\Feedback;
+use App\Models\MembershipFeature;
+use App\Models\MembershipPlan;
 use App\Models\Order;
 use App\Models\OrderChild;
 use App\Models\Review;
@@ -54,6 +56,7 @@ class DummyDataSeeder extends Seeder
         $this->taxes($organizers);
 
         $this->orders($events, $tickets, $customers);
+        $this->membershipPlans();
 
         $this->command?->info('Dummy data seeded.');
     }
@@ -464,6 +467,46 @@ class DummyDataSeeder extends Seeder
                     ]
                 );
             }
+        }
+    }
+
+    private function membershipPlans(): void
+    {
+        $features = [];
+        foreach (['Message organizers', 'Access secret parties', 'Free cancellation', 'Priority support', 'Early ticket access'] as $name) {
+            $features[$name] = MembershipFeature::firstOrCreate(['name' => $name])->id;
+        }
+
+        $plans = [
+            [
+                'name' => 'Silver', 'amount' => 9.99, 'price' => 9.99, 'duration_days' => 30, 'sort_order' => 1,
+                'description' => 'A light touch of perks for regular party-goers.',
+                'features' => ['Message organizers'],
+            ],
+            [
+                'name' => 'Gold', 'amount' => 24.99, 'price' => 19.99, 'duration_days' => 30, 'sort_order' => 2,
+                'description' => 'More access, better deals, faster support.',
+                'features' => ['Message organizers', 'Free cancellation', 'Early ticket access'],
+            ],
+            [
+                'name' => 'Platinum', 'amount' => 49.99, 'price' => 39.99, 'duration_days' => 90, 'sort_order' => 3,
+                'description' => 'Serious perks for members who party often.',
+                'features' => ['Message organizers', 'Free cancellation', 'Early ticket access', 'Access secret parties'],
+            ],
+            [
+                'name' => 'Diamond', 'amount' => 99.99, 'price' => 79.99, 'duration_days' => 365, 'sort_order' => 4,
+                'description' => 'The full experience - every perk, all year.',
+                'features' => ['Message organizers', 'Free cancellation', 'Early ticket access', 'Access secret parties', 'Priority support'],
+            ],
+        ];
+
+        foreach ($plans as $p) {
+            $planFeatures = $p['features'];
+            unset($p['features']);
+            $p['status'] = 1;
+
+            $plan = MembershipPlan::updateOrCreate(['name' => $p['name']], $p);
+            $plan->features()->sync(array_map(fn ($name) => $features[$name], $planFeatures));
         }
     }
 }
