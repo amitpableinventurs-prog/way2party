@@ -24,6 +24,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 
 /**
  * Fills every admin-managed section with just enough believable data to click
@@ -57,6 +58,7 @@ class DummyDataSeeder extends Seeder
 
         $this->orders($events, $tickets, $customers);
         $this->membershipPlans();
+        $this->attachRealImages();
 
         $this->command?->info('Dummy data seeded.');
     }
@@ -507,6 +509,113 @@ class DummyDataSeeder extends Seeder
 
             $plan = MembershipPlan::updateOrCreate(['name' => $p['name']], $p);
             $plan->features()->sync(array_map(fn ($name) => $features[$name], $planFeatures));
+        }
+    }
+
+    /**
+     * Downloads a real photo (picsum.photos for scenes, pravatar.cc for
+     * avatars) and caches it under a deterministic filename so re-running
+     * the seeder never re-downloads. Returns null on any failure so callers
+     * can just skip the update and keep whatever image was already there.
+     */
+    private function realImage(string $seed, bool $avatar = false): ?string
+    {
+        $hash = substr(md5($seed), 0, 16);
+        $filename = 'dummy_' . $hash . '.jpg';
+        $path = public_path('images/upload/' . $filename);
+        if (file_exists($path)) {
+            return $filename;
+        }
+
+        $url = $avatar
+            ? 'https://i.pravatar.cc/500?u=' . urlencode($seed)
+            : 'https://picsum.photos/seed/' . $hash . '/900/600';
+
+        try {
+            // verify=false: this only ever fetches public stock photos for
+            // local demo data (never anything sensitive), and some local
+            // dev PHP installs ship a broken/relative curl.cainfo path that
+            // would otherwise fail every HTTPS request here.
+            $response = Http::withOptions(['verify' => false])->timeout(10)->get($url);
+            if ($response->successful() && strlen($response->body()) > 0) {
+                file_put_contents($path, $response->body());
+                return $filename;
+            }
+        } catch (\Throwable $e) {
+            $this->command?->warn("Could not download dummy image for '{$seed}': " . $e->getMessage());
+        }
+
+        return null;
+    }
+
+    /**
+     * Replaces the generic default.png/defaultuser.png placeholder with a
+     * real photo, but ONLY for the exact records this seeder itself
+     * creates (matched by the same emails/names used above) - never a
+     * broad "any row still using default.png" scan, so real accounts that
+     * simply haven't uploaded a photo yet are never touched.
+     */
+    private function attachRealImages(): void
+    {
+        $organizerEmails = ['nova.events@example.com', 'skyline.shows@example.com', 'pulse.live@example.com'];
+        foreach (User::whereIn('email', $organizerEmails)->get() as $u) {
+            if ($img = $this->realImage('organizer-' . $u->email, true)) {
+                $u->update(['image' => $img]);
+            }
+        }
+
+        $scannerEmails = ['scanner.gatea@example.com', 'scanner.gateb@example.com'];
+        foreach (User::whereIn('email', $scannerEmails)->get() as $u) {
+            if ($img = $this->realImage('scanner-' . $u->email, true)) {
+                $u->update(['image' => $img]);
+            }
+        }
+
+        $customerEmails = ['aarav.sharma@example.com', 'diya.patel@example.com', 'kabir.mehta@example.com', 'ananya.rao@example.com', 'vivaan.nair@example.com'];
+        foreach (AppUser::whereIn('email', $customerEmails)->get() as $u) {
+            if ($img = $this->realImage('customer-' . $u->email, true)) {
+                $u->update(['image' => $img]);
+            }
+        }
+
+        $categoryNames = ['Music', 'Business', 'Sports', 'Food & Drink', 'Technology'];
+        foreach (Category::whereIn('name', $categoryNames)->get() as $c) {
+            if ($img = $this->realImage('category-' . $c->name)) {
+                $c->update(['image' => $img]);
+            }
+        }
+
+        $eventNames = ['Indie Music Fest', 'Startup Growth Summit', 'City Marathon 2026', 'Cloud & AI Conference', 'Street Food Carnival', 'Design Systems Workshop', 'Jazz Night Live', 'Photography Bootcamp'];
+        foreach (Event::whereIn('name', $eventNames)->get() as $e) {
+            if ($img = $this->realImage('event-' . $e->name)) {
+                $e->update(['image' => $img]);
+            }
+        }
+
+        $blogTitles = [
+            'How to plan a memorable music festival',
+            '5 ticketing mistakes event organizers make',
+            'A guide to hybrid and online events in 2026',
+            'Marketing your event on a small budget',
+            'Check-in day: a stress-free operations checklist',
+        ];
+        foreach (Blog::whereIn('title', $blogTitles)->get() as $b) {
+            if ($img = $this->realImage('blog-' . $b->title)) {
+                $b->update(['image' => $img]);
+            }
+        }
+
+        foreach (Banner::whereIn('title', $eventNames)->get() as $banner) {
+            if ($img = $this->realImage('banner-' . $banner->title)) {
+                $banner->update(['image' => $img]);
+            }
+        }
+
+        $planNames = ['Free', 'Silver', 'Gold', 'Platinum', 'Diamond'];
+        foreach (MembershipPlan::whereIn('name', $planNames)->get() as $plan) {
+            if ($img = $this->realImage('plan-' . $plan->name)) {
+                $plan->update(['image' => $img]);
+            }
         }
     }
 }
