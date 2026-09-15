@@ -11,10 +11,19 @@
             <div
                 class="absolute bg-blue blur-3xl opacity-10 s:bg-opacity-10 3xl:w-[370px] 3xl:h-[370px] 2xl:w-[300px] 2xl:h-[300px] 1xl:w-[300px] xmd:w-[300px] xmd:h-[300px] sm:w-[200px] sm:h-[300px] xxsm:w-[300px] xxsm:h-[300px] rounded-full -mt-5 2xl:-ml-20 1xl:-ml-20 sm:ml-2 xxsm:-ml-7">
             </div>
-            <div class="flex justify-start pt-5 z-10">
+            <div class="flex justify-start pt-5 z-10 flex-wrap items-end">
                 <p
                     class="font-poppins font-semibold md:text-5xl xxsm:text-2xl xsm:text-2xl sm:text-2xl text-blue leading-10 ">
-                    {{ __('Events') }}</p>&nbsp;&nbsp;
+                    @if (isset($category) && !empty($city))
+                        {{ $category->name }} {{ __('Events in') }} {{ $city->name }}
+                    @elseif (isset($category))
+                        {{ $category->name }} {{ __('Events') }}
+                    @elseif (isset($city) && !empty($city))
+                        {{ __('Events in') }} {{ $city->name }}
+                    @else
+                        {{ __('Events') }}
+                    @endif
+                </p>&nbsp;&nbsp;
                 <p
                     class="font-poppins font-medium md:text-2xl xxsm:text-xl sm:text-xl text-blue leading-10 pt-1 sm:pt-3">
                     ( {{ $events->count() }} )</p>
@@ -91,9 +100,10 @@
                                         </a>
                                     @endif
                                     @if ($item->category)
-                                        <span class="px-3 py-1 text-xs font-poppins text-success bg-success-light rounded-full">
+                                        <a href="{{ url('/events-category/' . $item->category_id . '/' . Str::slug($item->category->name)) . ($item->city ? '?city=' . $item->city_id : '') }}"
+                                            class="px-3 py-1 text-xs font-poppins text-success bg-success-light rounded-full hover:underline">
                                             {{ $item->category->name }}
-                                        </span>
+                                        </a>
                                     @endif
                                 </div>
                                 <div class="flex justify-between mt-7">
@@ -144,9 +154,10 @@
                                             </a>
                                         @endif
                                         @if ($item->category)
-                                            <span class="px-3 py-1 text-xs font-poppins text-success bg-success-light rounded-full">
+                                            <a href="{{ url('/events-category/' . $item->category_id . '/' . Str::slug($item->category->name)) . ($item->city ? '?city=' . $item->city_id : '') }}"
+                                                class="px-3 py-1 text-xs font-poppins text-success bg-success-light rounded-full hover:underline">
                                                 {{ $item->category->name }}
-                                            </span>
+                                            </a>
                                         @endif
                                     </div>
                                     <div class="flex justify-between mt-7">
@@ -199,9 +210,10 @@
                                         </a>
                                     @endif
                                     @if ($item->category)
-                                        <span class="px-3 py-1 text-xs font-poppins text-success bg-success-light rounded-full">
+                                        <a href="{{ url('/events-category/' . $item->category_id . '/' . Str::slug($item->category->name)) . ($item->city ? '?city=' . $item->city_id : '') }}"
+                                            class="px-3 py-1 text-xs font-poppins text-success bg-success-light rounded-full hover:underline">
                                             {{ $item->category->name }}
-                                        </span>
+                                        </a>
                                     @endif
                                 </div>
                                 <div class="flex justify-between mt-7">

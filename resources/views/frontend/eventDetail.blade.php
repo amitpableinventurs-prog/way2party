@@ -145,6 +145,22 @@
                                     <p class="font-poppins font-normal text-lg leading-7 text-gray"> {{ $data->people }}</p>
                                 @endif
                             </div>
+                            @if ($data->city || $data->category)
+                                <div class="flex items-center gap-2 mt-4 flex-wrap">
+                                    @if ($data->city)
+                                        <a href="{{ url('/events-city/' . $data->city_id . '/' . Str::slug($data->city->name)) }}"
+                                            class="px-3 py-1 text-xs font-poppins text-primary bg-primary-light rounded-full hover:underline">
+                                            {{ $data->city->name }}
+                                        </a>
+                                    @endif
+                                    @if ($data->category)
+                                        <a href="{{ url('/events-category/' . $data->category_id . '/' . Str::slug($data->category->name)) . ($data->city ? '?city=' . $data->city_id : '') }}"
+                                            class="px-3 py-1 text-xs font-poppins text-success bg-success-light rounded-full hover:underline">
+                                            {{ $data->category->name }}
+                                        </a>
+                                    @endif
+                                </div>
+                            @endif
                         </div>
                     </div>
                     <div class="mt-10 bg-white shadow-lg rounded-md">

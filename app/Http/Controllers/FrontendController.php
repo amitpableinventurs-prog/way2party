@@ -863,7 +863,7 @@ class FrontendController extends Controller
     {
         $setting = Setting::first(['app_name', 'logo', 'show_event_report_form']);
         $currency = Setting::first(['currency_sybmol']);
-        $data = Event::with(['category:id,name,image', 'organization:id,first_name,organization_name,bio,last_name,image'])->find($id);
+        $data = Event::with(['category:id,name,image', 'city:id,name', 'organization:id,first_name,organization_name,bio,last_name,image'])->find($id);
         if (!$data || !Event::where('id', $id)->visibleTo(Auth::guard('appuser')->user())->exists()) {
             abort(404);
         }
@@ -1323,10 +1323,11 @@ class FrontendController extends Controller
         }
         return true;
     }
-    public function categoryEvents($id, $name)
+    public function categoryEvents($id, $name, Request $request)
     {
         $setting = Setting::first(['app_name', 'logo']);
         $category = Category::find($id);
+        $city = $request->filled('city') ? City::find($request->city) : null;
 
         SEOMeta::setTitle($setting->app_name . '- Events' ?? env('APP_NAME'))
             ->setDescription('This is category events page')
@@ -1364,6 +1365,7 @@ class FrontendController extends Controller
         $date = Carbon::now($timezone);
         $events  = Event::with(['category:id,name', 'city:id,name'])
             ->where([['status', 1], ['is_deleted', 0], ['category_id', $id], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]])
+            ->when($city, fn ($q) => $q->where('city_id', $city->id))
             ->visibleTo(Auth::guard('appuser')->user())
             ->orderBy('start_time', 'ASC')->get();
         $offlinecount = 0;
@@ -1378,7 +1380,7 @@ class FrontendController extends Controller
         }
         $user = Auth::guard('appuser')->user();
         $catactive = $name;
-        return view('frontend.events', compact('events', 'category', 'onlinecount', 'offlinecount', 'user', 'catactive'));
+        return view('frontend.events', compact('events', 'category', 'city', 'onlinecount', 'offlinecount', 'user', 'catactive'));
     }
 
     public function cityEvents($id, $name)

@@ -205,9 +205,10 @@
                                             </a>
                                         @endif
                                         @if ($item->category)
-                                            <span class="px-3 py-1 text-xs font-poppins text-success bg-success-light rounded-full">
+                                            <a href="{{ url('/events-category/' . $item->category_id . '/' . Str::slug($item->category->name)) . ($item->city ? '?city=' . $item->city_id : '') }}"
+                                                class="px-3 py-1 text-xs font-poppins text-success bg-success-light rounded-full hover:underline">
                                                 {{ $item->category->name }}
-                                            </span>
+                                            </a>
                                         @endif
                                     </div>
                                     <div class="flex justify-between mt-7">
@@ -306,9 +307,10 @@
                                         </a>
                                     @endif
                                     @if ($item->category)
-                                        <span class="px-3 py-1 text-xs font-poppins text-success bg-success-light rounded-full">
+                                        <a href="{{ url('/events-category/' . $item->category_id . '/' . Str::slug($item->category->name)) . ($item->city ? '?city=' . $item->city_id : '') }}"
+                                            class="px-3 py-1 text-xs font-poppins text-success bg-success-light rounded-full hover:underline">
                                             {{ $item->category->name }}
-                                        </span>
+                                        </a>
                                     @endif
                                 </div>
                                 <div class="flex justify-between mt-7">
