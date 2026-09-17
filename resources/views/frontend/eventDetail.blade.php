@@ -153,7 +153,14 @@
                                             {{ $data->city->name }}
                                         </a>
                                     @endif
-                                    @if ($data->category)
+                                    @if ($data->categories->isNotEmpty())
+                                        @foreach ($data->categories as $cat)
+                                            <a href="{{ url('/events-category/' . $cat->id . '/' . Str::slug($cat->name)) . ($data->city ? '?city=' . $data->city_id : '') }}"
+                                                class="px-3 py-1 text-xs font-poppins text-success bg-success-light rounded-full hover:underline">
+                                                {{ $cat->name }}
+                                            </a>
+                                        @endforeach
+                                    @elseif ($data->category)
                                         <a href="{{ url('/events-category/' . $data->category_id . '/' . Str::slug($data->category->name)) . ($data->city ? '?city=' . $data->city_id : '') }}"
                                             class="px-3 py-1 text-xs font-poppins text-success bg-success-light rounded-full hover:underline">
                                             {{ $data->category->name }}

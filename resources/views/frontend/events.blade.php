@@ -99,7 +99,14 @@
                                             {{ $item->city->name }}
                                         </a>
                                     @endif
-                                    @if ($item->category)
+                                    @if ($item->categories->isNotEmpty())
+                                        @foreach ($item->categories as $cat)
+                                            <a href="{{ url('/events-category/' . $cat->id . '/' . Str::slug($cat->name)) . ($item->city ? '?city=' . $item->city_id : '') }}"
+                                                class="px-3 py-1 text-xs font-poppins text-success bg-success-light rounded-full hover:underline">
+                                                {{ $cat->name }}
+                                            </a>
+                                        @endforeach
+                                    @elseif ($item->category)
                                         <a href="{{ url('/events-category/' . $item->category_id . '/' . Str::slug($item->category->name)) . ($item->city ? '?city=' . $item->city_id : '') }}"
                                             class="px-3 py-1 text-xs font-poppins text-success bg-success-light rounded-full hover:underline">
                                             {{ $item->category->name }}
@@ -153,7 +160,14 @@
                                                 {{ $item->city->name }}
                                             </a>
                                         @endif
-                                        @if ($item->category)
+                                        @if ($item->categories->isNotEmpty())
+                                            @foreach ($item->categories as $cat)
+                                                <a href="{{ url('/events-category/' . $cat->id . '/' . Str::slug($cat->name)) . ($item->city ? '?city=' . $item->city_id : '') }}"
+                                                    class="px-3 py-1 text-xs font-poppins text-success bg-success-light rounded-full hover:underline">
+                                                    {{ $cat->name }}
+                                                </a>
+                                            @endforeach
+                                        @elseif ($item->category)
                                             <a href="{{ url('/events-category/' . $item->category_id . '/' . Str::slug($item->category->name)) . ($item->city ? '?city=' . $item->city_id : '') }}"
                                                 class="px-3 py-1 text-xs font-poppins text-success bg-success-light rounded-full hover:underline">
                                                 {{ $item->category->name }}
@@ -209,7 +223,14 @@
                                             {{ $item->city->name }}
                                         </a>
                                     @endif
-                                    @if ($item->category)
+                                    @if ($item->categories->isNotEmpty())
+                                        @foreach ($item->categories as $cat)
+                                            <a href="{{ url('/events-category/' . $cat->id . '/' . Str::slug($cat->name)) . ($item->city ? '?city=' . $item->city_id : '') }}"
+                                                class="px-3 py-1 text-xs font-poppins text-success bg-success-light rounded-full hover:underline">
+                                                {{ $cat->name }}
+                                            </a>
+                                        @endforeach
+                                    @elseif ($item->category)
                                         <a href="{{ url('/events-category/' . $item->category_id . '/' . Str::slug($item->category->name)) . ($item->city ? '?city=' . $item->city_id : '') }}"
                                             class="px-3 py-1 text-xs font-poppins text-success bg-success-light rounded-full hover:underline">
                                             {{ $item->category->name }}

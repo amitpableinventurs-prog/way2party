@@ -123,7 +123,8 @@ class EventController extends Controller
             'image' => 'bail|required|image|mimes:jpeg,png,jpg,gif|max:3048',
             'start_time' => 'bail|required',
             'end_time' => 'bail|required|after:start_time',
-            'category_id' => 'bail|required',
+            'category_id' => 'bail|required|array|min:1',
+            'category_id.*' => 'bail|exists:category,id',
             // change to 'bail|required|exists:city,id' once cities have been added in admin
             'city_id' => 'bail|nullable|exists:city,id',
             'address' => 'bail|required',
@@ -145,6 +146,8 @@ class EventController extends Controller
         ]);
         $data = $request->all();
         $data['type'] = 'offline';
+        $categoryIds = $request->input('category_id');
+        $data['category_id'] = $categoryIds[0];
         $data['scanner_id'] = implode(',', $request->scanner_id);
         $data['is_featured'] = $request->boolean('is_featured');
         $data['featured_order'] = $data['is_featured'] ? intval($request->featured_order) : 0;
@@ -159,6 +162,7 @@ class EventController extends Controller
             $data['user_id'] = Auth::user()->id;
         }
         $event = Event::create($data);
+        $event->categories()->sync($categoryIds);
         return redirect()->route('events.index')->withStatus(__('Event has added successfully.'));
     }
 
@@ -195,7 +199,8 @@ class EventController extends Controller
             'name' => 'bail|required',
             'start_time' => 'bail|required',
             'end_time' => 'bail|required|after:start_time',
-            'category_id' => 'bail|required',
+            'category_id' => 'bail|required|array|min:1',
+            'category_id.*' => 'bail|exists:category,id',
             'city_id' => 'bail|nullable|exists:city,id',
             'address' => 'bail|required',
             'lat' => 'bail|required',
@@ -216,6 +221,8 @@ class EventController extends Controller
         ]);
         $data = $request->all();
         $data['type'] = 'offline';
+        $categoryIds = $request->input('category_id');
+        $data['category_id'] = $categoryIds[0];
         $data['scanner_id'] = implode(',', $request->scanner_id);
         $data['is_featured'] = $request->boolean('is_featured');
         $data['featured_order'] = $data['is_featured'] ? intval($request->featured_order) : 0;
@@ -225,7 +232,8 @@ class EventController extends Controller
             (new AppHelper)->deleteFile($event->image);
             $data['image'] = (new AppHelper)->saveImage($request);
         }
-        $event = Event::find($event->id)->update($data);
+        $event->update($data);
+        $event->categories()->sync($categoryIds);
         return redirect()->route('events.index')->withStatus(__('Event has updated successfully.'));
     }
 
@@ -323,9 +331,9 @@ class EventController extends Controller
         $data = $request->only(['name', 'category_id', 'start_time', 'end_time', 'people', 'key_points', 'tags']);
 
         $categoryLabel = 'general';
-        if ($data['category_id']) {
-            $category = Category::select('name')
-                ->find($data['category_id']);
+        $categoryId = is_array($data['category_id'] ?? null) ? ($data['category_id'][0] ?? null) : ($data['category_id'] ?? null);
+        if ($categoryId) {
+            $category = Category::select('name')->find($categoryId);
             $categoryLabel = $category->name ?? $categoryLabel;
         }
 

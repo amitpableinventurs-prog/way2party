@@ -54,6 +54,14 @@ class Event extends Model
         return $this->hasOne('App\Models\Category', 'id', 'category_id');
     }
 
+    // All party types tagged on the event. `category_id`/`category()` above stay as the
+    // single "primary" category (mobile app API + existing single-category features read
+    // that), this is additive for the web admin's multi-select Party Type field.
+    public function categories()
+    {
+        return $this->belongsToMany('App\Models\Category', 'event_category', 'event_id', 'category_id');
+    }
+
     public function city()
     {
         return $this->hasOne('App\Models\City', 'id', 'city_id');

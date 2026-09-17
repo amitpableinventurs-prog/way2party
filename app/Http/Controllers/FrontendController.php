@@ -119,7 +119,7 @@ class FrontendController extends Controller
 
             $timezone = Setting::find(1)->timezone;
             $date = Carbon::now($timezone);
-            $events  = Event::with(['category:id,name', 'city:id,name'])
+            $events  = Event::with(['category:id,name', 'categories:id,name', 'city:id,name'])
                 ->where([['status', 1], ['is_deleted', 0], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]])
                 ->visibleTo(Auth::guard('appuser')->user())
                 ->orderBy('start_time', 'desc')->get();
@@ -133,7 +133,7 @@ class FrontendController extends Controller
                 $value->available_ticket = $value->total_ticket - $value->sold_ticket;
                 $value->append('auto_generated_tag');
             }
-            $featuredEvents = Event::with(['category:id,name', 'city:id,name'])->featured()
+            $featuredEvents = Event::with(['category:id,name', 'categories:id,name', 'city:id,name'])->featured()
                 ->where('end_time', '>', $date->format('Y-m-d H:i:s'))
                 ->visibleTo(Auth::guard('appuser')->user())
                 ->orderByFeatured()->take(8)->get();
@@ -798,7 +798,7 @@ class FrontendController extends Controller
 
         $timezone = Setting::find(1)->timezone;
         $date = Carbon::now($timezone);
-        $events  = Event::with(['category:id,name', 'city:id,name'])
+        $events  = Event::with(['category:id,name', 'categories:id,name', 'city:id,name'])
             ->where([['status', 1], ['is_deleted', 0], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d')]])
             ->visibleTo(Auth::guard('appuser')->user());
 
@@ -816,7 +816,10 @@ class FrontendController extends Controller
         }
         if ($request->has('category') && $request->category != null) {
             $chip['category'] = Category::find($request->category)->name;
-            $events = $events->where('category_id', $request->category);
+            $events = $events->where(function ($q) use ($request) {
+                $q->where('category_id', $request->category)
+                    ->orWhereHas('categories', fn ($qq) => $qq->where('category.id', $request->category));
+            });
         }
         if ($request->has('duration') && $request->duration != null) {
             $chip['date'] = $request->duration;
@@ -863,7 +866,7 @@ class FrontendController extends Controller
     {
         $setting = Setting::first(['app_name', 'logo', 'show_event_report_form']);
         $currency = Setting::first(['currency_sybmol']);
-        $data = Event::with(['category:id,name,image', 'city:id,name', 'organization:id,first_name,organization_name,bio,last_name,image'])->find($id);
+        $data = Event::with(['category:id,name,image', 'categories:id,name,image', 'city:id,name', 'organization:id,first_name,organization_name,bio,last_name,image'])->find($id);
         if (!$data || !Event::where('id', $id)->visibleTo(Auth::guard('appuser')->user())->exists()) {
             abort(404);
         }
@@ -1363,8 +1366,12 @@ class FrontendController extends Controller
 
         $timezone = Setting::find(1)->timezone;
         $date = Carbon::now($timezone);
-        $events  = Event::with(['category:id,name', 'city:id,name'])
-            ->where([['status', 1], ['is_deleted', 0], ['category_id', $id], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]])
+        $events  = Event::with(['category:id,name', 'categories:id,name', 'city:id,name'])
+            ->where([['status', 1], ['is_deleted', 0], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]])
+            ->where(function ($q) use ($id) {
+                $q->where('category_id', $id)
+                    ->orWhereHas('categories', fn ($qq) => $qq->where('category.id', $id));
+            })
             ->when($city, fn ($q) => $q->where('city_id', $city->id))
             ->visibleTo(Auth::guard('appuser')->user())
             ->orderBy('start_time', 'ASC')->get();
@@ -1422,7 +1429,7 @@ class FrontendController extends Controller
 
         $timezone = Setting::find(1)->timezone;
         $date = Carbon::now($timezone);
-        $events  = Event::with(['category:id,name', 'city:id,name'])
+        $events  = Event::with(['category:id,name', 'categories:id,name', 'city:id,name'])
             ->where([['status', 1], ['is_deleted', 0], ['city_id', $id], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]])
             ->visibleTo(Auth::guard('appuser')->user())
             ->orderBy('start_time', 'ASC')->get();
@@ -1480,13 +1487,13 @@ class FrontendController extends Controller
         $timezone = Setting::find(1)->timezone;
         $date = Carbon::now($timezone);
         if ($type == "all") {
-            $events  = Event::with(['category:id,name'])
+            $events  = Event::with(['category:id,name', 'categories:id,name'])
                 ->where([['status', 1], ['is_deleted', 0], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]])
                 ->orderBy('start_time', 'ASC')->get();
 
             return view('frontend.events', compact('events'));
         } else {
-            $events  = Event::with(['category:id,name'])
+            $events  = Event::with(['category:id,name', 'categories:id,name'])
                 ->where([['status', 1], ['is_deleted', 0], ['event_status', 'Pending'], ['type', $type], ['end_time', '>', $date->format('Y-m-d H:i:s')]])
                 ->orderBy('start_time', 'ASC')->get();
             return view('frontend.events', compact('events', 'type'));

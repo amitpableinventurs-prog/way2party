@@ -41,7 +41,7 @@
                                     <div class="col-lg-6">
                                         <div class="form-group">
                                             <label>{{ __('Name') }}</label>
-                                            <input type="text" name="name" value="{{ $event->name }}"
+                                            <input type="text" name="name" value="{{ old('name', $event->name) }}"
                                                 placeholder="{{ __('Name') }}"
                                                 class="form-control @error('name')? is-invalid @enderror">
                                             @error('name')
@@ -49,16 +49,21 @@
                                             @enderror
                                         </div>
                                         <div class="form-group">
-                                            <label>{{ __('Party Type') }}</label>
-                                            <select name="category_id" class="form-control select2">
-                                                <option value="">{{ __('Select Party Type') }}</option>
+                                            <label>{{ __('Party Type') }} {{ __('(Choose Multiple if required.)') }}</label>
+                                            <select name="category_id[]" class="form-control select2" multiple data-live-search="true">
+                                                @php
+                                                    $selectedCategories = old('category_id', $event->categories->pluck('id')->all());
+                                                @endphp
                                                 @foreach ($category as $item)
                                                     <option value="{{ $item->id }}"
-                                                        {{ $item->id == $event->category_id ? 'Selected' : '' }}>
+                                                        {{ in_array($item->id, $selectedCategories) ? 'Selected' : '' }}>
                                                         {{ $item->name }}</option>
                                                 @endforeach
                                             </select>
                                             @error('category_id')
+                                                <div class="invalid-feedback block">{{ $message }}</div>
+                                            @enderror
+                                            @error('category_id.*')
                                                 <div class="invalid-feedback block">{{ $message }}</div>
                                             @enderror
                                         </div>
@@ -68,7 +73,7 @@
                                                 <option value="">{{ __('Select City') }}</option>
                                                 @foreach ($city as $item)
                                                     <option value="{{ $item->id }}"
-                                                        {{ $item->id == $event->city_id ? 'Selected' : '' }}>
+                                                        {{ $item->id == old('city_id', $event->city_id) ? 'Selected' : '' }}>
                                                         {{ $item->name }}</option>
                                                 @endforeach
                                             </select>
@@ -84,7 +89,7 @@
                                         <div class="form-group">
                                             <label>{{ __('Start Time') }}</label>
                                             <input type="text" name="start_time" id="start_time"
-                                                value="{{ $event->start_time }}"
+                                                value="{{ old('start_time', $event->start_time) }}"
                                                 placeholder="{{ __('Choose Start time') }}"
                                                 class="form-control date @error('start_time')? is-invalid @enderror">
                                             @error('start_time')
@@ -96,7 +101,7 @@
                                         <div class="form-group">
                                             <label>{{ __('End Time') }}</label>
                                             <input type="text" name="end_time" id="end_time"
-                                                value="{{ $event->end_time }}" placeholder="{{ __('Choose End time') }}"
+                                                value="{{ old('end_time', $event->end_time) }}" placeholder="{{ __('Choose End time') }}"
                                                 class="form-control date @error('end_time')? is-invalid @enderror">
                                             @error('end_time')
                                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -111,7 +116,7 @@
                                             <option value="">{{ __('Choose Organizer') }}</option>
                                             @foreach ($users as $item)
                                                 <option value="{{ $item->id }}"
-                                                    {{ $item->id == $event->user_id ? 'Selected' : '' }}>
+                                                    {{ $item->id == old('user_id', $event->user_id) ? 'Selected' : '' }}>
                                                     {{ $item->first_name . ' ' . $item->last_name }}</option>
                                             @endforeach
                                         </select>
@@ -126,12 +131,13 @@
                                         <select name="scanner_id[]" class="form-control scanner_id select2 selectpicker"
                                             multiple data-live-search="true">
                                             <option value="" disabled>{{ __('Choose Scanner') }}</option>
+                                            @php
+                                                $selectedScanners = old('scanner_id')
+                                                    ?? array_filter(preg_split('/\s*,\s*/', (string) $event->scanner_id));
+                                            @endphp
                                             @foreach ($scanner as $item)
                                                 <option value="{{ $item->id }}"
-                                                    @if (str_contains($event->scanner_id, $item->id)) @if (preg_match("/\b$item->id\b/", $event->scanner_id))
-                                                            selected @endif
-                                                    @endif
-                                                    >
+                                                    {{ in_array($item->id, $selectedScanners) ? 'selected' : '' }}>
                                                     {{ $item->first_name . ' ' . $item->last_name }}</option>
                                             @endforeach
                                         </select>
@@ -145,7 +151,7 @@
                                         <div class="form-group">
                                             <label>{{ __('Maximum people will join in this event') }}</label>
                                             <input type="number" name="people" id="people"
-                                                value="{{ $event->people }}"
+                                                value="{{ old('people', $event->people) }}"
                                                 placeholder="{{ __('Maximum people will join in this event') }}"
                                                 class="form-control @error('people')? is-invalid @enderror">
                                             @error('people')
@@ -157,9 +163,9 @@
                                         <div class="form-group">
                                             <label>{{ __('status') }}</label>
                                             <select name="status" class="form-control select2">
-                                                <option value="1" {{ $event->status == '1' ? 'selected' : '' }}>
+                                                <option value="1" {{ old('status', $event->status) == '1' ? 'selected' : '' }}>
                                                     {{ __('Active') }}</option>
-                                                <option value="0" {{ $event->status == '0' ? 'Selected' : '' }}>
+                                                <option value="0" {{ old('status', $event->status) == '0' ? 'selected' : '' }}>
                                                     {{ __('Inactive') }}</option>
                                             </select>
                                             @error('status')
@@ -173,8 +179,9 @@
                                         <div class="form-group">
                                             <label>{{ __('Featured Event') }}</label>
                                             <select name="is_featured" id="is_featured" class="form-control select2">
-                                                <option value="0" {{ $event->is_featured ? '' : 'selected' }}>{{ __('No') }}</option>
-                                                <option value="1" {{ $event->is_featured ? 'selected' : '' }}>{{ __('Yes') }}</option>
+                                                @php $isFeatured = old('is_featured', $event->is_featured); @endphp
+                                                <option value="0" {{ $isFeatured ? '' : 'selected' }}>{{ __('No') }}</option>
+                                                <option value="1" {{ $isFeatured ? 'selected' : '' }}>{{ __('Yes') }}</option>
                                             </select>
                                             <small class="text-muted">{{ __('Featured events are highlighted on the home page.') }}</small>
                                             @error('is_featured')
@@ -216,8 +223,9 @@
                                         <div class="form-group">
                                             <label>{{ __('Ticket Cancellation') }}</label>
                                             <select name="cancellation_allowed" id="cancellation_allowed" class="form-control select2">
-                                                <option value="0" {{ $event->cancellation_allowed ? '' : 'selected' }}>{{ __('Not Allowed') }}</option>
-                                                <option value="1" {{ $event->cancellation_allowed ? 'selected' : '' }}>{{ __('Allowed') }}</option>
+                                                @php $cancellationAllowed = old('cancellation_allowed', $event->cancellation_allowed); @endphp
+                                                <option value="0" {{ $cancellationAllowed ? '' : 'selected' }}>{{ __('Not Allowed') }}</option>
+                                                <option value="1" {{ $cancellationAllowed ? 'selected' : '' }}>{{ __('Allowed') }}</option>
                                             </select>
                                             @error('cancellation_allowed')
                                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -238,7 +246,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label>{{ __('Tags') }}</label>
-                                    <input type="text" name="tags" value="{{ $event->tags }}"
+                                    <input type="text" name="tags" value="{{ old('tags', $event->tags) }}"
                                         class="form-control inputtags @error('tags')? is-invalid @enderror">
                                     @error('tags')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -248,7 +256,7 @@
                                     <label>{{ __('Description') }}</label>
                                     <textarea name="description" Placeholder="{{ __('Description') }}"
                                         class="textarea_editor @error('description')? is-invalid @enderror">
-                                {{ $event->description }}
+                                {{ old('description', $event->description) }}
                             </textarea>
                                     @error('description')
                                         <div class="invalid-feedback block">{{ $message }}</div>
@@ -259,7 +267,7 @@
                                     <div class="form-group">
                                         <label>{{ __('Event Address') }}</label>
                                         <input type="text" name="address" id="address"
-                                            value="{{ $event->address }}" placeholder="{{ __('Event Address') }}"
+                                            value="{{ old('address', $event->address) }}" placeholder="{{ __('Event Address') }}"
                                             class="form-control @error('address')? is-invalid @enderror">
                                         @error('address')
                                             <div class="invalid-feedback">{{ $message }}</div>
@@ -270,7 +278,7 @@
                                             <div class="form-group">
                                                 <label>{{ __('Latitude') }}</label>
                                                 <input type="text" name="lat" id="lat"
-                                                    value="{{ $event->lat }}" placeholder="{{ __('Latitude') }}"
+                                                    value="{{ old('lat', $event->lat) }}" placeholder="{{ __('Latitude') }}"
                                                     class="form-control @error('lat')? is-invalid @enderror">
                                                 @error('lat')
                                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -281,7 +289,7 @@
                                             <div class="form-group">
                                                 <label>{{ __('Longitude') }}</label>
                                                 <input type="text" name="lang" id="lang"
-                                                    value="{{ $event->lang }}" placeholder="{{ __('Longitude') }}"
+                                                    value="{{ old('lang', $event->lang) }}" placeholder="{{ __('Longitude') }}"
                                                     class="form-control @error('lang')? is-invalid @enderror">
                                                 @error('lang')
                                                     <div class="invalid-feedback">{{ $message }}</div>

@@ -47,16 +47,18 @@
                                             @enderror
                                         </div>
                                         <div class="form-group">
-                                            <label>{{ __('Party Type') }}</label>
-                                            <select name="category_id" class="form-control select2">
-                                                <option value="">{{ __('Select Party Type') }}</option>
+                                            <label>{{ __('Party Type') }} {{ __('(Choose Multiple if required.)') }}</label>
+                                            <select name="category_id[]" class="form-control select2" multiple data-live-search="true">
                                                 @foreach ($category as $item)
                                                     <option value="{{ $item->id }}"
-                                                        {{ $item->id == old('category') ? 'Selected' : '' }}>
+                                                        {{ in_array($item->id, old('category_id', [])) ? 'Selected' : '' }}>
                                                         {{ $item->name }}</option>
                                                 @endforeach
                                             </select>
-                                            @error('category')
+                                            @error('category_id')
+                                                <div class="invalid-feedback block">{{ $message }}</div>
+                                            @enderror
+                                            @error('category_id.*')
                                                 <div class="invalid-feedback block">{{ $message }}</div>
                                             @enderror
                                         </div>
@@ -125,7 +127,7 @@
                                         <option value="" disabled>{{ __('Choose Scanner') }}</option>
                                         @foreach ($scanner as $item)
                                             <option value="{{ $item->id }}"
-                                                {{ $item->id == old('scanner_id') ? 'Selected' : '' }}>
+                                                {{ in_array($item->id, old('scanner_id', [])) ? 'Selected' : '' }}>
                                                 {{ $item->first_name . ' ' . $item->last_name }}</option>
                                         @endforeach
                                     </select>
@@ -151,8 +153,8 @@
                                         <div class="form-group">
                                             <label>{{ __('status') }}</label>
                                             <select name="status" class="form-control select2">
-                                                <option value="1">{{ __('Active') }}</option>
-                                                <option value="0">{{ __('Inactive') }}</option>
+                                                <option value="1" {{ old('status', '1') == '1' ? 'selected' : '' }}>{{ __('Active') }}</option>
+                                                <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>{{ __('Inactive') }}</option>
                                             </select>
                                             @error('status')
                                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -259,7 +261,7 @@
                                 <div class="location-detail">
                                     <div class="form-group">
                                         <label>{{ __('Event Address') }}</label>
-                                        <input type="text" name="address" id="address"
+                                        <input type="text" name="address" id="address" value="{{ old('address') }}"
                                             placeholder="{{ __('Event Address') }}"
                                             class="form-control @error('address')? is-invalid @enderror">
                                         @error('address')
@@ -340,13 +342,13 @@
                 // QUICK VALIDATION  ––––––––––––––––––––––––––––––––––––––––––––––––
                 const missing = [];
                 const name        = $('input[name="name"]').val().trim();
-                const category_id = $('select[name="category_id"]').val();
+                const category_id = $('select[name="category_id[]"]').val();
                 const start_time  = $('#start_time').val().trim();
                 const end_time    = $('#end_time').val().trim();
                 const tags        = $('input[name="tags"]').val().trim();
 
                 if (!name)        missing.push('Name');
-                if (!category_id) missing.push('Party Type');
+                if (!category_id || !category_id.length) missing.push('Party Type');
                 if (!start_time || !end_time) missing.push('Start / End time');
                 if (!tags)        missing.push('Tags');
 
