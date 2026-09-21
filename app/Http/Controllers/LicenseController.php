@@ -225,6 +225,17 @@ class LicenseController extends Controller
         $user = AppUser::findOrFail($id);
 
         Auth::guard('appuser')->login($user);
+        // Flagged so FrontendController::home() doesn't immediately bounce this
+        // request back to /admin/home because the admin's own `web` guard is
+        // still authenticated in the same session.
+        session(['impersonating_appuser' => true]);
         return redirect('/');
+    }
+
+    public function exitAppuserImpersonation()
+    {
+        Auth::guard('appuser')->logout();
+        session()->forget('impersonating_appuser');
+        return redirect('admin/home');
     }
 }

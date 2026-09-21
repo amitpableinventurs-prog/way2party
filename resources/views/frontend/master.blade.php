@@ -110,6 +110,12 @@
         <input type="hidden" name="default_long" id="default_long"
             value="{{ \App\Models\Setting::find(1)->default_long }}">
         <div class="site-wrapper">
+            @if (session('impersonating_appuser'))
+                <div class="w-full bg-yellow-100 text-yellow-800 text-center text-sm py-2 px-4 font-poppins">
+                    {{ __('Viewing as') }} {{ Auth::guard('appuser')->user()->name ?? '' }} &mdash;
+                    <a href="{{ route('exitAppuserImpersonation') }}" class="underline font-medium">{{ __('Exit to Admin') }}</a>
+                </div>
+            @endif
             @include('frontend.layout.header')
             <div class="min-h-screen flex flex-col">
                 <main class="flex-grow">

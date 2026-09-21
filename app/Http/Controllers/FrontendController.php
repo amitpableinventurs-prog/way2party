@@ -90,7 +90,7 @@ class FrontendController extends Controller
         if (env('DB_DATABASE') == null) {
             return view('admin.frontpage');
         } else {
-            if (Auth::check() && Auth::user()->hasRole('admin')) {
+            if (Auth::check() && Auth::user()->hasRole('admin') && !session('impersonating_appuser')) {
                 return redirect('admin/home');
             } else if (Auth::check() && Auth::user()->hasRole('Organizer')) {
                 return redirect('organization/home');

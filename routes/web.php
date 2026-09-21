@@ -68,6 +68,8 @@ Route::get('/change-language/{lang}', [UserController::class, 'changeLanguage'])
 Route::get('/maintain', [SettingController::class, 'maintain']);
 Route::get('/send-mail/{id}', [OrderController::class, 'sendMail']);
 Route::get('/login-as-appuser/{id}',[LicenseController::class,'loginAsAppuser'])->name('loginAsAppuser')->middleware(['auth', 'signed']);
+Route::get('/exit-appuser-impersonation', [LicenseController::class, 'exitAppuserImpersonation'])
+    ->name('exitAppuserImpersonation')->middleware('auth');
 Route::get('/impersonate/organizer/{user}', [LicenseController::class, 'startOrganizerImpersonation'])
     ->name('impersonate.organizer')->middleware(['auth', 'signed']);
 Route::get('/impersonate/exit', [LicenseController::class, 'exitOrganizerImpersonation'])
