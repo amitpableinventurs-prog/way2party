@@ -142,7 +142,8 @@ class EventController extends Controller
             'tags' => 'regex:/^[a-zA-Z0-9\s,]+$/',
         ],
         [
-            'tags.regex' => 'Tags should not contain any special characters'
+            'tags.regex' => 'Tags should not contain any special characters',
+            'end_time.after' => 'End time must be later than start time — the same day is fine, just pick a later time.',
         ]);
         $data = $request->all();
         $data['type'] = 'offline';
@@ -217,7 +218,8 @@ class EventController extends Controller
             'tags' => 'regex:/^[a-zA-Z0-9\s,]+$/',
         ],
         [
-            'tags.regex' => 'Tags should not contain any special characters'
+            'tags.regex' => 'Tags should not contain any special characters',
+            'end_time.after' => 'End time must be later than start time — the same day is fine, just pick a later time.',
         ]);
         $data = $request->all();
         $data['type'] = 'offline';

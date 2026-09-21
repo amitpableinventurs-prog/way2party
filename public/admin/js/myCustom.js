@@ -761,11 +761,33 @@ $(document).ready(function () {
         success_callback: null
     });
 
-    $('#start_time,#end_time').flatpickr({
+    // End time only needs to be AFTER start time, not on a different date —
+    // link the pickers so end_time's minimum follows whatever start_time is
+    // set to (same day + a later hour is valid, e.g. a 4-hour event).
+    var endTimePicker = document.getElementById('end_time') ? flatpickr('#end_time', {
         minDate: "today",
         enableTime: true,
         dateFormat: "Y-m-d h:i K",
-    });
+    }) : null;
+
+    if (document.getElementById('start_time')) {
+        flatpickr('#start_time', {
+            minDate: "today",
+            enableTime: true,
+            dateFormat: "Y-m-d h:i K",
+            onChange: function (selectedDates) {
+                if (!endTimePicker || !selectedDates[0]) {
+                    return;
+                }
+                endTimePicker.set('minDate', selectedDates[0]);
+                // if the previously chosen end time no longer comes after the
+                // new start time, clear it so the user picks a valid one
+                if (endTimePicker.selectedDates[0] && endTimePicker.selectedDates[0] <= selectedDates[0]) {
+                    endTimePicker.clear();
+                }
+            },
+        });
+    }
 
     $('.duration').flatpickr({
         mode: 'range',
