@@ -16,6 +16,22 @@
         </div>
         <div
             class="mt-5 3xl:mx-52 2xl:mx-28 1xl:mx-28 xl:mx-36 xlg:mx-32 lg:mx-36 xxmd:mx-24 xmd:mx-32 md:mx-28 sm:mx-20 msm:mx-16 xsm:mx-10 xxsm:mx-5 z-10 relative">
+            {{-- Breadcrumb: Home > City > Party Type > Event --}}
+            <nav class="pb-5 z-10 relative font-poppins text-sm" aria-label="breadcrumb">
+                <a href="{{ url('/') }}" class="text-blue hover:underline">{{ __('Home') }}</a>
+                @if ($data->city)
+                    <span class="text-gray-400 mx-1">/</span>
+                    <a href="{{ url('/events-city/' . $data->city_id . '/' . Str::slug($data->city->name)) }}"
+                        class="text-blue hover:underline">{{ $data->city->name }}</a>
+                @endif
+                @if ($data->category)
+                    <span class="text-gray-400 mx-1">/</span>
+                    <a href="{{ url('/events-category/' . $data->category_id . '/' . Str::slug($data->category->name)) }}"
+                        class="text-blue hover:underline">{{ $data->category->name }}</a>
+                @endif
+                <span class="text-gray-400 mx-1">/</span>
+                <span class="text-gray-600">{{ $data->name }}</span>
+            </nav>
             <div
                 class="flex sm:space-x-0 msm:space-x-0 xxsm:space-x-0 lg:space-x-3 xlg:space-x-5 xxmd:flex-row xmd:flex-col xxsm:flex-col">
                 <div class="xxmd:w-2/3 xmd:w-full xxsm:w-full">
