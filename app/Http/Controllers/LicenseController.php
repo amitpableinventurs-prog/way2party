@@ -97,6 +97,14 @@ class LicenseController extends Controller
         return view("installer");
     }
 
+    public function showAdminLogin()
+    {
+        if (Auth::check()) {
+            return redirect('/admin/home');
+        }
+        return view('auth.login');
+    }
+
     public function adminLogin(Request $request)
     {
         // check post request or get request

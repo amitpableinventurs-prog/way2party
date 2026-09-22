@@ -50,12 +50,7 @@ Auth::routes(['verify' => true]);
 Route::get('/sitemap.xml', [SitemapController::class, 'index']);
 Route::get('/robots.txt', [SitemapController::class, 'robots']);
 
-Route::get('/login', function () {
-    if (Auth::check()) {
-        return redirect('/admin/home');
-    }
-    return view('auth.login');
-})->name('login');
+Route::get('/login', [LicenseController::class, 'showAdminLogin'])->name('login');
 
 
 Route::any('/admin/login', [LicenseController::class, 'adminLogin']);

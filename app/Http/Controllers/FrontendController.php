@@ -127,12 +127,10 @@ class FrontendController extends Controller
             $category = Category::where('status', 1)->orderBy('id', 'DESC')->get();
             $cities = City::where('status', 1)->orderBy('name')->get();
             $blog = Blog::with(['category:id,name'])->where('status', 1)->orderBy('id', 'DESC')->get();
-            foreach ($events as $value) {
-                $value->total_ticket = Ticket::where([['event_id', $value->id], ['is_deleted', 0], ['status', 1]])->sum('quantity');
-                $value->sold_ticket = Order::where('event_id', $value->id)->sum('quantity');
-                $value->available_ticket = $value->total_ticket - $value->sold_ticket;
-                $value->append('auto_generated_tag');
-            }
+            // total_ticket/sold_ticket/available_ticket aren't read by frontend.home —
+            // it only uses the auto_generated_tag accessor, which computes its own
+            // (now memoized) ticket counts. Recomputing them here again per event was
+            // pure dead weight — 2 extra queries per event for nothing.
             $featuredEvents = Event::with(['category:id,name', 'categories:id,name', 'city:id,name'])->featured()
                 ->where('end_time', '>', $date->format('Y-m-d H:i:s'))
                 ->visibleTo(Auth::guard('appuser')->user())
@@ -842,11 +840,8 @@ class FrontendController extends Controller
             }
         }
         $events = $events->orderBy('start_time', 'ASC')->get();
-        foreach ($events as $value) {
-            $value->total_ticket = Ticket::where([['event_id', $value->id], ['is_deleted', 0], ['status', 1]])->sum('quantity');
-            $value->sold_ticket = Order::where('event_id', $value->id)->sum('quantity');
-            $value->available_ticket = $value->total_ticket - $value->sold_ticket;
-        }
+        // total_ticket/sold_ticket/available_ticket aren't read by frontend.events —
+        // dropped the per-event recomputation (2 extra queries per event for nothing).
         $user = Auth::guard('appuser')->user();
         $offlinecount = 0;
         $onlinecount = 0;
@@ -1650,11 +1645,8 @@ class FrontendController extends Controller
         $user->saved_event = Event::whereIn('id', array_filter(explode(',', $user->favorite)))->where([['status', 1], ['is_deleted', 0]])->get();
         $user->saved_blog = Blog::whereIn('id', array_filter(explode(',', $user->favorite_blog)))->where('status', 1)->get();
         $user->following = User::whereIn('id', array_filter(explode(',', $user->following)))->get();
-        foreach ($user->saved_event as $value) {
-            $value->total_ticket = Ticket::where([['event_id', $value->id], ['is_deleted', 0], ['status', 1]])->sum('quantity');
-            $value->sold_ticket = Order::where('event_id', $value->id)->sum('quantity');
-            $value->available_ticket = $value->total_ticket - $value->sold_ticket;
-        }
+        // total_ticket/sold_ticket/available_ticket aren't read by frontend.profile —
+        // dropped the per-event recomputation (2 extra queries per saved event for nothing).
         return view('frontend.profile', compact('user'));
     }
 
@@ -2151,11 +2143,8 @@ class FrontendController extends Controller
             }
         }
         $events = $events->orderBy('start_time', 'ASC')->get();
-        foreach ($events as $value) {
-            $value->total_ticket = Ticket::where([['event_id', $value->id], ['is_deleted', 0], ['status', 1]])->sum('quantity');
-            $value->sold_ticket = Order::where('event_id', $value->id)->sum('quantity');
-            $value->available_ticket = $value->total_ticket - $value->sold_ticket;
-        }
+        // total_ticket/sold_ticket/available_ticket aren't read by frontend.events —
+        // dropped the per-event recomputation (2 extra queries per event for nothing).
         $user = Auth::guard('appuser')->user();
         $offlinecount = 0;
         $onlinecount = 0;
