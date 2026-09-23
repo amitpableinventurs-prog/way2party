@@ -9,6 +9,14 @@ use Carbon\Carbon;
 class Event extends Model
 {
     use HasFactory;
+
+    // Organizer-posted events are saved as PENDING (and status 0, so every public
+    // query that already filters on status = 1 keeps them hidden) until an admin
+    // approves them. Admin-created events are approved straight away.
+    const APPROVAL_PENDING = 'pending';
+    const APPROVAL_APPROVED = 'approved';
+    const APPROVAL_REJECTED = 'rejected';
+
     protected $fillable = [
         'name',
         'user_id',
@@ -26,6 +34,7 @@ class Event extends Model
         'description',
         'security',
         'status',
+        'approval_status',
         'is_featured',
         'featured_order',
         'visibility',
@@ -79,6 +88,16 @@ class Event extends Model
     public function faqs()
     {
         return $this->hasMany('App\Models\EventFaq', 'event_id', 'id');
+    }
+
+    public function isAwaitingApproval()
+    {
+        return $this->approval_status === self::APPROVAL_PENDING;
+    }
+
+    public function isRejected()
+    {
+        return $this->approval_status === self::APPROVAL_REJECTED;
     }
 
     public function getImagePathAttribute()

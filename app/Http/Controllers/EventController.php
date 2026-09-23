@@ -60,12 +60,14 @@ class EventController extends Controller
                     }
                 }
             }
-            $events = $events->orderBy('start_time', 'ASC')->get();
+            // events waiting for approval float to the top of the admin list
+            $events = $events->orderByRaw("approval_status = ? DESC", [Event::APPROVAL_PENDING])
+                ->orderBy('start_time', 'ASC')->get();
         } elseif (Auth::user()->hasRole('Organizer')) {
             $timezone = Setting::find(1)->timezone;
             $date = Carbon::now($timezone);
             $events  = Event::with(['category:id,name'])
-                ->where([['status', 1], ['user_id', Auth::user()->id], ['is_deleted', 0], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]]);
+                ->where([['user_id', Auth::user()->id], ['is_deleted', 0], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]]);
             $chip = array();
             if ($request->has('type') && $request->type != null) {
                 $chip['type'] = $request->type;
@@ -161,9 +163,17 @@ class EventController extends Controller
         }
         if (!Auth::user()->hasRole('admin')) {
             $data['user_id'] = Auth::user()->id;
+            // organizer events stay hidden until an admin approves them
+            $data['approval_status'] = Event::APPROVAL_PENDING;
+            $data['status'] = 0;
+        } else {
+            $data['approval_status'] = Event::APPROVAL_APPROVED;
         }
         $event = Event::create($data);
         $event->categories()->sync($categoryIds);
+        if ($event->isAwaitingApproval()) {
+            return redirect()->route('events.index')->withStatus(__('Event submitted. It is waiting for admin approval and will go live once approved.'));
+        }
         return redirect()->route('events.index')->withStatus(__('Event has added successfully.'));
     }
 
@@ -234,8 +244,17 @@ class EventController extends Controller
             (new AppHelper)->deleteFile($event->image);
             $data['image'] = (new AppHelper)->saveImage($request);
         }
+        unset($data['approval_status']);
+        if (!Auth::user()->hasRole('admin') && $event->approval_status !== Event::APPROVAL_APPROVED) {
+            // a pending event can't be self-published; editing a rejected one resubmits it
+            $data['approval_status'] = Event::APPROVAL_PENDING;
+            $data['status'] = 0;
+        }
         $event->update($data);
         $event->categories()->sync($categoryIds);
+        if ($event->isAwaitingApproval()) {
+            return redirect()->route('events.index')->withStatus(__('Event updated. It is waiting for admin approval.'));
+        }
         return redirect()->route('events.index')->withStatus(__('Event has updated successfully.'));
     }
 
@@ -264,6 +283,26 @@ class EventController extends Controller
         }
         $event->update(['is_featured' => !$event->is_featured]);
         return redirect()->back()->withStatus(__($event->is_featured ? 'Event marked as featured.' : 'Event removed from featured.'));
+    }
+
+    /**
+     * Admin approves an organizer's event: it goes live (status 1).
+     */
+    public function approve(Event $event)
+    {
+        abort_unless(Auth::user()->hasRole('admin'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $event->update(['approval_status' => Event::APPROVAL_APPROVED, 'status' => 1]);
+        return redirect()->back()->withStatus(__('Event approved and published.'));
+    }
+
+    /**
+     * Admin rejects an organizer's event: it stays hidden; the organizer can edit to resubmit.
+     */
+    public function reject(Event $event)
+    {
+        abort_unless(Auth::user()->hasRole('admin'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $event->update(['approval_status' => Event::APPROVAL_REJECTED, 'status' => 0]);
+        return redirect()->back()->withStatus(__('Event rejected.'));
     }
 
     public function getMonthEvent(Request $request)

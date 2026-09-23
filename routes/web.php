@@ -217,6 +217,8 @@ Route::group(['middleware' => ['auth', 'preferImpersonatedOrganizer']], function
     Route::post('/get-tickets-details',[UserController::class,'getTicketsDetails'])->name('getTicketsDetails');
     Route::get('/events/{event}/toggle-featured', [EventController::class, 'toggleFeatured'])
         ->name('events.toggleFeatured');
+    Route::post('/events/{event}/approve', [EventController::class, 'approve'])->name('events.approve');
+    Route::post('/events/{event}/reject', [EventController::class, 'reject'])->name('events.reject');
     Route::resources([
 
         // 'roles' => RoleController::class, // Do not enable this

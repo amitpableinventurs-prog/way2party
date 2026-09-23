@@ -289,6 +289,9 @@ class OrganizationApiController extends Controller
         ]);
         $data = $request->all();
         $data['user_id'] = Auth::user()->id;
+        // organizer events stay hidden until an admin approves them
+        $data['approval_status'] = Event::APPROVAL_PENDING;
+        $data['status'] = 0;
         // if ($request->tags != null) {
         //     $data['tags'] = array();
         //     foreach ($request->tags as $key) {
@@ -310,7 +313,7 @@ class OrganizationApiController extends Controller
         $data['end_time']  = $request->end_date . ' ' . $request->end_time;
 
         $event = Event::create($data);
-        return response()->json(['data' => $event, 'msg' => 'Add Event Successfully', 'success' => true], 200);
+        return response()->json(['data' => $event, 'msg' => 'Event submitted, waiting for admin approval', 'success' => true], 200);
     }
 
     public function editEvent(Request $request)
@@ -380,7 +383,14 @@ class OrganizationApiController extends Controller
         if ($request->maximum_checkins == '') {
             $data['maximum_checkins'] = null;
         }
-        $event = Event::find($request->id)->update($data);
+        unset($data['approval_status']);
+        $existing = Event::find($request->id);
+        if ($existing->approval_status !== Event::APPROVAL_APPROVED) {
+            // a pending event can't be self-published; editing a rejected one resubmits it
+            $data['approval_status'] = Event::APPROVAL_PENDING;
+            $data['status'] = 0;
+        }
+        $event = $existing->update($data);
         return response()->json(['msg' => 'Update Event Successfully', 'success' => true], 200);
     }
     public function addImageGallery(Request $request)

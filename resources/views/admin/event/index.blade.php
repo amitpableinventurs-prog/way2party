@@ -83,9 +83,29 @@
                                                     </td>
                                                 @endif
                                                 <td>
-                                                    <h5><span
-                                                            class="badge {{ $item->status == '1' ? 'badge-success' : 'badge-warning' }}  m-1">{{ $item->status == '1' ? 'Publish' : 'Draft' }}</span>
+                                                    <h5>
+                                                        @if ($item->isAwaitingApproval())
+                                                            <span class="badge badge-info m-1"><i class="far fa-clock"></i> {{ __('Waiting for approval') }}</span>
+                                                        @elseif ($item->isRejected())
+                                                            <span class="badge badge-danger m-1">{{ __('Rejected') }}</span>
+                                                        @else
+                                                            <span
+                                                                class="badge {{ $item->status == '1' ? 'badge-success' : 'badge-warning' }}  m-1">{{ $item->status == '1' ? 'Publish' : 'Draft' }}</span>
+                                                        @endif
                                                     </h5>
+                                                    @if (Auth::user()->hasRole('admin') && ($item->isAwaitingApproval() || $item->isRejected()))
+                                                        <form action="{{ route('events.approve', $item->id) }}" method="POST" class="d-inline">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-sm btn-success">{{ __('Approve') }}</button>
+                                                        </form>
+                                                        @if ($item->isAwaitingApproval())
+                                                            <form action="{{ route('events.reject', $item->id) }}" method="POST" class="d-inline"
+                                                                onsubmit="return confirm('{{ __('Reject this event?') }}');">
+                                                                @csrf
+                                                                <button type="submit" class="btn btn-sm btn-outline-danger">{{ __('Reject') }}</button>
+                                                            </form>
+                                                        @endif
+                                                    @endif
                                                 </td>
                                                 @if (Gate::check('event_edit'))
                                                     <td>

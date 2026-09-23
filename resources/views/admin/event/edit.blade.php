@@ -171,6 +171,11 @@
                                             @error('status')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
+                                            @if ($event->isAwaitingApproval())
+                                                <small class="form-text text-info"><i class="far fa-clock"></i> {{ __('Waiting for approval — this event goes live once an admin approves it.') }}</small>
+                                            @elseif ($event->isRejected() && !Auth::user()->hasRole('admin'))
+                                                <small class="form-text text-danger">{{ __('This event was rejected. Saving your changes resubmits it for approval.') }}</small>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>

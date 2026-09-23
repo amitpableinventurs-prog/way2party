@@ -862,7 +862,9 @@ class FrontendController extends Controller
         $setting = Setting::first(['app_name', 'logo', 'show_event_report_form']);
         $currency = Setting::first(['currency_sybmol']);
         $data = Event::with(['category:id,name,image', 'categories:id,name,image', 'city:id,name', 'organization:id,first_name,organization_name,bio,last_name,image'])->find($id);
-        if (!$data || !Event::where('id', $id)->visibleTo(Auth::guard('appuser')->user())->exists()) {
+        // events still waiting for (or refused) admin approval aren't public, even by direct link
+        if (!$data || $data->approval_status !== Event::APPROVAL_APPROVED
+            || !Event::where('id', $id)->visibleTo(Auth::guard('appuser')->user())->exists()) {
             abort(404);
         }
         SEOMeta::setTitle($data->name)
