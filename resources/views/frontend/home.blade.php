@@ -53,6 +53,26 @@
                       3xl:w-[74%] 1xl:w-[81%] xl:w-[82%] xlg:w-[77%] lg:w-[70%] xxmd:w-[80%] xmd:w-[70%] md:w-[70%] sm:w-[70%] msm:w-[70%] xsm:w-[80%] xxsm:w-[80%]">
                         <div
                             class="xlg:ml-[7%] xxmd:max-lg:mt-[50%] xxsm:ml-[0%] bg-white rounded-lg flex p-6 justify-between lg:mt-0 md:mt-[5rem] xlg:mt-8 3xl:flex-nowrap 1xl:flex-nowrap xxmd:flex-nowrap md:flex-wrap sm:flex-wrap msm:flex-wrap xsm:flex-wrap xxsm:flex-wrap">
+                            <div class="xmd:w-1/2 md:w-full sm:w-full msm:w-full xsm:w-full xxsm:w-full">
+                                <div class="flex">
+                                    <label for="city"
+                                        class="font-poppins font-medium text-lg leading-4 text-black">{{ __('Location') }}</label>
+                                </div>
+                                <div class="pt-3 ">
+                                    <form method="post" action="{{ url('all-events') }}">
+                                        @csrf
+                                        <select id="city" name="city" class="select2 z-20 w-full">
+                                            <option class="font-poppins font-normal text-sm text-black leading-6" selected
+                                                value="">
+                                                {{ __('All Locations') }}</option>
+                                            @foreach ($cities as $city)
+                                                <option class="font-poppins font-normal text-sm text-black leading-6"
+                                                    value="{{ $city->id }}">
+                                                    {{ $city->name }}</option>
+                                            @endforeach
+                                        </select>
+                                </div>
+                            </div>
                             <div
                                 class=" xmd:w-1/2 md:w-full sm:w-full msm:w-full xsm:w-full xxsm:w-full xmd:mx-0 xmd:py-3 xxmd:py-0 xxmd:mx-5 sm:py-3 msm:py-3 xsm:py-3 xxsm:py-3 md:mx-0 md:py-3 sm:mx-0 msm:mx-0 xsm:mx-0 xxsm:mx-0">
                                 <div class="flex">
@@ -60,8 +80,6 @@
                                         class="font-poppins font-medium text-lg leading-4 text-black">{{ __('Party Type') }}</label>
                                 </div>
                                 <div class="pt-3">
-                                    <form method="post" action="{{ url('all-events') }}">
-                                        @csrf
                                         <select id="category" name="category" class="select2 z-20 w-full">
                                             <option
                                                 class="text-black font-poppins hover:text-primary hover:bg-primary-light p-2"
@@ -74,24 +92,6 @@
                                                     {{ $item->name }}</option>
                                             @endforeach
                                         </select>
-                                </div>
-                            </div>
-                            <div class="xmd:w-1/2 md:w-full sm:w-full msm:w-full xsm:w-full xxsm:w-full">
-                                <div class="flex">
-                                    <label for="city"
-                                        class="font-poppins font-medium text-lg leading-4 text-black">{{ __('Location') }}</label>
-                                </div>
-                                <div class="pt-3 ">
-                                    <select id="city" name="city" class="select2 z-20 w-full">
-                                        <option class="font-poppins font-normal text-sm text-black leading-6" selected
-                                            value="">
-                                            {{ __('All Locations') }}</option>
-                                        @foreach ($cities as $city)
-                                            <option class="font-poppins font-normal text-sm text-black leading-6"
-                                                value="{{ $city->id }}">
-                                                {{ $city->name }}</option>
-                                        @endforeach
-                                    </select>
                                 </div>
                             </div>
                             <div
