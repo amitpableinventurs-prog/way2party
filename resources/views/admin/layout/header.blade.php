@@ -68,7 +68,7 @@
             </li>
         @endif
         {{-- Show Debug Mode ON badge if env app_debug is true --}}
-        @if (env('APP_DEBUG'))
+        @if (config('app.debug'))
         <button class="btn btn-danger shadow-none" disabled>⚠ {{ __('Debug Mode is ON') }}</button>
         @endif
         <?php $lang = session('locale') == null ? 'English' : session('locale'); ?>

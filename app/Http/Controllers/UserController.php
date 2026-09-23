@@ -180,7 +180,7 @@ class UserController extends Controller
 
         $setting = Setting::first(['app_name', 'logo']);
 
-        SEOMeta::setTitle($setting->app_name . ' - All-Events' ?? env('APP_NAME'))
+        SEOMeta::setTitle($setting->app_name . ' - All-Events' ?? config('app.name'))
             ->setDescription('This is all events page')
             ->setCanonical(url()->current())
             ->addKeyword([
@@ -191,15 +191,15 @@ class UserController extends Controller
                 $setting->app_name . ' Events',
             ]);
 
-        OpenGraph::setTitle($setting->app_name . ' - All-Events' ?? env('APP_NAME'))
+        OpenGraph::setTitle($setting->app_name . ' - All-Events' ?? config('app.name'))
             ->setDescription('This is all events page')
             ->setUrl(url()->current());
 
-        JsonLdMulti::setTitle($setting->app_name . ' - All-Events' ?? env('APP_NAME'));
+        JsonLdMulti::setTitle($setting->app_name . ' - All-Events' ?? config('app.name'));
         JsonLdMulti::setDescription('This is all events page');
         JsonLdMulti::addImage($setting->imagePath . $setting->logo);
 
-        SEOTools::setTitle($setting->app_name . ' - All-Events' ?? env('APP_NAME'));
+        SEOTools::setTitle($setting->app_name . ' - All-Events' ?? config('app.name'));
         SEOTools::setDescription('This is all events page');
         SEOTools::opengraph()->setUrl(url()->current());
         SEOTools::setCanonical(url()->current());

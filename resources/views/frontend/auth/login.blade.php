@@ -287,7 +287,7 @@
         }
     }
 
-    if ("{{ env('APP_DEBUG') }}" == true) {
+    if ("{{ config('app.debug') }}" == true) {
         function updateDefaultCreds() {
             const $selectedType = document.querySelector('input[name="type"]:checked');
             if ($selectedType.value == 'user') {
@@ -305,7 +305,7 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         updateGoogleLoginBtn();
-        if ("{{ env('APP_DEBUG') }}" == true) {
+        if ("{{ config('app.debug') }}" == true) {
             updateDefaultCreds();
         }
     });

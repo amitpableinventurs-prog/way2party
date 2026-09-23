@@ -2446,7 +2446,7 @@
                                                     <label class="custom-switch pl-0">
 
                                                     <input type="checkbox" name="app_debug"
-                                                        {{ env('APP_DEBUG') == true ? 'checked' : '' }}
+                                                        {{ config('app.debug') == true ? 'checked' : '' }}
                                                         value="1" class="custom-switch-input">
 
                                                         <span class="custom-switch-indicator"></span>

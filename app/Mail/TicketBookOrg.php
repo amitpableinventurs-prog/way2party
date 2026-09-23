@@ -32,7 +32,7 @@ class TicketBookOrg extends Mailable
     {
         $this->replaceContent();
         
-        return $this->from($address = env('MAIL_FROM_ADDRESS'), $name = $this->detail['app_name'])
+        return $this->from($address = config('mail.from.address'), $name = $this->detail['app_name'])
             ->subject($this->subject)->view('admin/mailMessage')
             ->with([
             'content' => $this->content,           

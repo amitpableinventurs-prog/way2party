@@ -22,7 +22,7 @@ class Localization
         if (session()->has('locale')) {
             App::setLocale(session()->get('locale'));
         } else
-        if (env('DB_DATABASE') != null) { {
+        if (config('database.connections.' . config('database.default') . '.database') != null) { {
                 $language = Setting::first()->language;
                 $direction = Language::where('name', $language)->first()->direction;
                 App::setLocale($language);

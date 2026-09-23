@@ -38,7 +38,7 @@ class TicketBook extends Mailable
         $this->replaceContent();
         $qrcode = QrCode::size(160)->generate($this->qrcode);
        
-        return $this->from($address = env('MAIL_FROM_ADDRESS'), $name = $this->detail['app_name'])
+        return $this->from($address = config('mail.from.address'), $name = $this->detail['app_name'])
             ->subject($this->subject)->view('admin/mailMessage', compact('qrcode'))
             ->with([
                 'content' => $this->content,

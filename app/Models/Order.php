@@ -81,7 +81,7 @@ class Order extends Model
             'endDate' => Carbon::parse($this->ticket_date ?? $this->event->end_time)->format('Y-m-d'),
             'endTime' => $this->ticket_date == null ? Carbon::parse( $this->event->end_time)->format('H:i:s') : Carbon::parse($this->ticket_date)->setTime(23, 59, 59)->format('H:i:s'),
             'timeZone' => config('app.timezone'),
-            'iCalFileName' => env('APP_NAME') . '-booking-' . str_replace('#', '', $this->order_id)
+            'iCalFileName' => config('app.name') . '-booking-' . str_replace('#', '', $this->order_id)
         ];
     }
 

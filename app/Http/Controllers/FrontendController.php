@@ -78,7 +78,7 @@ class FrontendController extends Controller
     public function __construct()
     {
 
-        if (env('DB_DATABASE') != null) {
+        if (config('database.connections.' . config('database.default') . '.database') != null) {
             (new AppHelper)->mailConfig();
             (new AppHelper)->eventStatusChange();
         }
@@ -87,7 +87,7 @@ class FrontendController extends Controller
     public function home()
     {
 
-        if (env('DB_DATABASE') == null) {
+        if (config('database.connections.' . config('database.default') . '.database') == null) {
             return view('admin.frontpage');
         } else {
             if (Auth::check() && Auth::user()->hasRole('admin') && !session('impersonating_appuser')) {
@@ -97,20 +97,20 @@ class FrontendController extends Controller
             }
             $setting = Setting::first(['app_name', 'logo']);
 
-            SEOMeta::setTitle($setting->app_name . ' - Home' ?? env('APP_NAME'))
+            SEOMeta::setTitle($setting->app_name . ' - Home' ?? config('app.name'))
                 ->setDescription('This is home page')
                 ->setCanonical(url()->current())
                 ->addKeyword(['home page', $setting->app_name, $setting->app_name . ' Home']);
 
-            OpenGraph::setTitle($setting->app_name . ' - Home' ?? env('APP_NAME'))
+            OpenGraph::setTitle($setting->app_name . ' - Home' ?? config('app.name'))
                 ->setDescription('This is home page')
                 ->setUrl(url()->current());
 
-            JsonLdMulti::setTitle($setting->app_name . ' - Home' ?? env('APP_NAME'));
+            JsonLdMulti::setTitle($setting->app_name . ' - Home' ?? config('app.name'));
             JsonLdMulti::setDescription('This is home page');
             JsonLdMulti::addImage($setting->imagePath . $setting->logo);
 
-            SEOTools::setTitle($setting->app_name . ' - Home' ?? env('APP_NAME'));
+            SEOTools::setTitle($setting->app_name . ' - Home' ?? config('app.name'));
             SEOTools::setDescription('This is home page');
             SEOTools::opengraph()->setUrl(url()->current());
             SEOTools::setCanonical(url()->current());
@@ -156,20 +156,20 @@ class FrontendController extends Controller
             return redirect()->back();
         }
         $setting = Setting::first(['app_name', 'logo']);
-        SEOMeta::setTitle($setting->app_name . ' - Login' ?? env('APP_NAME'))
+        SEOMeta::setTitle($setting->app_name . ' - Login' ?? config('app.name'))
             ->setDescription('This is login page')
             ->setCanonical(url()->current())
             ->addKeyword(['login page', $setting->app_name, $setting->app_name . ' Login', 'sign-in page', $setting->app_name . ' sign-in']);
 
-        OpenGraph::setTitle($setting->app_name . ' - Login' ?? env('APP_NAME'))
+        OpenGraph::setTitle($setting->app_name . ' - Login' ?? config('app.name'))
             ->setDescription('This is login page')
             ->setUrl(url()->current());
 
-        JsonLdMulti::setTitle($setting->app_name . ' - Login' ?? env('APP_NAME'));
+        JsonLdMulti::setTitle($setting->app_name . ' - Login' ?? config('app.name'));
         JsonLdMulti::setDescription('This is login page');
         JsonLdMulti::addImage($setting->imagePath . $setting->logo);
 
-        SEOTools::setTitle($setting->app_name . ' - Login' ?? env('APP_NAME'));
+        SEOTools::setTitle($setting->app_name . ' - Login' ?? config('app.name'));
         SEOTools::setDescription('This is login page');
         SEOTools::opengraph()->addProperty(
             'keywords',
@@ -217,7 +217,7 @@ class FrontendController extends Controller
                             } catch (\Exception $e) {
                                 info('Verification Mailing Related Error:' . $e->getMessage());
                                 $request->session()->flush();
-                                return redirect('user/login')->with('error_msg', env('APP_DEBUG') == true ? $e->getMessage() : __('Something Went Wrong'));
+                                return redirect('user/login')->with('error_msg', config('app.debug') == true ? $e->getMessage() : __('Something Went Wrong'));
                             }
                             $request->session()->flush();
                             return redirect('user/login')->with(['success' => "Verification link has been sent to your email. Please visit that link to complete the verification"]);
@@ -464,7 +464,7 @@ class FrontendController extends Controller
         }
         $setting = Setting::first(['app_name', 'logo']);
 
-        SEOMeta::setTitle($setting->app_name . ' - Register' ?? env('APP_NAME'))
+        SEOMeta::setTitle($setting->app_name . ' - Register' ?? config('app.name'))
             ->setDescription('This is register page')
             ->setCanonical(url()->current())
             ->addKeyword([
@@ -472,15 +472,15 @@ class FrontendController extends Controller
                 'sign-up page', $setting->app_name . ' sign-up'
             ]);
 
-        OpenGraph::setTitle($setting->app_name . ' - Register' ?? env('APP_NAME'))
+        OpenGraph::setTitle($setting->app_name . ' - Register' ?? config('app.name'))
             ->setDescription('This is register page')
             ->setUrl(url()->current());
 
-        JsonLdMulti::setTitle($setting->app_name . ' - Register' ?? env('APP_NAME'));
+        JsonLdMulti::setTitle($setting->app_name . ' - Register' ?? config('app.name'));
         JsonLdMulti::setDescription('This is register page');
         JsonLdMulti::addImage($setting->imagePath . $setting->logo);
 
-        SEOTools::setTitle($setting->app_name . ' - Register' ?? env('APP_NAME'));
+        SEOTools::setTitle($setting->app_name . ' - Register' ?? config('app.name'));
         SEOTools::setDescription('This is register page');
         SEOTools::opengraph()->addProperty(
             'keywords',
@@ -630,7 +630,7 @@ class FrontendController extends Controller
     public function resetPassword()
     {
         $setting = Setting::first(['app_name', 'logo']);
-        SEOMeta::setTitle($setting->app_name . ' - reset password' ?? env('APP_NAME'))
+        SEOMeta::setTitle($setting->app_name . ' - reset password' ?? config('app.name'))
             ->setDescription('This is reset password page')
             ->setCanonical(url()->current())
             ->addKeyword([
@@ -638,15 +638,15 @@ class FrontendController extends Controller
                 'forgot password page', $setting->app_name . ' forgot password'
             ]);
 
-        OpenGraph::setTitle($setting->app_name . ' - reset password' ?? env('APP_NAME'))
+        OpenGraph::setTitle($setting->app_name . ' - reset password' ?? config('app.name'))
             ->setDescription('This is reset password page')
             ->setUrl(url()->current());
 
-        JsonLdMulti::setTitle($setting->app_name . ' - reset password' ?? env('APP_NAME'));
+        JsonLdMulti::setTitle($setting->app_name . ' - reset password' ?? config('app.name'));
         JsonLdMulti::setDescription('This is reset password page');
         JsonLdMulti::addImage($setting->imagePath . $setting->logo);
 
-        SEOTools::setTitle($setting->app_name . ' - reset password' ?? env('APP_NAME'));
+        SEOTools::setTitle($setting->app_name . ' - reset password' ?? config('app.name'));
         SEOTools::setDescription('This is reset password page');
         SEOTools::opengraph()->addProperty(
             'keywords',
@@ -699,7 +699,7 @@ class FrontendController extends Controller
     {
         $setting = Setting::first(['app_name', 'logo']);
 
-        SEOMeta::setTitle($setting->app_name . ' - Organizer Register' ?? env('APP_NAME'))
+        SEOMeta::setTitle($setting->app_name . ' - Organizer Register' ?? config('app.name'))
             ->setDescription('This is organizer register page')
             ->setCanonical(url()->current())
             ->addKeyword([
@@ -707,15 +707,15 @@ class FrontendController extends Controller
                 'organizer sign-up page', $setting->app_name . ' organizer sign-up'
             ]);
 
-        OpenGraph::setTitle($setting->app_name . ' - Organizer Register' ?? env('APP_NAME'))
+        OpenGraph::setTitle($setting->app_name . ' - Organizer Register' ?? config('app.name'))
             ->setDescription('This is organizer register page')
             ->setUrl(url()->current());
 
-        JsonLdMulti::setTitle($setting->app_name . ' - Organizer Register' ?? env('APP_NAME'));
+        JsonLdMulti::setTitle($setting->app_name . ' - Organizer Register' ?? config('app.name'));
         JsonLdMulti::setDescription('This is organizer register page');
         JsonLdMulti::addImage($setting->imagePath . $setting->logo);
 
-        SEOTools::setTitle($setting->app_name . ' - Organizer Register' ?? env('APP_NAME'));
+        SEOTools::setTitle($setting->app_name . ' - Organizer Register' ?? config('app.name'));
         SEOTools::setDescription('This is register page');
         SEOTools::opengraph()->addProperty(
             'keywords',
@@ -762,7 +762,7 @@ class FrontendController extends Controller
         (new AppHelper)->eventStatusChange();
         $setting = Setting::first(['app_name', 'logo']);
 
-        SEOMeta::setTitle($setting->app_name . ' - All-Events' ?? env('APP_NAME'))
+        SEOMeta::setTitle($setting->app_name . ' - All-Events' ?? config('app.name'))
             ->setDescription('This is all events page')
             ->setCanonical(url()->current())
             ->addKeyword([
@@ -773,15 +773,15 @@ class FrontendController extends Controller
                 $setting->app_name . ' Events',
             ]);
 
-        OpenGraph::setTitle($setting->app_name . ' - All-Events' ?? env('APP_NAME'))
+        OpenGraph::setTitle($setting->app_name . ' - All-Events' ?? config('app.name'))
             ->setDescription('This is all events page')
             ->setUrl(url()->current());
 
-        JsonLdMulti::setTitle($setting->app_name . ' - All-Events' ?? env('APP_NAME'));
+        JsonLdMulti::setTitle($setting->app_name . ' - All-Events' ?? config('app.name'));
         JsonLdMulti::setDescription('This is all events page');
         JsonLdMulti::addImage($setting->imagePath . $setting->logo);
 
-        SEOTools::setTitle($setting->app_name . ' - All-Events' ?? env('APP_NAME'));
+        SEOTools::setTitle($setting->app_name . ' - All-Events' ?? config('app.name'));
         SEOTools::setDescription('This is all events page');
         SEOTools::opengraph()->setUrl(url()->current());
         SEOTools::setCanonical(url()->current());
@@ -1329,7 +1329,7 @@ class FrontendController extends Controller
         $category = Category::find($id);
         $city = $request->filled('city') ? City::find($request->city) : null;
 
-        SEOMeta::setTitle($setting->app_name . '- Events' ?? env('APP_NAME'))
+        SEOMeta::setTitle($setting->app_name . '- Events' ?? config('app.name'))
             ->setDescription('This is category events page')
             ->setCanonical(url()->current())
             ->addKeyword([
@@ -1340,15 +1340,15 @@ class FrontendController extends Controller
                 'events page',
             ]);
 
-        OpenGraph::setTitle($setting->app_name . ' - Events' ?? env('APP_NAME'))
+        OpenGraph::setTitle($setting->app_name . ' - Events' ?? config('app.name'))
             ->setDescription('This is category events page')
             ->setUrl(url()->current());
 
-        JsonLdMulti::setTitle($setting->app_name . ' - Events' ?? env('APP_NAME'));
+        JsonLdMulti::setTitle($setting->app_name . ' - Events' ?? config('app.name'));
         JsonLdMulti::setDescription('This is category events page');
         JsonLdMulti::addImage($setting->imagePath . $setting->logo);
 
-        SEOTools::setTitle($setting->app_name . ' - Events' ?? env('APP_NAME'));
+        SEOTools::setTitle($setting->app_name . ' - Events' ?? config('app.name'));
         SEOTools::setDescription('This is category events page');
         SEOTools::opengraph()->setUrl(url()->current());
         SEOTools::setCanonical(url()->current());
@@ -1392,7 +1392,7 @@ class FrontendController extends Controller
         $setting = Setting::first(['app_name', 'logo']);
         $city = City::find($id);
 
-        SEOMeta::setTitle($setting->app_name . '- Events' ?? env('APP_NAME'))
+        SEOMeta::setTitle($setting->app_name . '- Events' ?? config('app.name'))
             ->setDescription('This is city events page')
             ->setCanonical(url()->current())
             ->addKeyword([
@@ -1403,15 +1403,15 @@ class FrontendController extends Controller
                 'events page',
             ]);
 
-        OpenGraph::setTitle($setting->app_name . ' - Events' ?? env('APP_NAME'))
+        OpenGraph::setTitle($setting->app_name . ' - Events' ?? config('app.name'))
             ->setDescription('This is city events page')
             ->setUrl(url()->current());
 
-        JsonLdMulti::setTitle($setting->app_name . ' - Events' ?? env('APP_NAME'));
+        JsonLdMulti::setTitle($setting->app_name . ' - Events' ?? config('app.name'));
         JsonLdMulti::setDescription('This is city events page');
         JsonLdMulti::addImage($setting->imagePath . $setting->logo);
 
-        SEOTools::setTitle($setting->app_name . ' - Events' ?? env('APP_NAME'));
+        SEOTools::setTitle($setting->app_name . ' - Events' ?? config('app.name'));
         SEOTools::setDescription('This is city events page');
         SEOTools::opengraph()->setUrl(url()->current());
         SEOTools::setCanonical(url()->current());
@@ -1448,7 +1448,7 @@ class FrontendController extends Controller
     {
         $setting = Setting::first(['app_name', 'logo']);
 
-        SEOMeta::setTitle($setting->app_name . ' - All-Events' ?? env('APP_NAME'))
+        SEOMeta::setTitle($setting->app_name . ' - All-Events' ?? config('app.name'))
             ->setDescription('This is all events page')
             ->setCanonical(url()->current())
             ->addKeyword([
@@ -1459,15 +1459,15 @@ class FrontendController extends Controller
                 $setting->app_name . ' Events',
             ]);
 
-        OpenGraph::setTitle($setting->app_name . ' - All-Events' ?? env('APP_NAME'))
+        OpenGraph::setTitle($setting->app_name . ' - All-Events' ?? config('app.name'))
             ->setDescription('This is all events page')
             ->setUrl(url()->current());
 
-        JsonLdMulti::setTitle($setting->app_name . ' - All-Events' ?? env('APP_NAME'));
+        JsonLdMulti::setTitle($setting->app_name . ' - All-Events' ?? config('app.name'));
         JsonLdMulti::setDescription('This is all events page');
         JsonLdMulti::addImage($setting->imagePath . $setting->logo);
 
-        SEOTools::setTitle($setting->app_name . ' - All-Events' ?? env('APP_NAME'));
+        SEOTools::setTitle($setting->app_name . ' - All-Events' ?? config('app.name'));
         SEOTools::setDescription('This is all events page');
         SEOTools::opengraph()->setUrl(url()->current());
         SEOTools::setCanonical(url()->current());
@@ -1501,7 +1501,7 @@ class FrontendController extends Controller
     {
         $setting = Setting::first(['app_name', 'logo']);
 
-        SEOMeta::setTitle($setting->app_name . ' - Category' ?? env('APP_NAME'))
+        SEOMeta::setTitle($setting->app_name . ' - Category' ?? config('app.name'))
             ->setDescription('This is all category page')
             ->setCanonical(url()->current())
             ->addKeyword([
@@ -1512,15 +1512,15 @@ class FrontendController extends Controller
                 $setting->app_name . ' category',
             ]);
 
-        OpenGraph::setTitle($setting->app_name . ' - Category' ?? env('APP_NAME'))
+        OpenGraph::setTitle($setting->app_name . ' - Category' ?? config('app.name'))
             ->setDescription('This is all category page')
             ->setUrl(url()->current());
 
-        JsonLdMulti::setTitle($setting->app_name . ' - Category' ?? env('APP_NAME'));
+        JsonLdMulti::setTitle($setting->app_name . ' - Category' ?? config('app.name'));
         JsonLdMulti::setDescription('This is all category page');
         JsonLdMulti::addImage($setting->imagePath . $setting->logo);
 
-        SEOTools::setTitle($setting->app_name . ' - Category' ?? env('APP_NAME'));
+        SEOTools::setTitle($setting->app_name . ' - Category' ?? config('app.name'));
         SEOTools::setDescription('This is all category page');
         SEOTools::opengraph()->setUrl(url()->current());
         SEOTools::setCanonical(url()->current());
@@ -1543,7 +1543,7 @@ class FrontendController extends Controller
         $blogs = Blog::where('status', 1)->orderBy('id', 'DESC')->get();
         $category = Category::where('status', 1)->orderBy('id', 'DESC')->get();
         $setting = Setting::first(['app_name', 'logo']);
-        SEOMeta::setTitle($setting->app_name . ' - Blogs' ?? env('APP_NAME'))
+        SEOMeta::setTitle($setting->app_name . ' - Blogs' ?? config('app.name'))
             ->setDescription('This is blogs page')
             ->setCanonical(url()->current())
             ->addKeyword([
@@ -1553,13 +1553,13 @@ class FrontendController extends Controller
                 'blog page',
             ]);
         OpenGraph::setDescription('This is blogs page');
-        OpenGraph::setTitle($setting->app_name . ' - Blogs' ?? env('APP_NAME'));
+        OpenGraph::setTitle($setting->app_name . ' - Blogs' ?? config('app.name'));
         OpenGraph::setUrl(url()->current());
         OpenGraph::addProperty('type', 'blogs');
-        JsonLd::setTitle($setting->app_name . ' - Blogs' ?? env('APP_NAME'));
+        JsonLd::setTitle($setting->app_name . ' - Blogs' ?? config('app.name'));
         JsonLd::setDescription('This is blogs page');
         JsonLd::addImage($setting->imagePath . $setting->logo);
-        SEOTools::setTitle($setting->app_name . ' - Blogs' ?? env('APP_NAME'));
+        SEOTools::setTitle($setting->app_name . ' - Blogs' ?? config('app.name'));
         SEOTools::setDescription('This is blogs page');
         SEOTools::opengraph()->setUrl(url()->current());
         SEOTools::setCanonical(url()->current());
@@ -1627,12 +1627,12 @@ class FrontendController extends Controller
                 'country' => $user->country,
             ]);
 
-        JsonLd::setTitle('User Profile' ?? env('APP_NAME'))
+        JsonLd::setTitle('User Profile' ?? config('app.name'))
             ->setDescription('This is user profile page')
             ->setType('Profile')
             ->addImage($user->imagePath . $user->image);
 
-        SEOTools::setTitle('User Profile' ?? env('APP_NAME'));
+        SEOTools::setTitle('User Profile' ?? config('app.name'));
         SEOTools::setDescription('This is user profile page');
         SEOTools::opengraph()->setUrl(url()->current());
         SEOTools::setCanonical(url()->current());
@@ -1785,7 +1785,7 @@ class FrontendController extends Controller
     {
         $setting = Setting::first(['app_name', 'logo']);
 
-        SEOMeta::setTitle($setting->app_name . ' - Change Password' ?? env('APP_NAME'))
+        SEOMeta::setTitle($setting->app_name . ' - Change Password' ?? config('app.name'))
             ->setDescription('This is change password page')
             ->setCanonical(url()->current())
             ->addKeyword([
@@ -1794,15 +1794,15 @@ class FrontendController extends Controller
                 $setting->app_name . ' Change Password'
             ]);
 
-        OpenGraph::setTitle($setting->app_name . ' - Change Password' ?? env('APP_NAME'))
+        OpenGraph::setTitle($setting->app_name . ' - Change Password' ?? config('app.name'))
             ->setDescription('This is change password page')
             ->setUrl(url()->current());
 
-        JsonLdMulti::setTitle($setting->app_name . ' - Change Password' ?? env('APP_NAME'));
+        JsonLdMulti::setTitle($setting->app_name . ' - Change Password' ?? config('app.name'));
         JsonLdMulti::setDescription('This is change password page');
         JsonLdMulti::addImage($setting->imagePath . $setting->logo);
 
-        SEOTools::setTitle($setting->app_name . ' - Change Password' ?? env('APP_NAME'));
+        SEOTools::setTitle($setting->app_name . ' - Change Password' ?? config('app.name'));
         SEOTools::setDescription('This is change password page');
         SEOTools::opengraph()->addProperty('keywords', [
             'change password page',
@@ -1856,7 +1856,7 @@ class FrontendController extends Controller
     {
         $setting = Setting::first(['app_name', 'logo']);
         $data = ContactUs::find(1);
-        SEOMeta::setTitle($setting->app_name . ' - Contact Us' ?? env('APP_NAME'))
+        SEOMeta::setTitle($setting->app_name . ' - Contact Us' ?? config('app.name'))
             ->setDescription('This is contact us page')
             ->setCanonical(url()->current())
             ->addKeyword([
@@ -1865,15 +1865,15 @@ class FrontendController extends Controller
                 'contact us page',
             ]);
 
-        OpenGraph::setTitle($setting->app_name . ' - Contact Us' ?? env('APP_NAME'))
+        OpenGraph::setTitle($setting->app_name . ' - Contact Us' ?? config('app.name'))
             ->setDescription('This is contact us page')
             ->setUrl(url()->current());
 
-        JsonLdMulti::setTitle($setting->app_name . ' - Contact Us' ?? env('APP_NAME'));
+        JsonLdMulti::setTitle($setting->app_name . ' - Contact Us' ?? config('app.name'));
         JsonLdMulti::setDescription('This is contact us page');
         JsonLdMulti::addImage($setting->imagePath . $setting->logo);
 
-        SEOTools::setTitle($setting->app_name . ' - Contact Us' ?? env('APP_NAME'));
+        SEOTools::setTitle($setting->app_name . ' - Contact Us' ?? config('app.name'));
         SEOTools::setDescription('This is contact us page');
         SEOTools::opengraph()->setUrl(url()->current());
         SEOTools::setCanonical(url()->current());
@@ -1909,11 +1909,11 @@ class FrontendController extends Controller
             ->addImage($user->imagePath . $user->image);
 
 
-        JsonLd::setTitle('User Tickets' ?? env('APP_NAME'))
+        JsonLd::setTitle('User Tickets' ?? config('app.name'))
             ->setDescription('This is user tickets page')
             ->addImage($user->imagePath . $user->image);
 
-        SEOTools::setTitle('User Tickets' ?? env('APP_NAME'));
+        SEOTools::setTitle('User Tickets' ?? config('app.name'));
         SEOTools::setDescription('This is user tickets page');
         SEOTools::opengraph()->setUrl(url()->current());
         SEOTools::setCanonical(url()->current());
