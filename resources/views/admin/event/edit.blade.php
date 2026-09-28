@@ -251,10 +251,21 @@
                                 </div>
                                 <div class="form-group">
                                     <label>{{ __('Tags') }}</label>
-                                    <input type="text" name="tags" value="{{ old('tags', $event->tags) }}"
-                                        class="form-control inputtags @error('tags')? is-invalid @enderror">
+                                    <select name="tags[]" class="form-control select2" multiple data-live-search="true">
+                                        @foreach ($tags as $tag)
+                                            <option value="{{ $tag->name }}"
+                                                {{ in_array($tag->name, old('tags', $event->tag_list)) ? 'selected' : '' }}>
+                                                {{ $tag->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @if (count($tags) == 0)
+                                        <small class="form-text text-muted">{{ __('No tags yet — add them under Tags in the sidebar.') }}</small>
+                                    @endif
                                     @error('tags')
-                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        <div class="invalid-feedback block">{{ $message }}</div>
+                                    @enderror
+                                    @error('tags.*')
+                                        <div class="invalid-feedback block">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="form-group">

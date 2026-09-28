@@ -14,6 +14,7 @@ use App\Models\OrderTax;
 use App\Models\AppUser;
 use App\Models\Category;
 use App\Models\City;
+use App\Models\Tag;
 use App\Models\Blog;
 use App\Models\Faq;
 use Twilio\Rest\Client;
@@ -797,7 +798,7 @@ class FrontendController extends Controller
         $timezone = Setting::find(1)->timezone;
         $date = Carbon::now($timezone);
         $events  = Event::with(['category:id,name', 'categories:id,name', 'city:id,name'])
-            ->where([['status', 1], ['is_deleted', 0], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d')]])
+            ->where([['status', 1], ['is_deleted', 0], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]])
             ->visibleTo(Auth::guard('appuser')->user());
 
         $chip = array();
@@ -821,22 +822,22 @@ class FrontendController extends Controller
         }
         if ($request->has('duration') && $request->duration != null) {
             $chip['date'] = $request->duration;
+            // Match events that overlap the chosen day(s), so a same-day 2-3 hour
+            // event and a multi-day one running through that day both show up.
+            $range = null;
             if ($request->duration == 'Today') {
-                $temp = Carbon::now($timezone);
-                $events = $events->where('start_time', '<=' ,$temp);
+                $range = [Carbon::now($timezone)->startOfDay(), Carbon::now($timezone)->endOfDay()];
             } else if ($request->duration == 'Tomorrow') {
-                $temp = Carbon::tomorrow($timezone);
-                $events = $events->where('start_time','<=' ,$temp);
+                $range = [Carbon::tomorrow($timezone)->startOfDay(), Carbon::tomorrow($timezone)->endOfDay()];
             } else if ($request->duration == 'ThisWeek') {
-                $now = Carbon::now($timezone);
-                $weekStartDate = $now->startOfWeek()->format('Y-m-d H:i:s');
-                $weekEndDate = $now->endOfWeek()->format('Y-m-d H:i:s');
-                $events = $events->where('start_time','<=',$weekEndDate);
-            } else if ($request->duration == 'date') {
-                if (isset($request->date)) {
-                    $temp = Carbon::parse($request->date)->format('Y-m-d H:i:s');
-                    $events = $events->where('start_time','<=', $temp)->where('end_time','>=', $temp);
-                }
+                $range = [Carbon::now($timezone)->startOfWeek(), Carbon::now($timezone)->endOfWeek()];
+            } else if ($request->duration == 'date' && $request->filled('date')) {
+                $day = Carbon::parse($request->date, $timezone);
+                $range = [$day->copy()->startOfDay(), $day->copy()->endOfDay()];
+            }
+            if ($range) {
+                $events = $events->where('start_time', '<=', $range[1]->format('Y-m-d H:i:s'))
+                    ->where('end_time', '>=', $range[0]->format('Y-m-d H:i:s'));
             }
         }
         $events = $events->orderBy('start_time', 'ASC')->get();
@@ -1387,61 +1388,89 @@ class FrontendController extends Controller
         return view('frontend.events', compact('events', 'category', 'city', 'onlinecount', 'offlinecount', 'user', 'catactive'));
     }
 
-    public function cityEvents($id, $name)
+    public function redirectOldCityUrl($id, $name = null)
+    {
+        $city = City::findOrFail($id);
+
+        return redirect($city->url, 301);
+    }
+
+    public function cityEvents($slug)
+    {
+        $city = City::findBySlug($slug);
+        abort_if(!$city, 404);
+        return $this->eventListing($city, null);
+    }
+
+    public function cityTagEvents($citySlug, $tagSlug)
+    {
+        $city = City::findBySlug($citySlug);
+        $tag = Tag::findBySlug($tagSlug);
+        abort_if(!$city || !$tag, 404);
+        return $this->eventListing($city, $tag);
+    }
+
+    public function tagEvents($slug)
+    {
+        $tag = Tag::findBySlug($slug);
+        abort_if(!$tag, 404);
+        return $this->eventListing(null, $tag);
+    }
+
+    // Upcoming events for a city and/or tag, e.g. /city/chennai, /tag/dj-night,
+    // /city/chennai/tag/dj-night.
+    private function eventListing(?City $city, ?Tag $tag)
     {
         $setting = Setting::first(['app_name', 'logo']);
-        $city = City::find($id);
+        $place = $city ? ' in ' . $city->name : '';
+        $what = $tag ? $tag->name . ' Events' : 'Events & Parties';
+        $title = $what . $place . ' | ' . $setting->app_name;
+        $description = 'Find and book upcoming ' . ($tag ? $tag->name . ' events' : 'parties and events') . $place . ' on ' . $setting->app_name . '.';
+        $canonical = $tag ? $tag->url($city) : $city->url;
+        $image = $city && $city->image ? url('images/upload/' . $city->image) : $setting->imagePath . $setting->logo;
 
-        SEOMeta::setTitle($setting->app_name . '- Events' ?? config('app.name'))
-            ->setDescription('This is city events page')
-            ->setCanonical(url()->current())
-            ->addKeyword([
-                'city event page',
-                $city->name . ' - Events',
+        SEOMeta::setTitle($title, false)
+            ->setDescription($description)
+            ->setCanonical($canonical)
+            ->addKeyword(array_filter([
+                $tag ? $tag->name . ' events' . $place : null,
+                $city ? $city->name . ' events' : null,
+                $city ? 'parties in ' . $city->name : null,
                 $setting->app_name,
-                $setting->app_name . ' Events',
-                'events page',
-            ]);
+            ]));
 
-        OpenGraph::setTitle($setting->app_name . ' - Events' ?? config('app.name'))
-            ->setDescription('This is city events page')
-            ->setUrl(url()->current());
+        OpenGraph::setTitle($title)
+            ->setDescription($description)
+            ->setUrl($canonical)
+            ->addImage($image);
 
-        JsonLdMulti::setTitle($setting->app_name . ' - Events' ?? config('app.name'));
-        JsonLdMulti::setDescription('This is city events page');
-        JsonLdMulti::addImage($setting->imagePath . $setting->logo);
-
-        SEOTools::setTitle($setting->app_name . ' - Events' ?? config('app.name'));
-        SEOTools::setDescription('This is city events page');
-        SEOTools::opengraph()->setUrl(url()->current());
-        SEOTools::setCanonical(url()->current());
-        SEOTools::opengraph()->addProperty('keywords', [
-            'city event page',
-            $city->name . ' - Events',
-            $setting->app_name,
-            $setting->app_name . ' Events',
-            'events page',
-        ]);
-        SEOTools::jsonLd()->addImage($setting->imagePath . $setting->logo);
+        JsonLdMulti::setTitle($title);
+        JsonLdMulti::setDescription($description);
+        JsonLdMulti::addImage($image);
 
         $timezone = Setting::find(1)->timezone;
         $date = Carbon::now($timezone);
-        $events  = Event::with(['category:id,name', 'categories:id,name', 'city:id,name'])
-            ->where([['status', 1], ['is_deleted', 0], ['city_id', $id], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]])
+        $upcoming = Event::with(['category:id,name', 'categories:id,name', 'city:id,name'])
+            ->where([['status', 1], ['is_deleted', 0], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]])
+            ->when($city, fn ($q) => $q->where('city_id', $city->id))
             ->visibleTo(Auth::guard('appuser')->user())
             ->orderBy('start_time', 'ASC')->get();
-        $offlinecount = 0;
-        $onlinecount = 0;
-        foreach ($events as $key => $value) {
-            if ($value->type == 'online') {
-                $onlinecount += 1;
-            }
-            if ($value->type == 'offline') {
-                $offlinecount += 1;
-            }
-        }
+
+        // tag chips: every active tag used by upcoming events on this city page
+        // (or site-wide on /tag/...), so visitors can hop between tags
+        $usedTags = $upcoming->flatMap(fn ($e) => $e->tag_list)->map(fn ($t) => mb_strtolower($t))->unique()->all();
+        $tagLinks = Tag::where('status', 1)->orderBy('name')->get()
+            ->filter(fn ($t) => in_array(mb_strtolower($t->name), $usedTags))
+            ->values();
+
+        $events = $tag
+            ? $upcoming->filter(fn ($e) => in_array(mb_strtolower($tag->name), array_map('mb_strtolower', $e->tag_list)))->values()
+            : $upcoming;
+
+        $offlinecount = $events->where('type', 'offline')->count();
+        $onlinecount = $events->where('type', 'online')->count();
         $user = Auth::guard('appuser')->user();
-        return view('frontend.events', compact('events', 'city', 'onlinecount', 'offlinecount', 'user'));
+        return view('frontend.events', compact('events', 'city', 'tag', 'tagLinks', 'onlinecount', 'offlinecount', 'user'));
     }
 
     public function eventType($type)
@@ -2163,21 +2192,7 @@ class FrontendController extends Controller
     }
     public function eventsByTag($tag)
     {
-        $events = Event::where([['tags', 'LIKE', "%$tag%"], ['is_deleted', 0]])->get();
-        $onlinecount = 0;
-        $offlinecount = 0;
-        foreach ($events as $key => $value) {
-            if ($value->type == 'online') {
-                $onlinecount += 1;
-            } else {
-                $offlinecount += 1;
-            }
-        }
-        if (Auth::guard('appuser')->check()) {
-            $user = Auth::guard('appuser')->user();
-            return view('frontend.events', compact('events', 'onlinecount', 'offlinecount', 'user'));
-        }
-        return view('frontend.events', compact('events', 'onlinecount', 'offlinecount'));
+        return redirect('/tag/' . \Illuminate\Support\Str::slug($tag), 301);
     }
     public function blogByTag($tag)
     {

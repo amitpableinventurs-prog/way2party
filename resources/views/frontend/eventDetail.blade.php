@@ -17,11 +17,11 @@
         <div
             class="mt-5 3xl:mx-52 2xl:mx-28 1xl:mx-28 xl:mx-36 xlg:mx-32 lg:mx-36 xxmd:mx-24 xmd:mx-32 md:mx-28 sm:mx-20 msm:mx-16 xsm:mx-10 xxsm:mx-5 z-10 relative">
             {{-- Breadcrumb: Home > City > Party Type > Event --}}
-            <nav class="pb-5 z-10 relative font-poppins text-sm" aria-label="breadcrumb">
+            <nav class="pb-5 z-10 relative font-poppins text-lg font-semibold" aria-label="breadcrumb">
                 <a href="{{ url('/') }}" class="text-blue hover:underline">{{ __('Home') }}</a>
                 @if ($data->city)
                     <span class="text-gray-400 mx-1">/</span>
-                    <a href="{{ url('/events-city/' . $data->city_id . '/' . Str::slug($data->city->name)) }}"
+                    <a href="{{ $data->city->url }}"
                         class="text-blue hover:underline">{{ $data->city->name }}</a>
                 @endif
                 @if ($data->category)
@@ -164,7 +164,7 @@
                             @if ($data->city || $data->category)
                                 <div class="flex items-center gap-2 mt-4 flex-wrap">
                                     @if ($data->city)
-                                        <a href="{{ url('/events-city/' . $data->city_id . '/' . Str::slug($data->city->name)) }}"
+                                        <a href="{{ $data->city->url }}"
                                             class="px-3 py-1 text-xs font-poppins text-primary bg-primary-light rounded-full hover:underline">
                                             {{ $data->city->name }}
                                         </a>
@@ -194,7 +194,7 @@
                             </p>
                             <div class="flex flex-wrap mt-5">
                                 @foreach ($tags as $item)
-                                    <a href="{{ url('/user/tag/' . $item) }}">
+                                    <a href="{{ $data->city ? url('/city/' . $data->city->slug . '/tag/' . Str::slug($item)) : url('/tag/' . Str::slug($item)) }}">
                                         <div
                                             class="mt-2 mr-3 px-3 py-2 text-success bg-success-light rounded-md font-poppins font-normal text-base leading-6">
                                             {{ $item }}</div>

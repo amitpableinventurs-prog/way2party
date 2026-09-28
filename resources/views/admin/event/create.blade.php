@@ -232,10 +232,21 @@
                                 </div>
                                 <div class="form-group">
                                     <label>{{ __('Tags') }}</label>
-                                    <input type="text" name="tags" value="{{ old('tags') }}"
-                                        class="form-control inputtags @error('tags')? is-invalid @enderror">
+                                    <select name="tags[]" class="form-control select2" multiple data-live-search="true">
+                                        @foreach ($tags as $tag)
+                                            <option value="{{ $tag->name }}"
+                                                {{ in_array($tag->name, old('tags', [])) ? 'selected' : '' }}>
+                                                {{ $tag->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @if (count($tags) == 0)
+                                        <small class="form-text text-muted">{{ __('No tags yet — add them under Tags in the sidebar.') }}</small>
+                                    @endif
                                     @error('tags')
-                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        <div class="invalid-feedback block">{{ $message }}</div>
+                                    @enderror
+                                    @error('tags.*')
+                                        <div class="invalid-feedback block">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="form-group">
@@ -345,7 +356,7 @@
                 const category_id = $('select[name="category_id[]"]').val();
                 const start_time  = $('#start_time').val().trim();
                 const end_time    = $('#end_time').val().trim();
-                const tags        = $('input[name="tags"]').val().trim();
+                const tags        = ($('select[name="tags[]"]').val() || []).join(', ');
 
                 if (!name)        missing.push('Name');
                 if (!category_id || !category_id.length) missing.push('Party Type');

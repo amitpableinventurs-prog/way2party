@@ -69,6 +69,13 @@
                     </a>
                 </li>
             @endcan
+            @can('tag_access')
+                <li class="{{ request()->is('event-tags*') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ url('event-tags') }}">
+                        <i class="fas fa-tags"></i> <span>{{ __('Tags') }}</span>
+                    </a>
+                </li>
+            @endcan
             @if(Auth::user()->hasRole('admin'))
                 <li class="{{ request()->is('get-notification*') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ url('get-notification') }}">

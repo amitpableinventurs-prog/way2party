@@ -192,6 +192,21 @@ class Event extends Model
      * 'previously_attended' is visible only to a customer with a past order
      * for any past event by this event's organizer.
      */
+    // Exact match against the comma-separated `tags` column ("DJ" must not
+    // match "DJ Night"); tolerates a space after the comma from older data.
+    public function scopeWithTag($query, $tagName)
+    {
+        return $query->whereRaw(
+            "FIND_IN_SET(?, REPLACE(REPLACE(COALESCE(tags, ''), ', ', ','), ' ,', ','))",
+            [trim($tagName)]
+        );
+    }
+
+    public function getTagListAttribute()
+    {
+        return array_values(array_filter(array_map('trim', explode(',', (string) $this->tags))));
+    }
+
     public function scopeVisibleTo($query, $appUser = null)
     {
         $appUserId = $appUser->id ?? null;

@@ -199,7 +199,7 @@
                                     </a>
                                     <div class="flex items-center gap-2 mt-2 flex-wrap">
                                         @if ($item->city)
-                                            <a href="{{ url('/events-city/' . $item->city_id . '/' . Str::slug($item->city->name)) }}"
+                                            <a href="{{ $item->city->url }}"
                                                 class="px-3 py-1 text-xs font-poppins text-primary bg-primary-light rounded-full hover:underline">
                                                 {{ $item->city->name }}
                                             </a>
@@ -308,7 +308,7 @@
                                 </a>
                                 <div class="flex items-center gap-2 mt-2 flex-wrap">
                                     @if ($item->city)
-                                        <a href="{{ url('/events-city/' . $item->city_id . '/' . Str::slug($item->city->name)) }}"
+                                        <a href="{{ $item->city->url }}"
                                             class="px-3 py-1 text-xs font-poppins text-primary bg-primary-light rounded-full hover:underline">
                                             {{ $item->city->name }}
                                         </a>
@@ -426,7 +426,7 @@
             <div
                 class="grid gap-x-7 3xl:grid-cols-4 xl:grid-cols-4 xlg:grid-cols-2 xxmd:grid-cols-2 xxmd:gap-y-7 sm:grid-cols-1 sm:gap-y-7 msm:grid-cols-1 xxsm:grid-cols-1 msm:gapy-7 xxsm:gap-y-7 justify-between pt-10 z-10 relative">
                 @foreach ($cities as $item)
-                    <a href="{{ url('events-city/' . $item->id) . '/' . Str::slug($item->name) }}"
+                    <a href="{{ $item->url }}"
                         class="shadow-lg bg-white p-5 rounded-lg hover:scale-110 transition-all duration-500 cursor-pointer block">
                         <img src="{{ $item->image ? url('images/upload/' . $item->image) : asset('images/events.png') }}"
                             alt="" class="rounded-lg w-full h-40 bg-cover object-cover">

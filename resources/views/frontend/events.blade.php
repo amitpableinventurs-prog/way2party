@@ -21,11 +21,11 @@
                 class="absolute bg-blue blur-3xl opacity-10 s:bg-opacity-10 3xl:w-[370px] 3xl:h-[370px] 2xl:w-[300px] 2xl:h-[300px] 1xl:w-[300px] xmd:w-[300px] xmd:h-[300px] sm:w-[200px] sm:h-[300px] xxsm:w-[300px] xxsm:h-[300px] rounded-full -mt-5 2xl:-ml-20 1xl:-ml-20 sm:ml-2 xxsm:-ml-7">
             </div>
             {{-- Breadcrumb: Home > City > Party Type (only the parts that apply) --}}
-            <nav class="pt-5 z-10 relative font-poppins text-sm" aria-label="breadcrumb">
+            <nav class="pt-5 z-10 relative font-poppins text-lg font-semibold" aria-label="breadcrumb">
                 <a href="{{ url('/') }}" class="text-blue hover:underline">{{ __('Home') }}</a>
                 @if (isset($city) && $city)
                     <span class="text-gray-400 mx-1">/</span>
-                    <a href="{{ url('/events-city/' . $city->id . '/' . Str::slug($city->name)) }}"
+                    <a href="{{ $city->url }}"
                         class="text-blue hover:underline">{{ $city->name }}</a>
                 @endif
                 @if (isset($category) && $category)
@@ -33,11 +33,18 @@
                     <a href="{{ url('/events-category/' . $category->id . '/' . Str::slug($category->name)) }}"
                         class="text-blue hover:underline">{{ $category->name }}</a>
                 @endif
+                @if (isset($tag) && $tag)
+                    <span class="text-gray-400 mx-1">/</span>
+                    <a href="{{ $tag->url($city ?? null) }}"
+                        class="text-blue hover:underline">{{ $tag->name }}</a>
+                @endif
             </nav>
             <div class="flex justify-start pt-5 z-10 flex-wrap items-end">
                 <p
                     class="font-poppins font-semibold md:text-5xl xxsm:text-2xl xsm:text-2xl sm:text-2xl text-blue leading-10 ">
-                    @if (isset($category) && !empty($city))
+                    @if (isset($tag) && $tag)
+                        {{ $tag->name }} {{ __('Events') }}@if (!empty($city)) {{ __('in') }} {{ $city->name }}@endif
+                    @elseif (isset($category) && !empty($city))
                         {{ $category->name }} {{ __('Events in') }} {{ $city->name }}
                     @elseif (isset($category))
                         {{ $category->name }} {{ __('Events') }}
@@ -51,6 +58,20 @@
                     class="font-poppins font-medium md:text-2xl xxsm:text-xl sm:text-xl text-blue leading-10 pt-1 sm:pt-3">
                     ( {{ $events->count() }} )</p>
             </div>
+            @if (!empty($tagLinks) && count($tagLinks))
+                {{-- Tag chips: real links (crawlable), scoped to the city when on a city page --}}
+                <div class="flex flex-wrap items-center gap-2 pt-4 z-10 relative font-poppins">
+                    <span class="text-gray font-medium mr-1">{{ __('Tags') }}:</span>
+                    @if (!empty($city))
+                        <a href="{{ $city->url }}"
+                            class="px-3 py-1 rounded-full text-sm shadow-sm {{ empty($tag) ? 'bg-primary text-white' : 'bg-white text-primary' }}">{{ __('All') }}</a>
+                    @endif
+                    @foreach ($tagLinks as $tagLink)
+                        <a href="{{ $tagLink->url($city ?? null) }}"
+                            class="px-3 py-1 rounded-full text-sm shadow-sm {{ !empty($tag) && $tag->id == $tagLink->id ? 'bg-primary text-white' : 'bg-white text-primary' }}">#{{ $tagLink->name }}</a>
+                    @endforeach
+                </div>
+            @endif
             <div class="mb-4 pt-4">
                 <ul class="flex flex-wrap -mb-px text-lg font-medium text-center events xmd:space-y-0 md:space-y-2 sm:space-y-2 xxsm:space-y-2"
                     id="myTab" data-tabs-toggle="#myTabContent" role="tablist">
@@ -113,7 +134,7 @@
                                 </a>
                                 <div class="flex items-center gap-2 mt-2 flex-wrap">
                                     @if ($item->city)
-                                        <a href="{{ url('/events-city/' . $item->city_id . '/' . Str::slug($item->city->name)) }}"
+                                        <a href="{{ $item->city->url }}"
                                             class="px-3 py-1 text-xs font-poppins text-primary bg-primary-light rounded-full hover:underline">
                                             {{ $item->city->name }}
                                         </a>
@@ -175,7 +196,7 @@
                                         </a>
                                         <div class="flex items-center gap-2 mt-2 flex-wrap">
                                             @if ($item->city)
-                                                <a href="{{ url('/events-city/' . $item->city_id . '/' . Str::slug($item->city->name)) }}"
+                                                <a href="{{ $item->city->url }}"
                                                     class="px-3 py-1 text-xs font-poppins text-primary bg-primary-light rounded-full hover:underline">
                                                     {{ $item->city->name }}
                                                 </a>

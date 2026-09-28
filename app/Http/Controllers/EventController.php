@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Models\Category;
 use App\Models\City;
+use App\Models\Tag;
 use App\Models\Ticket;
 use App\Models\Order;
 use App\Models\Setting;
@@ -115,7 +116,8 @@ class EventController extends Controller
             $scanner = User::role('scanner')->where('org_id', Auth::user()->id)->orderBy('id', 'DESC')->get();
         }
         $openai_switch = Setting::first()->openai_switch;
-        return view('admin.event.create', compact('category', 'city', 'users', 'scanner', 'openai_switch'));
+        $tags = Tag::where('status', 1)->orderBy('name')->get();
+        return view('admin.event.create', compact('category', 'city', 'tags', 'users', 'scanner', 'openai_switch'));
     }
 
     public function store(Request $request)
@@ -141,14 +143,16 @@ class EventController extends Controller
             'description' => 'bail|required',
             'scanner_id' => 'bail|required',
             'people' => 'bail|required',
-            'tags' => 'regex:/^[a-zA-Z0-9\s,]+$/',
+            'tags' => 'bail|nullable|array',
+            'tags.*' => 'bail|exists:tags,name',
         ],
         [
-            'tags.regex' => 'Tags should not contain any special characters',
+            'tags.*.exists' => 'Please pick tags from the list (admins can add new ones under Tags).',
             'end_time.after' => 'End time must be later than start time — the same day is fine, just pick a later time.',
         ]);
         $data = $request->all();
         $data['type'] = 'offline';
+        $data['tags'] = implode(',', $request->input('tags', []));
         $categoryIds = $request->input('category_id');
         $data['category_id'] = $categoryIds[0];
         $data['scanner_id'] = implode(',', $request->scanner_id);
@@ -200,7 +204,9 @@ class EventController extends Controller
         } else if (Auth::user()->hasRole('Organizer')) {
             $scanner = User::role('scanner')->where('org_id', Auth::user()->id)->orderBy('id', 'DESC')->get();
         }
-        return view('admin.event.edit', compact('event', 'category', 'city', 'users', 'scanner'));
+        // inactive tags already on this event stay selectable so saving doesn't drop them
+        $tags = Tag::where('status', 1)->orWhereIn('name', $event->tag_list)->orderBy('name')->get();
+        return view('admin.event.edit', compact('event', 'category', 'city', 'tags', 'users', 'scanner'));
     }
 
     public function update(Request $request, Event $event)
@@ -225,14 +231,16 @@ class EventController extends Controller
             'description' => 'bail|required',
             'scanner_id' => 'bail|required',
             'people' => 'bail|required',
-            'tags' => 'regex:/^[a-zA-Z0-9\s,]+$/',
+            'tags' => 'bail|nullable|array',
+            'tags.*' => 'bail|exists:tags,name',
         ],
         [
-            'tags.regex' => 'Tags should not contain any special characters',
+            'tags.*.exists' => 'Please pick tags from the list (admins can add new ones under Tags).',
             'end_time.after' => 'End time must be later than start time — the same day is fine, just pick a later time.',
         ]);
         $data = $request->all();
         $data['type'] = 'offline';
+        $data['tags'] = implode(',', $request->input('tags', []));
         $categoryIds = $request->input('category_id');
         $data['category_id'] = $categoryIds[0];
         $data['scanner_id'] = implode(',', $request->scanner_id);

@@ -6,6 +6,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CityController;
+use App\Http\Controllers\TagController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\TicketController;
@@ -232,6 +233,7 @@ Route::group(['middleware' => ['auth', 'preferImpersonatedOrganizer']], function
         'coupon' =>  CouponController::class,
         'category' =>  CategoryController::class,
         'city' =>  CityController::class,
+        'event-tags' =>  TagController::class,
         // 'location' =>  LocationController::class,
         'events' =>  EventController::class,
         'notification-template' =>  NotificationTemplateController::class,

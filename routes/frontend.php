@@ -60,7 +60,10 @@ Route::group(['middleware' => ['mode', 'XSS']], function () {
         Route::get('/all-events', [FrontendController::class, 'allEvents']);
         Route::post('/all-events', [FrontendController::class, 'allEvents']);
         Route::get('/events-category/{id}/{name}', [FrontendController::class, 'categoryEvents']);
-        Route::get('/events-city/{id}/{name}', [FrontendController::class, 'cityEvents']);
+        Route::get('/city/{slug}', [FrontendController::class, 'cityEvents'])->where('slug', '(?!create$)[A-Za-z0-9-]+')->name('cityEvents'); // 'create' belongs to the admin city resource
+        Route::get('/events-city/{id}/{name?}', [FrontendController::class, 'redirectOldCityUrl']);
+        Route::get('/city/{city}/tag/{tag}', [FrontendController::class, 'cityTagEvents'])->name('cityTagEvents');
+        Route::get('/tag/{slug}', [FrontendController::class, 'tagEvents'])->name('tagEvents');
         Route::get('/event-type/{type}', [FrontendController::class, 'eventType']);
         Route::get('/event/{id}/{name}', [FrontendController::class, 'eventDetail']);
         Route::get('/events/{id}', [FrontendController::class, 'eventDetail']);
