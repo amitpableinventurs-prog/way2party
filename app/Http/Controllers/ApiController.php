@@ -826,7 +826,7 @@ class ApiController extends Controller
             $currency_code = Setting::first()->currency;
             $stripe_payment = $currency_code == "USD" || $currency_code == "EUR" || $currency_code == "INR" ? $request->payment * 100 : $request->payment;
 
-            $cur = Setting::find(1)->currency;
+            $cur = Setting::current()->currency;
             $stripe_secret =  PaymentSetting::find(1)->stripeSecretKey;
 
             Stripe\Stripe::setApiKey($stripe_secret);
@@ -1050,7 +1050,7 @@ class ApiController extends Controller
 
     public function searchEvent(Request $request)
     {
-        $timezone = Setting::find(1)->timezone;
+        $timezone = Setting::current()->timezone;
         $date = Carbon::now($timezone);
         $data = Event::where([['status', 1], ['is_deleted', 0], ['start_time', '>=', $date->format('Y-m-d')]]);
         if ($request->lat != null && $request->lang != null) {
@@ -1130,7 +1130,7 @@ class ApiController extends Controller
             $content = NotificationTemplate::where('title', 'Reset Password')->first()->mail_content;
             $detail['user_name'] = $user->name;
             $detail['password'] = $password;
-            $detail['app_name'] = Setting::find(1)->app_name;
+            $detail['app_name'] = Setting::current()->app_name;
 
             try {
                 $setting = Setting::first();

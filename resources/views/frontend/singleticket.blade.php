@@ -16,7 +16,7 @@
       <style>
           @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
       </style>
-      <?php $primary_color = \App\Models\Setting::find(1)->primary_color; ?>
+      <?php $primary_color = \App\Models\Setting::current()->primary_color; ?>
       <style>
           body {
               background: <?php echo $primary_color . '1a'; ?>;

@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     @php
-        $favicon = \App\Models\Setting::find(1)->favicon;
+        $favicon = \App\Models\Setting::current()->favicon;
     @endphp
     <meta charset="utf-8">
     <link href="{{ $favicon ? url('images/upload/' . $favicon) : asset('/images/logo.png') }}" rel="icon"
@@ -17,7 +17,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css" rel="stylesheet" />
 
     <script src="{{ asset('js/custom.js') }}"></script>
-    <?php $primary_color = \App\Models\Setting::find(1)->primary_color; ?>
+    <?php $primary_color = \App\Models\Setting::current()->primary_color; ?>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <style>

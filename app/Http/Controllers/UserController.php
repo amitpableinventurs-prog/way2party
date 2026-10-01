@@ -212,7 +212,7 @@ class UserController extends Controller
         ]);
         SEOTools::jsonLd()->addImage($setting->imagePath . $setting->logo);
 
-        $timezone = Setting::find(1)->timezone;
+        $timezone = Setting::current()->timezone;
         $date = Carbon::now($timezone);
         $events  = Event::with(['category:id,name'])
             ->where([['status', 1], ['is_deleted', 0], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]]);
@@ -314,7 +314,7 @@ class UserController extends Controller
         $data->tax_total = array_sum($arr);
         // $data->tax = Tax::where([['user_id', $data->event->user_id], ['allow_all_bill', 1], ['status', 1]])->orderBy('id', 'DESC')->get()->makeHidden(['created_at', 'updated_at']);
         // $data->tax_total = intval(Tax::where([['user_id', $data->event->user_id], ['allow_all_bill', 1], ['status', 1]])->sum('price'));
-        $data->currency_code = Setting::find(1)->currency;
+        $data->currency_code = Setting::current()->currency;
         $seat = '';
         $orders = Order::where('event_id', $data->event['id'])->get();
         return view('admin.organizer.organizerCheckout', compact('data'));
@@ -355,7 +355,7 @@ class UserController extends Controller
         $master['eventDate'] = array();
 
         $events = Event::where([['status', 1], ['is_deleted', 0]])->orderBy('id', 'DESC')->get();
-        $timezone = Setting::find(1)->timezone;
+        $timezone = Setting::current()->timezone;
         $date = Carbon::now($timezone);
         $events  = Event::with(['category:id,name'])
             ->where([['status', 1], ['is_deleted', 0], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]]);
@@ -430,7 +430,7 @@ class UserController extends Controller
             $value->average = $value->tickets == 0 ? 0 : $value->sold_ticket * 100 / $value->tickets;
         }
 
-        $timezone = Setting::find(1)->timezone;
+        $timezone = Setting::current()->timezone;
         $date = Carbon::now($timezone);
         $events  = Event::with(['category:id,name'])
             ->where([['status', 1], ['user_id', Auth::user()->id], ['is_deleted', 0], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]]);
@@ -560,7 +560,7 @@ class UserController extends Controller
 
     public function scanner()
     {
-        $timezone = Setting::find(1)->timezone;
+        $timezone = Setting::current()->timezone;
         $date = Carbon::now($timezone);
         if (Auth::user()->hasRole('admin')) {
             $scanners = User::role('scanner')->orderBy('id', 'DESC')->get();

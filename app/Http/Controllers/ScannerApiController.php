@@ -60,7 +60,7 @@ class ScannerApiController extends Controller
             $content = NotificationTemplate::where('title', 'Reset Password')->first()->mail_content;
             $detail['user_name'] = $user->name;
             $detail['password'] = $password;
-            $detail['app_name'] = Setting::find(1)->app_name;
+            $detail['app_name'] = Setting::current()->app_name;
             try {
                 $setting = Setting::first();
                 Config::set('mail.transport', $setting->mail_mailer);
@@ -90,7 +90,7 @@ class ScannerApiController extends Controller
     public function events()
     {
         $organizer = Auth::user()->org_id;
-        $timezone = Setting::find(1)->timezone;
+        $timezone = Setting::current()->timezone;
         $date = Carbon::now($timezone);
         $data = Event::where([['status', 1], ['is_deleted', 0], ['user_id', $organizer], ['end_time', '>', $date->format('Y-m-d H:i:s')]])
             ->orderBy('id', 'DESC')->get()->makeHidden(['created_at', 'updated_at', 'tags', 'security', 'lang', 'lat', 'people', 'gallery', 'description']);
@@ -175,7 +175,7 @@ class ScannerApiController extends Controller
             }
         }
         $order = Order::find($child->order_id);
-        $currency = Setting::find(1)->synbol;
+        $currency = Setting::current()->synbol;
         $data = [
             'payment_type' => $order->payment_type,
             'amount' => $order->payment,

@@ -1,7 +1,7 @@
 @extends('frontend.master', ['activePage' => 'home'])
 @section('title', __('Send Funds'))
 @section('content')
-    <div class="pb-20 bg-scroll min-h-screen" style="background-image: url('{{ asset('images/events.png') }}')">
+    <div class="pb-20 bg-scroll min-h-screen" style="background-image: url('{{ asset('images/events-bg.jpg') }}')">
         <div class="container mx-auto mt-8">
             <p class="font-poppins font-semibold md:text-5xl xxsm:text-2xl xsm:text-2xl sm:text-2xl text-blue leading-10">
                 {{ __('Send Funds') }}</p>

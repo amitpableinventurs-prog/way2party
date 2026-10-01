@@ -1,6 +1,6 @@
 @php
-    $logo = \App\Models\Setting::find(1)->logo;
-    $favicon = \App\Models\Setting::find(1)->favicon;
+    $logo = \App\Models\Setting::current()->logo;
+    $favicon = \App\Models\Setting::current()->favicon;
     $modules = \App\Models\Module::all();
 @endphp
 <div class="main-sidebar">

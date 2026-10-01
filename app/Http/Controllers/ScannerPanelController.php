@@ -73,7 +73,7 @@ class ScannerPanelController extends Controller
     {
         (new AppHelper)->eventStatusChange();
         $scannerId = Auth::user()->id;
-        $timezone = Setting::find(1)->timezone;
+        $timezone = Setting::current()->timezone;
         $date = Carbon::now($timezone);
 
         $events = Event::where([['status', 1], ['is_deleted', 0]])
@@ -180,7 +180,7 @@ class ScannerPanelController extends Controller
             return ['status' => 'already_used', 'message' => __('This ticket has already been fully checked in.'), 'order_child_id' => $child->id];
         }
 
-        $timezone = Setting::find(1)->timezone;
+        $timezone = Setting::current()->timezone;
         $now = Carbon::now($timezone);
         if ($ticket->allday == 0) {
             if ($order->ticket_date && Carbon::parse($order->ticket_date)->format('Y-m-d') != $now->format('Y-m-d')) {

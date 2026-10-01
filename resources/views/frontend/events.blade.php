@@ -11,7 +11,7 @@
             ->sortBy('name');
     @endphp
 
-    <div class="pb-20 bg-scroll min-h-screen" style="background-image: url('{{ asset('images/events.png') }}')">
+    <div class="pb-20 bg-scroll min-h-screen" style="background-image: url('{{ asset('images/events-bg.jpg') }}')">
 
         {{-- scroll --}}
 
@@ -106,7 +106,7 @@
                                 class="shadow-2xl p-5 rounded-lg bg-white hover:scale-110 transition-all duration-500 cursor-pointer">
                                 <a href="{{ url('/event/' . $item->id . '/' . Str::slug($item->name)) }}">
                                     <div class="relative capitalize">
-                                        <img src="{{ url('images/upload/' . $item->image) }}" alt=""
+                                        <img loading="lazy" decoding="async" src="{{ url('images/upload/' . $item->image) }}" alt=""
                                         class="h-40 rounded-lg w-full object-cover bg-cover ">
                                         @switch(strtolower($item->auto_generated_tag))
                                             @case('almost full')
@@ -186,7 +186,7 @@
                                 @if ($item->categories->isNotEmpty() ? $item->categories->contains('id', $tabCategory->id) : $item->category_id == $tabCategory->id)
                                     <div class="shadow-2xl p-5 rounded-lg bg-white hover:scale-110 transition-all duration-500 cursor-pointer">
                                         <a href="{{ url('/event/' . $item->id . '/' . Str::slug($item->name)) }}">
-                                            <img src="{{ url('images/upload/' . $item->image) }}" alt=""
+                                            <img loading="lazy" decoding="async" src="{{ url('images/upload/' . $item->image) }}" alt=""
                                                 class="h-40 rounded-lg w-full object-cover bg-cover ">
                                             <p class="font-popping font-semibold text-xl leading-8 pt-2 w-[90%] truncate">
                                                 {{ $item->name }}</p>

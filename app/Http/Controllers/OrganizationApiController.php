@@ -170,7 +170,7 @@ class OrganizationApiController extends Controller
             $content = NotificationTemplate::where('title', 'Reset Password')->first()->mail_content;
             $detail['user_name'] = $user->name;
             $detail['password'] = $password;
-            $detail['app_name'] = Setting::find(1)->app_name;
+            $detail['app_name'] = Setting::current()->app_name;
             try {
                 $setting = Setting::first();
                 Config::set('mail.transport', $setting->mail_mailer);
@@ -199,7 +199,7 @@ class OrganizationApiController extends Controller
 
     public function events()
     {
-        $timezone = Setting::find(1)->timezone;
+        $timezone = Setting::current()->timezone;
         $date = Carbon::now($timezone);
         $data['past'] =  Event::with(['ticket'])
         ->where([['status', 1], ['is_deleted', 0], ['user_id', Auth::user()->id], ['start_time', '<=', $date->format('Y-m-d H:i:s')], ['end_time', '<=', $date->format('Y-m-d H:i:s')]])

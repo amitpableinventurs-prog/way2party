@@ -2,12 +2,12 @@
 @section('title', __('Organizer Details'))
 @section('content')
 
-    <div class="pb-20 bg-scroll min-h-screen" style="background-image: url('{{ asset('images/events.png') }}')">
+    <div class="pb-20 bg-scroll min-h-screen" style="background-image: url('{{ asset('images/events-bg.jpg') }}')">
 
         {{-- scroll --}}
         {{-- <div class="mr-4 flex justify-end z-20">
             <a type="button" href="{{ url('#') }}" class="back-to-top bg-primary rounded-full p-4 fixed z-20  mt-72">
-                <img src="{{ asset('images/downarrow.png') }}" alt="" class="w-3 h-3 z-20">
+                <img loading="lazy" decoding="async" src="{{ asset('images/downarrow.png') }}" alt="" class="w-3 h-3 z-20">
             </a>
         </div> --}}
 
@@ -16,7 +16,7 @@
             class=" 3xl:mx-52 2xl:mx-28 1xl:mx-28 xl:mx-36 xlg:mx-32 lg:mx-36 xxmd:mx-24 xmd:mx-32 md:mx-28 sm:mx-20 msm:mx-16 xsm:mx-10 xxsm:mx-0 z-10 relative mt-10">
             <div class="shadow-2xl p-5 rounded-lg bg-white flex sm:flex-nowrap msm:flex-wrap xxsm:flex-wrap mb-5">
                 <div class="flex sm:flex-nowrap msm:flex-wrap xxsm:flex-wrap">
-                    <img src="{{ asset('images/upload/' . $data->image) }}" alt=""
+                    <img loading="lazy" decoding="async" src="{{ asset('images/upload/' . $data->image) }}" alt=""
                         class="h-32 w-32 object-cover bg-cover  rounded-full">
                     <div class="mt-4 ml-3 mr-3">
                         <p class="font-poppins font-semibold text-4xl leading-7 text-black">{{ ($data->first_name ?? '') . ' ' .( $data->last_name ?? '')}}</p>
@@ -113,7 +113,7 @@
                 class="grid gap-x-7 lx3:grid-cols-4 xl:grid-cols-3 xlg:grid-cols-2 xxmd:grid-cols-2 xxmd:gap-y-7 xmd:gap-y-7 xxsm:gap-y-7 sm:grid-cols-1 sm:gap-y-7 msm:grid-cols-1 xxsm:grid-cols-1 justify-between pt-5">
                 @foreach ($data->events as $item)
                     <div class="shadow-2xl p-5 rounded-lg bg-white">
-                        <img src="{{ asset('images/upload/' . $item->image) }}" alt=""
+                        <img loading="lazy" decoding="async" src="{{ asset('images/upload/' . $item->image) }}" alt=""
                             class="rounded-lg w-full h-40 bg-cover object-cover ">
                         <p class="font-popping font-semibold text-xl leading-8 pt-2">{{ $item->name }}</p>
                         <p class="font-poppins  font-normal text-base leading-6 text-gray pt-1">

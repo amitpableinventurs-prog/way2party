@@ -234,7 +234,7 @@ class OrderController extends Controller
     {
         $data = $request->all();
         if ($request->payment_type == "STRIPE") {
-            $currency = Setting::find(1)->currency;
+            $currency = Setting::current()->currency;
             $stripe_secret = OrganizerPaymentKeys::find(1)->stripeSecretKey;
             Stripe\Stripe::setApiKey($stripe_secret);
             $stripeDetail =  Stripe\Charge::create([

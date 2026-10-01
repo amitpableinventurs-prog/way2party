@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<?php $primary_color = \App\Models\Setting::find(1)->primary_color; ?>
+<?php $primary_color = \App\Models\Setting::current()->primary_color; ?>
 
 <head>
     <meta charset="utf-8">

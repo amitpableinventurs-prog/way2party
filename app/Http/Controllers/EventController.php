@@ -28,7 +28,7 @@ class EventController extends Controller
     {
         abort_if(Gate::denies('event_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         if (Auth::user()->hasRole('admin')) {
-            $timezone = Setting::find(1)->timezone;
+            $timezone = Setting::current()->timezone;
             $date = Carbon::now($timezone);
             $events  = Event::with(['category:id,name'])
                 ->where([['is_deleted', 0], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]]);
@@ -65,7 +65,7 @@ class EventController extends Controller
             $events = $events->orderByRaw("approval_status = ? DESC", [Event::APPROVAL_PENDING])
                 ->orderBy('start_time', 'ASC')->get();
         } elseif (Auth::user()->hasRole('Organizer')) {
-            $timezone = Setting::find(1)->timezone;
+            $timezone = Setting::current()->timezone;
             $date = Carbon::now($timezone);
             $events  = Event::with(['category:id,name'])
                 ->where([['user_id', Auth::user()->id], ['is_deleted', 0], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]]);
@@ -351,6 +351,7 @@ class EventController extends Controller
             $name = uniqid() . '.' . $image->getClientOriginalExtension();
             $destinationPath = public_path('/images/upload');
             $image->move($destinationPath, $name);
+            $name = (new AppHelper)->optimizeImage($destinationPath, $name);
             array_push($event, $name);
             Event::find($request->id)->update(['gallery' => implode(',', $event)]);
         }

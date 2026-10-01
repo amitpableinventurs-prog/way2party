@@ -1,8 +1,9 @@
 @extends('frontend.master', ['activePage' => 'checkout'])
+@section('payment_sdks', true)
 @section('title', __('Checkout'))
 @section('content')
     {{-- content --}}
-    <div class="pb-20 bg-scroll min-h-screen" style="background-image: url('{{ asset('images/events.png') }}')">
+    <div class="pb-20 bg-scroll min-h-screen" style="background-image: url('{{ asset('images/events-bg.jpg') }}')">
         {{-- scroll --}}
         <div id="stripe_message" class="bg-danger text-white text-center p-2 hidden"></div>
         <div class="mr-4 flex justify-end z-30">

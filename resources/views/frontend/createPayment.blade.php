@@ -133,7 +133,7 @@ hr {
                         <input type="hidden" name="payment_method" value="both" /> <!-- Can be card, account, both -->
                         <input type="hidden" name="description" value="test" /> 
                         <input type="hidden" name="country" value="NG" /> 
-                        <input type="hidden" name="currency" value="{{App\Models\Setting::find(1)->currency}}" /> 
+                        <input type="hidden" name="currency" value="{{App\Models\Setting::current()->currency}}" /> 
                         <input type="hidden" name="email" value="{{$order->customer->email}}" /> 
                         <input type="hidden" name="firstname" value="{{$order->customer->name}}" /> 
                         <input type="hidden" name="lastname" value="{{$order->customer->last_name}}" />

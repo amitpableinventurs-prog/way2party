@@ -324,7 +324,7 @@
         </style>
     </section>
     @php
-        $gmapkey = App\Models\Setting::find(1)->map_key;
+        $gmapkey = App\Models\Setting::current()->map_key;
     @endphp
     <script type="text/javascript" src="https://maps.google.com/maps/api/js?key={{$gmapkey}}&libraries=places">
     </script>

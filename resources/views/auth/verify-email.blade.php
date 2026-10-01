@@ -111,7 +111,7 @@
     <table border="0" cellpadding="0" cellspacing="0" width="100%">
         <!-- LOGO -->
         <tr>
-            <?php $primary_color = \App\Models\Setting::find(1)->primary_color; ?>
+            <?php $primary_color = \App\Models\Setting::current()->primary_color; ?>
 
             <td bgcolor="{{ $primary_color }}" align="center">
                 <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
@@ -177,7 +177,7 @@
                     <tr>
                         <td bgcolor="#ffffff" align="left"
                             style="padding: 0px 30px 40px 30px; border-radius: 0px 0px 4px 4px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;">
-                            <?php $app_name = \App\Models\Setting::find(1)->app_name; ?>
+                            <?php $app_name = \App\Models\Setting::current()->app_name; ?>
                             <p style="margin: 0;">{{__("Cheers,")}}<br>{{ $app_name }}</p>
                         </td>
                     </tr>

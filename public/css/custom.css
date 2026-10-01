@@ -38,6 +38,17 @@
 }
 #app{
     opacity: 0;
+    /* Safety net: reveal the page even if a script before custom.js fails to load. */
+    animation: app-reveal 0s 3s forwards;
+}
+@keyframes app-reveal {
+    to { opacity: 1; }
+}
+.lds-ripple {
+    animation: loader-hide 0s 3s forwards;
+}
+@keyframes loader-hide {
+    to { visibility: hidden; }
 }
 .lds-ripple div {
 

@@ -2,7 +2,7 @@
 @section('title', __('Wallet'))
 @section('content')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css" rel="stylesheet" />
-    <div class="pb-20 bg-scroll min-h-screen" style="background-image: url('{{ asset('images/events.png') }}')">
+    <div class="pb-20 bg-scroll min-h-screen" style="background-image: url('{{ asset('images/events-bg.jpg') }}')">
         <div class="container mx-auto mt-8">
             <div class="flex justify-between pt-5 z-10 py-3">
                 <div>

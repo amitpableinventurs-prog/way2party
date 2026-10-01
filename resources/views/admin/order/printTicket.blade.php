@@ -12,7 +12,7 @@
             <div class="invoice">
                 <div class="invoice-print">
                     <div class="ticket-header mb-4 text-center text-primary">
-                        <h2>{{ App\Models\Setting::find(1)->app_name }}</h2>
+                        <h2>{{ App\Models\Setting::current()->app_name }}</h2>
                     </div>
                     <div class="row ticket-header pb-3 mb-3">
                         <div class="col-lg-6 print-left">

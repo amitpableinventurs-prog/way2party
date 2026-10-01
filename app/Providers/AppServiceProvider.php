@@ -30,15 +30,21 @@ class AppServiceProvider extends ServiceProvider
     {
         //
         Schema::defaultStringLength(191);
-        view()->composer('*', function ($view) {
-            $currency = null;
-            if (config('database.connections.' . config('database.default') . '.database')) {
-                $setting = Setting::find(1);
-                if ($setting && $setting->currency) {
-                    $currency = optional(Currency::where('code', $setting->currency)->first())->symbol;
+        // Runs for every view and partial, so resolve the symbol once per request
+        // instead of 2 queries per rendered view.
+        $currencySymbol = null;
+        view()->composer('*', function ($view) use (&$currencySymbol) {
+            if ($currencySymbol === null) {
+                $currency = null;
+                if (config('database.connections.' . config('database.default') . '.database')) {
+                    $setting = Setting::current();
+                    if ($setting && $setting->currency) {
+                        $currency = optional(Currency::where('code', $setting->currency)->first())->symbol;
+                    }
                 }
+                $currencySymbol = $currency ?? '$';
             }
-            $view->with('currency', $currency ?? '$');
+            $view->with('currency', $currencySymbol);
         });
 
         // Scoped to the root layout (rendered once per request) so addImage() below never
@@ -47,7 +53,7 @@ class AppServiceProvider extends ServiceProvider
             if (!config('database.connections.' . config('database.default') . '.database')) {
                 return;
             }
-            $setting = Setting::find(1);
+            $setting = Setting::current();
             if ($setting && $setting->logo) {
                 $logoUrl = ($setting->imagePath ?? url('images/upload/')) . $setting->logo;
                 OpenGraph::setSiteName($setting->app_name)->addImage($logoUrl);

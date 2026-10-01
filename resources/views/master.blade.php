@@ -3,12 +3,12 @@
 
 <head>
     @php
-        $favicon = \App\Models\Setting::find(1)->favicon;
+        $favicon = \App\Models\Setting::current()->favicon;
         $modules = \App\Models\Module::all();
     @endphp
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
-    <title>{{ \App\Models\Setting::find(1)->app_name }}</title>
+    <title>{{ \App\Models\Setting::current()->app_name }}</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- General CSS Files -->
     <link href="{{ $favicon ? url('images/upload/' . $favicon) : asset('/images/logo.png') }}" rel="icon"
@@ -43,7 +43,7 @@
 </head>
 
 <body>
-    <?php $primary_color = \App\Models\Setting::find(1)->primary_color; ?>
+    <?php $primary_color = \App\Models\Setting::current()->primary_color; ?>
 
     <style>
         :root {
@@ -99,7 +99,7 @@
                 @include('admin.layout.sidebar')
                 <div class="main-content">
                     @if (Auth::user()->hasRole('admin'))
-                        <?php $status = \App\Models\Setting::find(1)->license_status; ?>
+                        <?php $status = \App\Models\Setting::current()->license_status; ?>
                         @if ($status == 1)
                             @yield('content')
                             @yield('content-license')
@@ -164,7 +164,7 @@
     @auth
         <?php
         $sendbox = \App\Models\PaymentSetting::where('id', 1)->first();
-        $cur = \App\Models\Setting::find(1)->currency;
+        $cur = \App\Models\Setting::current()->currency;
         ?>
         @if ($sendbox)
             @if ($sendbox->paypalClientId)

@@ -3,11 +3,11 @@
 @section('content')
     @php
         $social = \App\Models\Setting::find(1);
-        $logo = \App\Models\Setting::find(1)->logo;
+        $logo = \App\Models\Setting::current()->logo;
         $admin = \App\Models\User::find(1);
     @endphp
 
-    <div class="pb-20 bg-scroll min-h-screen" style="background-image: url('{{ asset('images/events.png') }}')">
+    <div class="pb-20 bg-scroll min-h-screen" style="background-image: url('{{ asset('images/events-bg.jpg') }}')">
         {{-- scroll --}}
         <div class="mr-4 flex justify-end z-30">
             <a type="button" href="{{ url('#') }}"
@@ -190,7 +190,7 @@
     </script>
 
     @php
-        $gmapkey = \App\Models\Setting::find(1)->map_key;
+        $gmapkey = \App\Models\Setting::current()->map_key;
     @endphp
     <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ $gmapkey }}&loading=async&callback=initMap"></script>
 @endsection

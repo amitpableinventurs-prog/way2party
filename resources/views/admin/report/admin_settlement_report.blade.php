@@ -103,7 +103,7 @@
                         </div>
                     </div>
                     @php
-                        $cur = \App\Models\Setting::find(1)->currency;
+                        $cur = \App\Models\Setting::current()->currency;
                     @endphp
                     <div class="row b-bottom mb-4 pb-4">
                         <div class="col-6">

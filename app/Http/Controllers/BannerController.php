@@ -24,7 +24,7 @@ class BannerController extends Controller
     public function create()
     {
         abort_if(Gate::denies('banner_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $timezone = Setting::find(1)->timezone;
+        $timezone = Setting::current()->timezone;
         $date = Carbon::now($timezone);
         $events  = Event::where([['status', 1], ['is_deleted', 0], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]])
             ->orderBy('start_time', 'desc')->get();
@@ -48,7 +48,7 @@ class BannerController extends Controller
     public function edit(Banner $banner)
     {
         abort_if(Gate::denies('banner_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $timezone = Setting::find(1)->timezone;
+        $timezone = Setting::current()->timezone;
         $date = Carbon::now($timezone);
         $events  = Event::where([['status', 1], ['is_deleted', 0], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]])
         ->orderBy('start_time', 'desc')->get();

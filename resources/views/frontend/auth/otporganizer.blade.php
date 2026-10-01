@@ -11,7 +11,7 @@
     <script src="https://unpkg.com/flowbite@1.5.5/dist/flowbite.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
-    <?php $primary_color = \App\Models\Setting::find(1)->primary_color; ?>
+    <?php $primary_color = \App\Models\Setting::current()->primary_color; ?>
 
     <style>
         :root {

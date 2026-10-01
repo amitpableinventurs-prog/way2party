@@ -4,7 +4,7 @@
         $category = \App\Models\category::where('status', 1)->get();
     }
     $user = Auth::guard('appuser')->user();
-    $logo = \App\Models\Setting::find(1)->logo;
+    $logo = \App\Models\Setting::current()->logo;
     $wallet = \App\Models\PaymentSetting::first()->wallet;
 @endphp
 <!-- component -->

@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>{{ \App\Models\Setting::find(1)->app_name }} | @yield('title')</title>
+    <title>{{ \App\Models\Setting::current()->app_name }} | @yield('title')</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     {!! JsonLdMulti::generate() !!}
@@ -13,7 +13,7 @@
     {!! Twitter::generate() !!}
     {!! JsonLd::generate() !!}
     @php
-        $favicon = \App\Models\Setting::find(1)->favicon;
+        $favicon = \App\Models\Setting::current()->favicon;
     @endphp
     <!-- Favicons -->
     <link href="{{ $favicon ? url('images/upload/' . $favicon) : asset('/images/logo.png') }}" rel="icon"
@@ -38,7 +38,7 @@
 </head>
 
 <body>
-    <?php $primary_color = \App\Models\Setting::find(1)->primary_color; ?>
+    <?php $primary_color = \App\Models\Setting::current()->primary_color; ?>
     <style>
         .img {
             height: 60px;
@@ -67,7 +67,7 @@
                     </svg>
                 </a>
 
-                <a><img class="img" src="{{ url('images/upload/' . \App\Models\Setting::find(1)->logo) }}"> </a>
+                <a><img class="img" src="{{ url('images/upload/' . \App\Models\Setting::current()->logo) }}"> </a>
 
             </div>
 

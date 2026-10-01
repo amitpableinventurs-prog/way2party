@@ -124,7 +124,7 @@ class Event extends Model
     public function getTotalTicketsAttribute()
     {
         if ($this->totalTicketsCache === null) {
-            $timezone = Setting::find(1)->timezone;
+            $timezone = Setting::current()->timezone;
             $date = Carbon::now($timezone);
             $this->totalTicketsCache = intval(Ticket::where([['event_id', $this->attributes['id']], ['is_deleted', 0], ['status', 1], ['end_time', '>=', $date->format('Y-m-d H:i:s')], ['start_time', '<=', $date->format('Y-m-d H:i:s')]])->sum('quantity'));
         }

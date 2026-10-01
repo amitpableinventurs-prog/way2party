@@ -5,7 +5,7 @@
         $user = Auth::guard('appuser')->user();
         $localeCode = session('code') ?? 'en';
     @endphp
-    <div class="pb-20 bg-scroll min-h-screen" style="background-image: url('{{ asset('images/events.png') }}')">
+    <div class="pb-20 bg-scroll min-h-screen" style="background-image: url('{{ asset('images/events-bg.jpg') }}')">
         <div
             class="mt-5 3xl:mx-52 2xl:mx-28 1xl:mx-28 xl:mx-36 xlg:mx-32 lg:mx-36 xxmd:mx-24 xmd:mx-32 md:mx-28 sm:mx-20 msm:mx-16 xsm:mx-10 xxsm:mx-5 z-10 relative">
             <img src="{{ asset('images/home2.png') }}" alt="" class="object-cover w-full">

@@ -1,7 +1,7 @@
 @extends('frontend.master', ['activePage' => null])
 @section('title', __('Privacy-policy'))
 @section('content')
-    <div class=" bg-scroll min-h-screen" style="background-image: url('{{ asset('images/events.png') }}')">
+    <div class=" bg-scroll min-h-screen" style="background-image: url('{{ asset('images/events-bg.jpg') }}')">
         {{-- scroll --}}
         <div class="mr-4 flex justify-end z-30">
             <a type="button" href="{{url('#')}}" class="scroll-up-button bg-primary rounded-full p-4 fixed z-20  2xl:mt-[49%] xl:mt-[59%] xlg:mt-[68%] lg:mt-[75%] xxmd:mt-[83%] md:mt-[90%]

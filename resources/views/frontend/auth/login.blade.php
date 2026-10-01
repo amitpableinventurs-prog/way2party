@@ -12,9 +12,9 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css" rel="stylesheet" />
-    <?php $primary_color = \App\Models\Setting::find(1)->primary_color; ?>
+    <?php $primary_color = \App\Models\Setting::current()->primary_color; ?>
     @php
-        $favicon = \App\Models\Setting::find(1)->favicon;
+        $favicon = \App\Models\Setting::current()->favicon;
     @endphp
     <meta charset="utf-8">
     <link href="{{ $favicon ? url('images/upload/' . $favicon) : asset('/images/logo.png') }}" rel="icon"

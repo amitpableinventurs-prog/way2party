@@ -150,7 +150,7 @@
             <div class="mr-4 flex justify-end">
                 <a type="button" href="{{ url('#') }}"
                     class="back-to-top bg-primary rounded-full p-4 fixed z-20  mt-72">
-                    <img src="{{ url('images/downarrow.png') }}" alt="" class="w-3 h-3 z-20">
+                    <img loading="lazy" decoding="async" src="{{ url('images/downarrow.png') }}" alt="" class="w-3 h-3 z-20">
                 </a>
             </div>
             {{-- main --}}
@@ -171,7 +171,7 @@
                         <div class=" xxsm:max-sm:hidden">
                             <a type="button" href="{{ url('/all-events') }}"
                                 class="px-10 py-3 text-primary border border-primary text-center font-poppins font-normal text-base leading-6 rounded-md flex">{{ __('See all') }}
-                                <img src="{{ url('images/right.png') }}" alt="" class="w-3 h-3 mt-1.5 ml-2"></a>
+                                <img loading="lazy" decoding="async" src="{{ url('images/right.png') }}" alt="" class="w-3 h-3 mt-1.5 ml-2"></a>
                         </div>
                     </div>
                     <div
@@ -182,7 +182,7 @@
                                 <div class="relative overflow-hidden">
                                     <a href="{{ url('event/' . $item->id . '/' . Str::slug($item->name)) }}">
                                         <div class="relative capitalize">
-                                            <img src="{{ url('images/upload/' . $item->image) }}" alt=""
+                                            <img loading="lazy" decoding="async" src="{{ url('images/upload/' . $item->image) }}" alt=""
                                                 class="h-40 rounded-lg w-full object-cover bg-cover ">
                                             <span
                                                 class="bg-primary text-center text-sm text-white py-1 px-2 rounded-bl-lg rounded-tr-lg absolute top-0 right-0">
@@ -256,7 +256,7 @@
                     <div class=" xxsm:max-sm:hidden">
                         <a type="button" href="{{ url('/all-events') }}"
                             class="px-10 py-3 text-blue border border-blue text-center font-poppins font-normal text-base leading-6 rounded-md flex">{{ __('See all') }}
-                            <img src="{{ url('images/right.png') }}" alt="" class="w-3 h-3 mt-1.5 ml-2"></a>
+                            <img loading="lazy" decoding="async" src="{{ url('images/right.png') }}" alt="" class="w-3 h-3 mt-1.5 ml-2"></a>
                     </div>
                 </div>
                 @if (count($events) == 0)
@@ -272,7 +272,7 @@
                             <div class="relative overflow-hidden">
                                 <a href="{{ url('event/' . $item->id . '/' . Str::slug($item->name)) }}">
                                     <div class="relative capitalize">
-                                        <img src="{{ url('images/upload/' . $item->image) }}" alt=""
+                                        <img loading="lazy" decoding="async" src="{{ url('images/upload/' . $item->image) }}" alt=""
                                             class="h-40 rounded-lg w-full object-cover bg-cover ">
                                         @switch(strtolower($item->auto_generated_tag))
                                             @case('almost full')
@@ -356,7 +356,7 @@
                 <div class="sm:hidden">
                     <a type="button" href="{{ url('/all-events') }}"
                         class="px-10 py-3 text-blue border border-blue text-center font-poppins font-normal text-base leading-6 rounded-md flex">{{ __('See all') }}
-                        <img src="{{ url('images/right.png') }}" alt="" class="w-3 h-3 mt-1.5 ml-2"></a>
+                        <img loading="lazy" decoding="async" src="{{ url('images/right.png') }}" alt="" class="w-3 h-3 mt-1.5 ml-2"></a>
                 </div>
             </div>
             {{-- Featured Categories --}}
@@ -372,7 +372,7 @@
                 <div class=" xxsm:max-sm:hidden">
                     <a type="button" href="{{ url('/all-category') }}"
                         class="px-10 py-3 text-success border border-success text-center font-poppins font-normal text-base leading-6 rounded-md flex">{{ __('See all') }}
-                        <img src="{{ url('images/right-success.png') }}" alt=""
+                        <img loading="lazy" decoding="async" src="{{ url('images/right-success.png') }}" alt=""
                             class="w-3 h-3 mt-1.5 ml-2"></a>
                 </div>
             </div>
@@ -387,7 +387,7 @@
                     <div
                         class="shadow-lg bg-white p-5 rounded-lg hover:scale-110 transition-all duration-500 cursor-pointer">
                         <a href="{{ url('events-category/' . $item->id) . '/' . Str::slug($item->name) }}">
-                            <img src="{{ url('images/upload/' . $item->image) }}" alt=""
+                            <img loading="lazy" decoding="async" src="{{ url('images/upload/' . $item->image) }}" alt=""
                                 class="rounded-lg w-full h-40 bg-cover object-cover">
                             <a href="{{ url('events-category/' . $item->id) . '/' . Str::slug($item->name) }}">
                                 <p class="font-popping font-semibold text-xl leading-8 text-center pt-3">
@@ -403,7 +403,7 @@
             <div class="sm:hidden">
                 <a type="button" href="{{ url('/all-category') }}"
                     class="px-10 py-3 text-success border border-success text-center font-poppins font-normal text-base leading-6 rounded-md flex">{{ __('See all') }}
-                    <img src="{{ url('images/right-success.png') }}" alt=""
+                    <img loading="lazy" decoding="async" src="{{ url('images/right-success.png') }}" alt=""
                         class="w-3 h-3 mt-1.5 ml-2"></a>
             </div>
         </div>
@@ -428,7 +428,7 @@
                 @foreach ($cities as $item)
                     <a href="{{ $item->url }}"
                         class="shadow-lg bg-white p-5 rounded-lg hover:scale-110 transition-all duration-500 cursor-pointer block">
-                        <img src="{{ $item->image ? url('images/upload/' . $item->image) : asset('images/events.png') }}"
+                        <img loading="lazy" decoding="async" src="{{ $item->image ? url('images/upload/' . $item->image) : asset('images/events-bg.jpg') }}"
                             alt="" class="rounded-lg w-full h-40 bg-cover object-cover">
                         <p class="font-popping font-semibold text-xl leading-8 text-center pt-3">
                             {{ $item->name }}
@@ -454,7 +454,7 @@
             <div class=" xxsm:max-sm:hidden">
                 <a type="button" href="{{ url('/all-blogs') }}"
                     class="px-10 py-3 text-warning border border-warning text-center font-poppins font-normal text-base leading-6 rounded-md flex">{{ __('See all') }}
-                    <img src="{{ url('images/right-warning.png') }}" alt=""
+                    <img loading="lazy" decoding="async" src="{{ url('images/right-warning.png') }}" alt=""
                         class="w-3 h-3 mt-1.5 ml-2"></a>
             </div>
         </div>
@@ -471,7 +471,7 @@
                         class="w-full shadow-lg p-5 rounded-lg flex 3xl:flex-nowrap md:flex-nowrap sm:flex-wrap msm:flex-wrap xsm:flex-wrap xxsm:flex-wrap bg-white xlg:w-full xmd:w-full 3xl:mb-0 xl:mb-0 xlg:mb-5 xxsm:mb-5">
                         <div
                             class="relative 3xl:w-[60%] xl:w-[60%] xlg:w-[30%] xmd:w-[60%] xxmd:w-[20%]  sm:w-1/2">
-                            <img src="{{ asset('images/upload/' . $item->image) }}" alt=""
+                            <img loading="lazy" decoding="async" src="{{ asset('images/upload/' . $item->image) }}" alt=""
                                 class="rounded-lg h-56 w-full object-cover">
                             @if (Auth::guard('appuser')->user())
                                 <div
@@ -519,7 +519,7 @@
     <div class="sm:hidden">
         <a type="button" href="{{ url('/all-blogs') }}"
             class="px-10 py-3 mb-8 text-warning border border-warning text-center font-poppins font-normal text-base leading-6 rounded-md flex">{{ __('See all') }}
-            <img src="{{ url('images/right-warning.png') }}" alt="" class="w-3 h-3 mt-1.5 ml-2"></a>
+            <img loading="lazy" decoding="async" src="{{ url('images/right-warning.png') }}" alt="" class="w-3 h-3 mt-1.5 ml-2"></a>
     </div>
     @if ($showLinkBanner->show_link_banner == 1)
         <div class="w-full h-full bg-gradient-to-r from-gradient-bg1 to-gradient-bg2">
@@ -566,7 +566,7 @@
                     <a href="{{ $brand->url }}"
                         class="flex-none relative p-4 lg:px-6 before:content-[''] before:absolute before:inset-0 before:z-[-1] before:scale-90 before:rounded-full hocus:before:scale-100 before:transition-all hocus:before:bg-violet-50"
                         target="_blank" rel="noopener">
-                       <img src="{{ $brand->logo_image ? asset('images/brands/' . $brand->logo_image) : asset('images/brands/placeholder.png') }}" alt="{{ __($brand->name) }}" class="h-[160px] object-contain hover:scale-110 transition-all duration-500 cursor-pointer">
+                       <img loading="lazy" decoding="async" src="{{ $brand->logo_image ? asset('images/brands/' . $brand->logo_image) : asset('images/brands/placeholder.png') }}" alt="{{ __($brand->name) }}" class="h-[160px] object-contain hover:scale-110 transition-all duration-500 cursor-pointer">
                     </a>
                 </li>
                 @endforeach

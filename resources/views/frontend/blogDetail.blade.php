@@ -2,7 +2,7 @@
 @section('title', __('Blog Detail'))
 @section('content')
 
-    <div class="pb-20 bg-scroll min-h-screen" style="background-image: url('{{ asset('images/events.png') }}')">
+    <div class="pb-20 bg-scroll min-h-screen" style="background-image: url('{{ asset('images/events-bg.jpg') }}')">
         {{-- scroll --}}
         <div class="mr-4 flex justify-end z-30">
             <a type="button" href="{{ url('#') }}"

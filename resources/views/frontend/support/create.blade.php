@@ -1,7 +1,7 @@
 @extends('frontend.master', ['activePage' => 'support'])
 @section('title', __('New Support Ticket'))
 @section('content')
-    <div class="pb-20 bg-scroll min-h-screen" style="background-image: url('{{ asset('images/events.png') }}')">
+    <div class="pb-20 bg-scroll min-h-screen" style="background-image: url('{{ asset('images/events-bg.jpg') }}')">
         <div
             class="mt-5 3xl:mx-52 2xl:mx-28 1xl:mx-28 xl:mx-36 xlg:mx-32 lg:mx-36 xxmd:mx-24 xmd:mx-32 md:mx-28 sm:mx-20 msm:mx-16 xsm:mx-10 xxsm:mx-5 z-10 relative">
             <p class="font-poppins font-semibold text-4xl leading-10 text-black pt-5">{{ __('New Support Ticket') }}</p>

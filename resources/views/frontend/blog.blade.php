@@ -1,7 +1,7 @@
 @extends('frontend.master', ['activePage' => 'blog'])
 @section('title', __('Our Latest Blog'))
 @section('content')
-    <div class="pb-20 bg-scroll min-h-screen" style="background-images: url('{{ asset('images/events.png') }}')">
+    <div class="pb-20 bg-scroll min-h-screen" style="background-images: url('{{ asset('images/events-bg.jpg') }}')">
 
         <div
             class="mt-5 3xl:mx-52 2xl:mx-28 1xl:mx-28 xl:mx-36 xlg:mx-32 lg:mx-36 xxmd:mx-24 xmd:mx-32 md:mx-28 sm:mx-20 msm:mx-16 xsm:mx-10 xxsm:mx-5 z-10 relative">
@@ -49,7 +49,7 @@
                             <div class="flex 3xl:flex-row 2xl:flex-nowrap 1xl:flex-nowrap xl:flex-nowrap xlg:flex-wrap flex-wrap justify-between 3xl:pt-5 xl:pt-5 gap-x-5 xl:w-full xlg:w-full">
                                 <div class="w-full shadow-lg p-5 rounded-lg flex 3xl:flex-nowrap md:flex-nowrap sm:flex-wrap msm:flex-wrap xsm:flex-wrap xxsm:flex-wrap bg-white xlg:w-full xmd:w-full 3xl:mb-0 xl:mb-0 xlg:mb-5 xxsm:mb-5">
                                     <div class="relative 3xl:w-[60%] xl:w-[60%] xlg:w-[30%] xmd:w-[60%] xxmd:w-[20%]">
-                                        <img src="{{ asset('images/upload/' . $item->image) }}" alt=""
+                                        <img loading="lazy" decoding="async" src="{{ asset('images/upload/' . $item->image) }}" alt=""
                                             class="rounded-lg h-56 w-full">
                                         @if (Auth::guard('appuser')->user())
                                             <div
@@ -106,7 +106,7 @@
                                             class="w-full shadow-lg p-5 rounded-lg flex 3xl:flex-nowrap md:flex-nowrap sm:flex-wrap msm:flex-wrap xsm:flex-wrap xxsm:flex-wrap bg-white xlg:w-full xmd:w-full 3xl:mb-0 xl:mb-0 xlg:mb-5 xxsm:mb-5">
                                             <div
                                                 class="relative 3xl:w-[60%] xl:w-[60%] xlg:w-[30%] xmd:w-[60%] xxmd:w-[20%]">
-                                                <img src="{{ asset('images/upload/' . $blog->image) }}" alt=""
+                                                <img loading="lazy" decoding="async" src="{{ asset('images/upload/' . $blog->image) }}" alt=""
                                                     class="rounded-lg h-56 w-full">
                                                 @if (Auth::guard('appuser')->user())
                                                     <div

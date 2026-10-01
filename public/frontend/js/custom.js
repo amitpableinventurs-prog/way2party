@@ -1,12 +1,13 @@
 "use strict";
 var base_url = $("#base_url").val();
 var cur = $("#currency").val();
-$(".lds-ripple").fadeOut(1500, function () {
+// Was fadeOut(1500) + 700ms fade-in: ~2.2s of forced blank screen on every page view.
+$(".lds-ripple").fadeOut(150, function () {
     $("#app").animate(
         {
             opacity: 1,
         },
-        700
+        150
     );
 });
 $(document).ready(function () {

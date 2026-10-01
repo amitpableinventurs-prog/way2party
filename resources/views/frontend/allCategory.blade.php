@@ -1,12 +1,12 @@
 @extends('frontend.master', ['activePage' => 'category'])
 @section('title', __('All Party Types'))
 @section('content')
-    <div class="pb-20 bg-scroll min-h-screen" style="background-image: url('{{ asset('images/events.png') }}')">
+    <div class="pb-20 bg-scroll min-h-screen" style="background-image: url('{{ asset('images/events-bg.jpg') }}')">
         {{-- scroll --}}
         <div class="mr-4 flex justify-end z-30">
             <a type="button" href="{{ url('#') }}"
                 class="scroll-up-button bg-primary rounded-full p-4 fixed z-20 mt-[30%]">
-                <img src="{{ asset('images/downarrow.png') }}" alt="" class="w-3 h-3 z-20">
+                <img loading="lazy" decoding="async" src="{{ asset('images/downarrow.png') }}" alt="" class="w-3 h-3 z-20">
             </a>
         </div>
         <div
@@ -30,7 +30,7 @@
                 @foreach ($data as $item)
                     <div
                         class="shadow-2xl bg-white p-5 rounded-lg hover:scale-110 transition-all duration-500 cursor-pointer">
-                        <img src="{{ asset('images/upload/' . $item->image) }}" alt=""
+                        <img loading="lazy" decoding="async" src="{{ asset('images/upload/' . $item->image) }}" alt=""
                             class="h-40 rounded-lg w-full object-cover">
                         <a href="{{ url('events-category/' . $item->id) . '/' . $item->name }}">
                             <p class="font-popping font-semibold text-xl leading-8 text-center pt-3">{{ $item->name }}</p>

@@ -118,16 +118,19 @@ class FrontendController extends Controller
             SEOTools::jsonLd()->addImage($setting->imagePath . $setting->logo);
 
 
-            $timezone = Setting::find(1)->timezone;
+            $timezone = Setting::current()->timezone;
             $date = Carbon::now($timezone);
             $events  = Event::with(['category:id,name', 'categories:id,name', 'city:id,name'])
                 ->where([['status', 1], ['is_deleted', 0], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]])
                 ->visibleTo(Auth::guard('appuser')->user())
-                ->orderBy('start_time', 'desc')->get();
-            $organizer = User::role('Organizer')->where('is_profile_private', 0)->orderBy('id', 'DESC')->get();
+                // Home is a preview with "See all" links — rendering every upcoming event
+                // (each costing ticket-count queries) made the page grow with the catalogue.
+                ->orderBy('start_time', 'desc')->take(12)->get();
+            // frontend.home never reads $organizer; kept as an empty collection for compact().
+            $organizer = collect();
             $category = Category::where('status', 1)->orderBy('id', 'DESC')->get();
             $cities = City::where('status', 1)->orderBy('name')->get();
-            $blog = Blog::with(['category:id,name'])->where('status', 1)->orderBy('id', 'DESC')->get();
+            $blog = Blog::with(['category:id,name'])->where('status', 1)->orderBy('id', 'DESC')->take(6)->get();
             // total_ticket/sold_ticket/available_ticket aren't read by frontend.home —
             // it only uses the auto_generated_tag accessor, which computes its own
             // (now memoized) ticket counts. Recomputing them here again per event was
@@ -143,7 +146,7 @@ class FrontendController extends Controller
             $user = Auth::guard('appuser')->user();
             $showLinkBanner = Setting::find(1,['show_link_banner','googleplay_link','appstore_link']);
 
-            if(Setting::find(1)->show_brands_carousel == 1) {
+            if(Setting::current()->show_brands_carousel == 1) {
                 $brands = Brand::enabled()->get();
             } else {
                 $brands = [];
@@ -495,7 +498,7 @@ class FrontendController extends Controller
         SEOTools::opengraph()->setUrl(url()->current());
         SEOTools::setCanonical(url()->current());
         SEOTools::jsonLd()->addImage($setting->imagePath . $setting->logo);
-        $logo = Setting::find(1)->logo;
+        $logo = Setting::current()->logo;
         $phone = Country::get();
         return view('frontend.auth.register', compact('logo', 'phone'));
     }
@@ -679,7 +682,7 @@ class FrontendController extends Controller
             $content = NotificationTemplate::where('title', 'Reset Password')->first()->mail_content;
             $detail['user_name'] = $user->name;
             $detail['password'] = $password;
-            $detail['app_name'] = Setting::find(1)->app_name;
+            $detail['app_name'] = Setting::current()->app_name;
             if ($request->type == 'user') {
                 AppUser::find($user->id)->update(['password' => Hash::make($password)]);
             } else {
@@ -795,7 +798,7 @@ class FrontendController extends Controller
         ]);
         SEOTools::jsonLd()->addImage($setting->imagePath . $setting->logo);
 
-        $timezone = Setting::find(1)->timezone;
+        $timezone = Setting::current()->timezone;
         $date = Carbon::now($timezone);
         $events  = Event::with(['category:id,name', 'categories:id,name', 'city:id,name'])
             ->where([['status', 1], ['is_deleted', 0], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]])
@@ -911,7 +914,7 @@ class FrontendController extends Controller
         ]);
         SEOTools::jsonLd()->addImage($setting->imagePath . $setting->logo);
         SEOTools::jsonLd()->addImage($data->imagePath . $data->image);
-        $timezone = Setting::find(1)->timezone;
+        $timezone = Setting::current()->timezone;
         $date = Carbon::now($timezone);
         $data->free_ticket = Ticket::where([['event_id', $data->id], ['is_deleted', 0], ['type', 'free'], ['status', 1], ['end_time', '>=', $date->format('Y-m-d H:i:s')], ['start_time', '<=', $date->format('Y-m-d H:i:s')]])->orderBy('id', 'DESC')->get();
         $data->paid_ticket = Ticket::where([['event_id', $data->id], ['is_deleted', 0], ['type', 'paid'], ['status', 1], ['end_time', '>=', $date->format('Y-m-d H:i:s')], ['start_time', '<=', $date->format('Y-m-d H:i:s')]])->orderBy('id', 'DESC')->get();
@@ -977,7 +980,7 @@ class FrontendController extends Controller
         SEOTools::jsonLd()->addImage($setting->imagePath . $setting->logo);
         SEOTools::jsonLd()->addImage($data->imagePath . $data->image);
 
-        $timezone = Setting::find(1)->timezone;
+        $timezone = Setting::current()->timezone;
         $date = Carbon::now($timezone);
         $data->total_event = Event::where([['status', 1], ['is_deleted', 0], ['user_id', $id], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]])->count();
         $data->events = Event::where([['status', 1], ['is_deleted', 0], ['user_id', $id], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]])->orderBy('start_time', 'ASC')->with('faqs')->get();
@@ -1362,7 +1365,7 @@ class FrontendController extends Controller
         ]);
         SEOTools::jsonLd()->addImage($setting->imagePath . $setting->logo);
 
-        $timezone = Setting::find(1)->timezone;
+        $timezone = Setting::current()->timezone;
         $date = Carbon::now($timezone);
         $events  = Event::with(['category:id,name', 'categories:id,name', 'city:id,name'])
             ->where([['status', 1], ['is_deleted', 0], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]])
@@ -1448,7 +1451,7 @@ class FrontendController extends Controller
         JsonLdMulti::setDescription($description);
         JsonLdMulti::addImage($image);
 
-        $timezone = Setting::find(1)->timezone;
+        $timezone = Setting::current()->timezone;
         $date = Carbon::now($timezone);
         $upcoming = Event::with(['category:id,name', 'categories:id,name', 'city:id,name'])
             ->where([['status', 1], ['is_deleted', 0], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]])
@@ -1510,7 +1513,7 @@ class FrontendController extends Controller
         SEOTools::jsonLd()->addImage($setting->imagePath . $setting->logo);
 
 
-        $timezone = Setting::find(1)->timezone;
+        $timezone = Setting::current()->timezone;
         $date = Carbon::now($timezone);
         if ($type == "all") {
             $events  = Event::with(['category:id,name', 'categories:id,name'])
@@ -2123,13 +2126,13 @@ class FrontendController extends Controller
 
     public function privacypolicy()
     {
-        $policy = Setting::find(1)->privacy_policy_organizer;
+        $policy = Setting::current()->privacy_policy_organizer;
         return view('frontend.privacy-policy', compact('policy'));
     }
 
     public function appuserPrivacyPolicyShow(Request $request)
     {
-        $policy = Setting::find(1)->appuser_privacy_policy;
+        $policy = Setting::current()->appuser_privacy_policy;
         return view('frontend.privacy-policy', compact('policy'));
     }
     public function searchEvent(Request $request)
@@ -2138,7 +2141,7 @@ class FrontendController extends Controller
         if ($search == '') {
             return redirect()->back();
         }
-        $timezone = Setting::find(1)->timezone;
+        $timezone = Setting::current()->timezone;
         $date = Carbon::now($timezone);
         $events  = Event::with(['category:id,name'])
             ->where([['address', 'LIKE', "%$search%"], ['status', 1], ['is_deleted', 0], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d')]])

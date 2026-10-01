@@ -1,7 +1,7 @@
 @extends('master')
 @section('content')
     @php
-        $logo = \App\Models\Setting::find(1)->logo;
+        $logo = \App\Models\Setting::current()->logo;
     @endphp
     <section class="section">
         <div class="d-flex flex-wrap align-items-stretch">
@@ -10,7 +10,7 @@
                     <img src="{{ $logo ? asset('/images/upload/' . $logo) : asset('/images/logo.png') }}" alt="logo"
                          height="50px" class="mb-4 mt-2 object-contain w-auto">
                     <h4 class="text-dark font-weight-normal mb-4">{{ __('Welcome to ') }}<span
-                            class="font-weight-bold">{{ \App\Models\Setting::find(1)->app_name }}</span></h4>
+                            class="font-weight-bold">{{ \App\Models\Setting::current()->app_name }}</span></h4>
                     <form method="POST" action="{{ url('admin/login') }}" class="needs-validation" novalidate="">
                         @csrf
                         <div class="form-group">

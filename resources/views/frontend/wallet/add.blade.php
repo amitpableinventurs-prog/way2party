@@ -1,4 +1,5 @@
 @extends('frontend.master', ['activePage' => 'home'])
+@section('payment_sdks', true)
 @section('title', __('Add to Wallet'))
 @section('content')
     {{-- Payments Keys --}}
@@ -9,7 +10,7 @@
     <input type="hidden" name="email" value="{{ auth()->guard('appuser')->user()->email }}">
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css" rel="stylesheet" />
-    <div class="pb-20 bg-scroll min-h-screen" style="background-image: url('{{ asset('images/events.png') }}')">
+    <div class="pb-20 bg-scroll min-h-screen" style="background-image: url('{{ asset('images/events-bg.jpg') }}')">
         <div class="container mx-auto mt-8">
             <div class="pt-10">
                 <div class="flex justify-center gap-10">

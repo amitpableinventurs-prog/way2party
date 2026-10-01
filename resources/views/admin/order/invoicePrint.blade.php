@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
-    <title>{{ \App\Models\Setting::find(1)->app_name }}</title>
+    <title>{{ \App\Models\Setting::current()->app_name }}</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- General CSS Files -->
-    <link href="{{ url('images/upload/' . \App\Models\Setting::find(1)->favicon) }}" rel="icon" type="image/png">
+    <link href="{{ url('images/upload/' . \App\Models\Setting::current()->favicon) }}" rel="icon" type="image/png">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         crossorigin="anonymous">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
@@ -28,7 +28,7 @@
 </head>
 
 <body>
-    <?php $primary_color = \App\Models\Setting::find(1)->primary_color; ?>
+    <?php $primary_color = \App\Models\Setting::current()->primary_color; ?>
 
     <style>
         :root {
