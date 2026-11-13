@@ -1,8 +1,14 @@
 @extends('frontend.master', ['activePage' => 'home'])
 @section('title', __('Home'))
 @section('content')
-    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
-    <div class="bg-scroll" style="background-image: url('images/Eventright Background.png')">
+    @push('page_styles')
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
+    @endpush
+    {{-- Only the home page has the banner slider; slick.min.js used to load on every page. --}}
+    @push('page_scripts')
+        <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+    @endpush
+    <div class="bg-scroll" style="background-image: url('{{ asset('images/home-bg.jpg') }}')">
         <div class="w-full h-full m-auto">
             <div id="default-carousel" class="relative" data-carousel="slide">
                 <!-- Carousel wrapper -->
@@ -12,7 +18,8 @@
                             <div class="h-1/2 relative">
                                 <a href="{{ url('event/' . $item->event->id . '/' . Str::slug($item->event->name)) }}">
                                     <div class="h-1/2 relative">
-                                        <img src="{{ asset('/images/upload/' . $item->image) }}"
+                                        <img @if ($loop->first) fetchpriority="high" @else loading="lazy" decoding="async" @endif
+                                            src="{{ asset('/images/upload/' . $item->image) }}"
                                             class="object-cover h-[600px] w-full mx-auto xxsm:max-msm:h-full"
                                             alt="Image 1">
                                         <h1
@@ -524,7 +531,7 @@
     @if ($showLinkBanner->show_link_banner == 1)
         <div class="w-full h-full bg-gradient-to-r from-gradient-bg1 to-gradient-bg2">
             <div class="w-full bg-cover bg-no-repeat"
-                style="background-image: url({{ asset('/images/bg-img.png') }});height: 548px;">
+                style="background-image: url({{ asset('/images/bg-img.webp') }});height: 548px;">
                 <div id="success_msg"
                     class="w-full bg-[#4fd69c] text-white font-semibold text-center text-lg tracking-wide">
                 </div>

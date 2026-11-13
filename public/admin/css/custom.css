@@ -680,8 +680,10 @@ tfoot {
     border-top: 1px solid #ddd;
 }
 
-#app {
-    display: none;
+/* #app used to be display:none until myCustom.js faded it in (~2.2s on every admin /
+   organizer page). It now shows immediately. */
+.lds-ripple {
+    display: none !important;
 }
 
 .ticket-header {

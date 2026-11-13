@@ -1,4 +1,5 @@
 @extends('master')
+@section('payment_sdks', true)
 
 @section('content')
 <section class="section">

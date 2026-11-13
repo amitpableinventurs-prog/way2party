@@ -88,13 +88,20 @@ main() {
 
     "$PHP" artisan migrate --force
 
-    # optimize:clear only — the app runs fine uncached; a bad config:cache would
-    # white-screen the site until the next deploy. Turn on fuller caching later
-    # by adding the lines below once the site is proven stable under it.
     "$PHP" artisan optimize:clear
     "$PHP" artisan storage:link 2>/dev/null || true
     "$PHP" artisan queue:restart 2>/dev/null || true
-    # "$PHP" artisan config:cache && "$PHP" artisan route:cache && "$PHP" artisan view:cache
+
+    # Cache config/routes/views: saves several hundred ms of boot work per request.
+    # Guarded — if caching or the smoke test fails, drop the caches and keep running
+    # uncached rather than leave a broken cache serving the live site.
+    if "$PHP" artisan config:cache && "$PHP" artisan route:cache && "$PHP" artisan view:cache \
+       && "$PHP" deploy/smoke-test.php; then
+        echo "$(date '+%F %T')  caches built and smoke test passed"
+    else
+        echo "$(date '+%F %T')  WARN: caching/smoke test failed — running uncached"
+        "$PHP" artisan optimize:clear
+    fi
 
     echo "$(date '+%F %T')  done -> now at $(git rev-parse --short HEAD)"
 }

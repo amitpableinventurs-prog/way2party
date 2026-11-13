@@ -36,19 +36,16 @@
     width: 80px;
     height: 80px;
 }
-#app{
-    opacity: 0;
-    /* Safety net: reveal the page even if a script before custom.js fails to load. */
-    animation: app-reveal 0s 3s forwards;
-}
-@keyframes app-reveal {
-    to { opacity: 1; }
-}
+/* The page used to stay invisible (#app opacity:0) until every script at the end of
+   <body> had downloaded and run, so visitors stared at a spinner for 1-3s. Show the
+   HTML as soon as it arrives instead; the spinner is no longer needed. */
 .lds-ripple {
-    animation: loader-hide 0s 3s forwards;
+    display: none !important;
 }
-@keyframes loader-hide {
-    to { visibility: hidden; }
+/* Home banner slider: before slick initialises, show only the first slide so the
+   banners don't briefly stack on top of each other. */
+.your-carousel:not(.slick-initialized) > *:not(:first-child) {
+    display: none;
 }
 .lds-ripple div {
 

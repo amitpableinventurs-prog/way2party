@@ -38,14 +38,14 @@
     <!-- Vendor CSS Files -->
     <link href="{{ url('frontend/css/ionicons.min.css') }}" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.min.css" rel="stylesheet" />
-    <link href="{{ url('frontend/css/animate.min.css') }}" rel="stylesheet">
+    {{-- animate.css (71KB) and owl.carousel.css were render-blocking but unused by any view. --}}
     <link href="{{ url('frontend/css/font-awesome.min.css') }}" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link href="{{ url('frontend/css/owl.carousel.min.css') }}" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    {{-- Pinned version: the unversioned URL made jsDelivr resolve "latest" on every miss. --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
     @if (session('direction') == 'rtl')
         <link rel="stylesheet" href="{{ url('frontend/css/rtl.css') }}">
     @endif
+    @stack('page_styles')
 </head>
 
 <body>
@@ -139,9 +139,10 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.min.js"></script>
         <script src="{{ url('frontend/js/jquery.easing.min.js') }}"></script>
         <script src="{{ url('frontend/js/validate.js') }}"></script>
-        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-        <script src="{{ url('frontend/js/owl.carousel.min.js') }}"></script>
-        <script src="{{ url('frontend/js/scrollreveal.min.js') }}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
+        {{-- sweetalert2 used to block rendering in <head>; it's only needed on click. --}}
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+        {{-- owl.carousel / scrollreveal removed: no view uses them (main.js guards the calls). --}}
         <script src="{{ url('frontend/js/map.js') }}"></script>
 
         {{-- Payment SDKs (~300KB of third-party JS, PayPal's is slow) used to load on every
@@ -157,12 +158,13 @@
                     data-namespace="paypal_sdk"></script>
             @endif
         @endif
-        <script src="https://unpkg.com/flowbite@1.5.5/dist/flowbite.js"></script>
-        <script src="{{ url('frontend/js/qrcode.min.js') }}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/flowbite@1.5.5/dist/flowbite.min.js"></script>
+        {{-- qrcode.min.js removed: nothing on the frontend calls QRCode. slick.min.js is
+             pushed by the home page only. --}}
+        @stack('page_scripts')
         <script src="{{ url('frontend/js/main.js') }}"></script>
         <script src="{{ url('frontend/js/custom.js') }}"></script>
         <script src="{{ url('js/custom.js') }}"></script>
-        <script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
         @yield('js')
     </div>
 </body>

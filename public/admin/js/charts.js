@@ -24,6 +24,10 @@ $(document).ready(function()
 });
 
 function loadMap() {
+    // jvectormap is no longer loaded (no view has #eventMap).
+    if (!$.fn.vectorMap || !$('#eventMap').length) {
+        return;
+    }
     $('#eventMap').vectorMap(
     {
         map: 'world_mill',

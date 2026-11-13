@@ -4,7 +4,6 @@
 <head>
     @php
         $favicon = \App\Models\Setting::current()->favicon;
-        $modules = \App\Models\Module::all();
     @endphp
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
@@ -20,10 +19,9 @@
 
     <link rel="stylesheet" type="text/css"
         href="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.21/b-1.6.2/b-flash-1.6.2/b-html5-1.6.2/b-print-1.6.2/datatables.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
 
-    <link href="https://jvectormap.com/css/jquery-jvectormap-2.0.3.css" rel="stylesheet">
     <!-- CSS Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"
@@ -157,11 +155,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
     <script src="https://cdn.datatables.net/select/1.3.1/js/dataTables.select.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
-    @auth
+    {{-- PayPal SDK only on the admin pages that render PayPal buttons
+         (@section('payment_sdks', true)); it used to load on every admin page. --}}
+    @hasSection('payment_sdks')
         <?php
         $sendbox = \App\Models\PaymentSetting::where('id', 1)->first();
         $cur = \App\Models\Setting::current()->currency;
@@ -173,13 +173,12 @@
                     data-namespace="paypal_sdk"></script>
             @endif
         @endif
-    @endauth
+    @endif
 
 
 
 
-    <script src="{{ url('admin/js/jquery-jvectormap.min.js') }}"></script>
-    <script src="{{ url('admin/js/jquery-jvectormap-world-mill.js') }}"></script>
+    {{-- jvectormap (177KB) removed: no admin view has the #eventMap element. --}}
     <script src="{{ url('admin/js/jquery.uploadPreview.min.js') }}"></script>
     <script src="{{ url('admin/js/bootstrap-tagsinput.min.js') }}"></script>
     <script src="{{ url('admin/js/bootstrap-colorpicker.min.js') }}"></script>
@@ -187,13 +186,8 @@
     <script src="{{ url('admin/js/charts.js') }}"></script>
     <script src="{{ url('admin/js/stisla.js') }}"></script>
     <script src="{{ url('admin/js/scripts.js') }}"></script>
-    <script src="{{ url('frontend/js/qrcode.min.js') }}"></script>
     <script src="{{ url('admin/js/myCustom.js') }}"></script>
     <script src="{{ url('admin/js/custom.js') }}"></script>
-    {{-- @foreach ($modules as $module)
-        @if ($module->is_install === 1 && $module->is_enable === 1)
-        @endif
-    @endforeach --}}
 
 </body>
 

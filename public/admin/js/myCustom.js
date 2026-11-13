@@ -3,9 +3,8 @@ var base_url = $('#base_url').val();
 var cur = $('#currency').val();
 var pay_fd;
 
-$(".lds-ripple").fadeOut(1500, function () {
-    $("#app").fadeIn(700);
-});
+// Was fadeOut(1500) + fadeIn(700): ~2.2s of forced blank screen on every admin page.
+$(".lds-ripple").remove();
 
 function copyText(id) {
     var value = document.getElementById(id).textContent;

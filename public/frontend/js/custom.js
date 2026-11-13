@@ -1,15 +1,8 @@
 "use strict";
 var base_url = $("#base_url").val();
 var cur = $("#currency").val();
-// Was fadeOut(1500) + 700ms fade-in: ~2.2s of forced blank screen on every page view.
-$(".lds-ripple").fadeOut(150, function () {
-    $("#app").animate(
-        {
-            opacity: 1,
-        },
-        150
-    );
-});
+// The page is visible as soon as the HTML arrives (see css/custom.css); no loader fade.
+$(".lds-ripple").remove();
 $(document).ready(function () {
     var url = window.location.href;
     var id = url.substring(url.lastIndexOf("#") + 1);
@@ -1129,6 +1122,10 @@ $(document).ready(function () {
 
 // Carasoule
 $(document).ready(function () {
+    // slick is only loaded on the home page now.
+    if (!$.fn.slick || !$('.your-carousel').length) {
+        return;
+    }
     $('.your-carousel').slick({
         infinite: true, // Enable infinite loop
         speed: 300, // Transition speed

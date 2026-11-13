@@ -19,16 +19,13 @@
     <link href="{{ $favicon ? url('images/upload/' . $favicon) : asset('/images/logo.png') }}" rel="icon"
         type="image/png">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700&display=swap" rel="stylesheet">
     <!-- Vendor CSS Files -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         crossorigin="anonymous">
     <link href="{{ url('frontend/css/ionicons.min.css') }}" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.min.css" rel="stylesheet" />
-    <link href="{{ url('frontend/css/animate.min.css') }}" rel="stylesheet">
     <link href="{{ url('frontend/css/font-awesome.min.css') }}" rel="stylesheet">
-    <link href="{{ url('frontend/css/owl.carousel.min.css') }}" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <!-- Template Main CSS File -->
     <link href="{{ url('frontend/css/style.css') }}" rel="stylesheet">
     <link href="{{ url('frontend/css/custom.css') }}" rel="stylesheet">
@@ -80,13 +77,11 @@
 
     <!-- Vendor JS Files -->
     <script src="{{ url('frontend/js/jquery.min.js') }}"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" crossorigin="anonymous"></script>
     <script src="{{ url('frontend/js/bootstrap.bundle.min.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.min.js"></script>
     <script src="{{ url('frontend/js/jquery.easing.min.js') }}"></script>
     <script src="{{ url('frontend/js/validate.js') }}"></script>
-    <script src="{{ url('frontend/js/owl.carousel.min.js') }}"></script>
-    <script src="{{ url('frontend/js/scrollreveal.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
     <!-- Template Main JS File -->
     <script src="{{ url('frontend/js/main.js') }}"></script>

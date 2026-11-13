@@ -1572,7 +1572,7 @@ class FrontendController extends Controller
 
     public function blogs()
     {
-        $blogs = Blog::where('status', 1)->orderBy('id', 'DESC')->get();
+        $blogs = Blog::with(['category:id,name'])->where('status', 1)->orderBy('id', 'DESC')->get();
         $category = Category::where('status', 1)->orderBy('id', 'DESC')->get();
         $setting = Setting::first(['app_name', 'logo']);
         SEOMeta::setTitle($setting->app_name . ' - Blogs' ?? config('app.name'))
@@ -2199,7 +2199,7 @@ class FrontendController extends Controller
     }
     public function blogByTag($tag)
     {
-        $blogs = Blog::where('tags', 'LIKE', "%$tag%")->where('status', 1)->orderBy('id', 'DESC')->get();
+        $blogs = Blog::with(['category:id,name'])->where('tags', 'LIKE', "%$tag%")->where('status', 1)->orderBy('id', 'DESC')->get();
         $category = Category::where('status', 1)->orderBy('id', 'DESC')->get();
         if (Auth::guard('appuser')->user()) {
             $user = Auth::guard('appuser')->user();

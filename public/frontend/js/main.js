@@ -29,11 +29,18 @@
     var navHeight = nav.outerHeight();
 
     /*--/ ScrollReveal /Easy scroll animations for web and mobile browsers /--*/
-    window.sr = ScrollReveal();
-    sr.reveal('.foo', {
-        duration: 1000,
-        delay: 15
-    });
+    // ScrollReveal and Owl Carousel are no longer loaded on every page (no view uses
+    // .foo or any of the owl carousel ids below), so guard the old template calls.
+    if (window.ScrollReveal) {
+        window.sr = ScrollReveal();
+        sr.reveal('.foo', {
+            duration: 1000,
+            delay: 15
+        });
+    }
+    if (!$.fn.owlCarousel) {
+        $.fn.owlCarousel = function () { return this; };
+    }
 
     /*--/ Carousel owl /--*/
     $('#carousel').owlCarousel({
