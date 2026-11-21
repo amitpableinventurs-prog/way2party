@@ -33,7 +33,7 @@ main() {
     # shellcheck disable=SC1091
     [ -f "$APP_DIR/deploy/.deploy-env" ] && . "$APP_DIR/deploy/.deploy-env"
     PHP="${PHP:-$(command -v php 2>/dev/null || echo /usr/local/bin/php)}"
-    COMPOSER="${COMPOSER:-/opt/cpanel/composer/bin/composer}"
+    COMPOSER="${COMPOSER:-$(command -v composer 2>/dev/null || echo /opt/cpanel/composer/bin/composer)}"
     BRANCH="${BRANCH:-main}"
 
     # --- new commits? ----------------------------------------------------------
