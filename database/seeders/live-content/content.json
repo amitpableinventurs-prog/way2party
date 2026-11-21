@@ -1,0 +1,226 @@
+{
+ "category_rename": {
+  "Event category": "Concerts & Live Music"
+ },
+ "category_images": {
+  "Concerts & Live Music": "cat_music.jpg",
+  "Pubs Night Clubs": "cat_pubs.jpg",
+  "Food & Drink": "cat_food.jpg",
+  "Home and Private": "cat_home.jpg",
+  "Business": "cat_business.jpg"
+ },
+ "city_images": {
+  "Mumbai": "city_mumbai.jpg",
+  "Hyderabad": "city_hyderabad.jpg",
+  "Chennai": "city_chennai.jpg",
+  "Indore": "city_indore.jpg"
+ },
+ "events": [
+  {
+   "key": "nye",
+   "name": "New Year's Eve Rooftop Countdown 2027",
+   "city": "Mumbai",
+   "category": "Pubs Night Clubs",
+   "start": "2026-12-31 20:00:00",
+   "end": "2027-01-01 02:00:00",
+   "address": "Lower Parel, Mumbai, Maharashtra 400013",
+   "lat": "18.9977",
+   "lang": "72.8376",
+   "people": 300,
+   "featured": 10,
+   "image": "ev_nye.jpg",
+   "description": "<p>Say goodbye to 2026 under the Mumbai skyline. The New Year's Eve Rooftop Countdown brings together live DJ sets, a welcome mocktail, a midnight countdown and a city view you will remember all year.</p><p><strong>What to expect</strong></p><ul><li>Commercial, Bollywood and house music by resident DJs from 8 PM</li><li>Live countdown on the big screen at midnight</li><li>Food counters with veg and non-veg options (pay at venue)</li><li>Photo booth and party props</li></ul><p>Entry is for guests aged 21 and above. Please carry a valid photo ID.</p>"
+  },
+  {
+   "key": "bolly",
+   "name": "Bollywood Retro Night",
+   "city": "Hyderabad",
+   "category": "Pubs Night Clubs",
+   "start": "2026-12-12 21:00:00",
+   "end": "2026-12-13 01:30:00",
+   "address": "Road No. 36, Jubilee Hills, Hyderabad, Telangana 500033",
+   "lat": "17.4326",
+   "lang": "78.4071",
+   "people": 250,
+   "featured": 9,
+   "image": "ev_bolly.jpg",
+   "description": "<p>Dust off your dancing shoes. Bollywood Retro Night is a non-stop journey through the biggest Hindi film hits of the 70s, 80s and 90s, mixed live with today's chartbusters.</p><p>Dress code: retro Bollywood. The best-dressed guests win a surprise from the house.</p><ul><li>Live DJ with retro and new Bollywood mashups</li><li>Dance-off at 11:30 PM</li><li>Themed photo corner</li></ul><p>Entry for guests aged 21 and above. Valid photo ID required.</p>"
+  },
+  {
+   "key": "techno",
+   "name": "Techno Underground: Winter Edition",
+   "city": "Indore",
+   "category": "Concerts & Live Music",
+   "start": "2026-12-19 21:00:00",
+   "end": "2026-12-20 02:00:00",
+   "address": "Scheme No. 54, Vijay Nagar, Indore, Madhya Pradesh 452010",
+   "lat": "22.7533",
+   "lang": "75.8937",
+   "people": 400,
+   "featured": 6,
+   "image": "ev_techno.jpg",
+   "description": "<p>Indore's underground electronic music night returns for a winter edition. Expect deep, driving techno, a full laser and light show, and a crowd that is there for the music.</p><ul><li>Three back-to-back DJ sets</li><li>Full laser and lighting production</li><li>Water and refreshment counters inside the venue</li></ul><p>Entry for guests aged 18 and above. Doors close at 12:30 AM.</p>"
+  },
+  {
+   "key": "xmas",
+   "name": "Christmas Eve Live Music Night",
+   "city": "Mumbai",
+   "category": "Concerts & Live Music",
+   "start": "2026-12-24 19:00:00",
+   "end": "2026-12-24 23:30:00",
+   "address": "Hill Road, Bandra West, Mumbai, Maharashtra 400050",
+   "lat": "19.0596",
+   "lang": "72.8295",
+   "people": 350,
+   "featured": 8,
+   "image": "ev_xmas.jpg",
+   "description": "<p>Celebrate Christmas Eve with a live band playing carols, pop classics and rock anthems, followed by a late-night DJ set. A warm, festive evening for friends, couples and families.</p><ul><li>Live band from 7:30 PM</li><li>Christmas carol sing-along</li><li>DJ set from 10 PM</li><li>Festive food and dessert counters (pay at venue)</li></ul>"
+  },
+  {
+   "key": "pool",
+   "name": "Sunset Pool Party on ECR",
+   "city": "Chennai",
+   "category": "Pubs Night Clubs",
+   "start": "2027-01-17 16:00:00",
+   "end": "2027-01-17 22:00:00",
+   "address": "East Coast Road, Neelankarai, Chennai, Tamil Nadu 600115",
+   "lat": "12.9165",
+   "lang": "80.2503",
+   "people": 200,
+   "featured": 7,
+   "image": "ev_pool.jpg",
+   "description": "<p>Spend a Sunday evening by the pool on Chennai's East Coast Road. Chilled house music at sunset, upbeat sets after dark, pool games and plenty of space to relax.</p><ul><li>Poolside DJ from 4 PM</li><li>Pool volleyball and floats</li><li>Snacks and drinks counters (pay at venue)</li><li>Changing rooms and lockers available</li></ul><p>Swimwear is required to enter the pool. Entry for guests aged 18 and above.</p>"
+  },
+  {
+   "key": "food",
+   "name": "Indore Street Food & Music Carnival",
+   "city": "Indore",
+   "category": "Food & Drink",
+   "start": "2027-01-24 17:00:00",
+   "end": "2027-01-24 23:00:00",
+   "address": "Near Rajwada, Indore, Madhya Pradesh 452004",
+   "lat": "22.7185",
+   "lang": "75.8553",
+   "people": 1000,
+   "featured": 5,
+   "image": "ev_food.jpg",
+   "description": "<p>Indore is India's street-food capital, and this carnival celebrates it. Taste poha-jalebi, bhutte ka kees, garadu, shikanji and much more from dozens of stalls, with live music all evening.</p><ul><li>40+ food stalls (pay at each stall)</li><li>Live folk and indie music performances</li><li>Kids' play zone</li><li>Family-friendly — all ages welcome</li></ul>"
+  },
+  {
+   "key": "cocktail",
+   "name": "Cocktail Mixology Masterclass",
+   "city": "Mumbai",
+   "category": "Food & Drink",
+   "start": "2027-01-09 18:00:00",
+   "end": "2027-01-09 21:00:00",
+   "address": "Colaba Causeway, Colaba, Mumbai, Maharashtra 400005",
+   "lat": "18.9067",
+   "lang": "72.8147",
+   "people": 40,
+   "featured": 0,
+   "image": "ev_cocktail.jpg",
+   "description": "<p>Learn to shake, stir and garnish like a professional bartender. In this hands-on masterclass you will make three classic cocktails and one signature drink, and take home the recipes.</p><ul><li>Hands-on session with all tools and ingredients provided</li><li>Mocktail versions available on request</li><li>Small group — limited seats</li></ul><p>For guests aged 21 and above. Please carry a valid photo ID.</p>"
+  },
+  {
+   "key": "founders",
+   "name": "Founders & Creators Networking Mixer",
+   "city": "Hyderabad",
+   "category": "Business",
+   "start": "2027-01-30 18:30:00",
+   "end": "2027-01-30 21:30:00",
+   "address": "HITEC City, Madhapur, Hyderabad, Telangana 500081",
+   "lat": "17.4435",
+   "lang": "78.3772",
+   "people": 150,
+   "featured": 0,
+   "image": "ev_founders.jpg",
+   "description": "<p>An evening for startup founders, creators, investors and professionals to meet, share ideas and build useful connections in a relaxed setting.</p><ul><li>Short founder talks at 7 PM</li><li>Open networking with snacks and beverages</li><li>Bring your visiting cards — or your LinkedIn QR code</li></ul>"
+  },
+  {
+   "key": "house",
+   "name": "Game Night & Karaoke House Party",
+   "city": "Chennai",
+   "category": "Home and Private",
+   "start": "2026-12-27 19:00:00",
+   "end": "2026-12-27 23:30:00",
+   "address": "Anna Nagar, Chennai, Tamil Nadu 600040",
+   "lat": "13.0850",
+   "lang": "80.2101",
+   "people": 60,
+   "featured": 0,
+   "image": "ev_house.jpg",
+   "description": "<p>A cosy house-party evening with board games, card games and a full karaoke setup. Come solo or with friends — it is a great way to meet new people.</p><ul><li>Board games, Uno, Pictionary and more</li><li>Karaoke with Tamil, Hindi and English tracks</li><li>Snacks and soft drinks included</li></ul>"
+  }
+ ],
+ "banners": [
+  {
+   "event": "nye",
+   "title": "New Year's Eve Rooftop Countdown",
+   "image": "bn_fireworks.jpg"
+  },
+  {
+   "event": "bolly",
+   "title": "Bollywood Retro Night",
+   "image": "bn_confetti.jpg"
+  },
+  {
+   "event": "techno",
+   "title": "Techno Underground",
+   "image": "bn_dj.jpg"
+  },
+  {
+   "event": "xmas",
+   "title": "Christmas Eve Live Music",
+   "image": "bn_concert.jpg"
+  },
+  {
+   "event": "pool",
+   "title": "Sunset Pool Party",
+   "image": "bn_pool.jpg"
+  }
+ ],
+ "blogs": [
+  {
+   "title": "How to plan a memorable house party",
+   "category": "Home and Private",
+   "image": "blog_house.jpg",
+   "tags": "house party,party planning,tips",
+   "description": "<p>A great house party is less about a big budget and more about good planning. Here is a simple plan that works.</p><p><strong>1. Fix the guest list first.</strong> The number of guests decides everything else — food, drinks, seating and even the music volume your neighbours will tolerate.</p><p><strong>2. Pick a theme (or don't).</strong> A light theme such as retro, game night or all-white gives guests something to talk about. If it feels forced, skip it.</p><p><strong>3. Plan food that is easy to eat standing up.</strong> Finger food, chaat counters and one-pot dishes keep you out of the kitchen.</p><p><strong>4. Build a playlist in advance.</strong> Start slow, build energy after the first hour and keep a few sing-along tracks ready for later.</p><p><strong>5. Think about the end.</strong> Arrange cabs for guests who need them and keep water and snacks out for the last hour.</p><p>Want someone else to do the hosting? Browse home and private events on Way2Party.</p>"
+  },
+  {
+   "title": "A party-goer's guide to nightlife in Mumbai, Hyderabad, Chennai and Indore",
+   "category": "Pubs Night Clubs",
+   "image": "blog_nightlife.jpg",
+   "tags": "nightlife,clubs,cities",
+   "description": "<p>Every Indian city parties differently. Here is what to expect in the four cities on Way2Party.</p><p><strong>Mumbai</strong> never really sleeps. Lower Parel, Bandra and Andheri are packed with rooftop bars, live-music venues and clubs, and weekends start on Thursday.</p><p><strong>Hyderabad</strong> nightlife centres on Jubilee Hills, Banjara Hills and the HITEC City belt. Expect Bollywood nights, live gigs and a strong brunch culture.</p><p><strong>Chennai</strong> is more relaxed — think beach-side evenings on ECR, pool parties and lounges, with most venues closing a little earlier.</p><p><strong>Indore</strong> mixes a young college crowd with the country's best late-night street food, so a night out often ends at a food street rather than a club.</p><p>Whichever city you are in, check the event page for timings, age limits and dress codes before you head out.</p>"
+  },
+  {
+   "title": "New Year's Eve: how to choose the right party",
+   "category": "Pubs Night Clubs",
+   "image": "blog_nye.jpg",
+   "tags": "new year,nye,party tips",
+   "description": "<p>New Year's Eve is the busiest party night of the year. A few checks before you book can save the evening.</p><p><strong>Look at the full timing.</strong> Does entry close at a fixed time? Is there a countdown? When does the music stop?</p><p><strong>Check what is included.</strong> Some passes include food or drinks, others only entry. Compare like with like.</p><p><strong>Plan your ride home.</strong> Cabs surge after midnight. Pick a venue you can get back from, or plan a designated driver.</p><p><strong>Book early.</strong> Popular rooftops and clubs fill up days before 31 December.</p><p>You can find New Year's Eve events across Mumbai, Hyderabad, Chennai and Indore on Way2Party.</p>"
+  },
+  {
+   "title": "Hosting a birthday party at home: a simple checklist",
+   "category": "Home and Private",
+   "image": "blog_birthday.jpg",
+   "tags": "birthday,checklist,home party",
+   "description": "<p>Use this checklist to plan a birthday party at home without last-minute panic.</p><p><strong>Two weeks before:</strong> fix the date, guest list and budget; send invitations; order the cake.</p><p><strong>One week before:</strong> plan the menu, buy decorations, make a playlist and plan one or two games.</p><p><strong>The day before:</strong> clean and set up the space, charge speakers and lights, keep extra plates, cups and napkins ready.</p><p><strong>On the day:</strong> set up food and drinks an hour early, keep a first-aid kit handy and take lots of photos.</p><p>Prefer a venue instead? Browse private party events on Way2Party.</p>"
+  },
+  {
+   "title": "Party safety tips every guest should know",
+   "category": "Concerts & Live Music",
+   "image": "blog_safety.jpg",
+   "tags": "safety,concerts,tips",
+   "description": "<p>Big events are more fun when everyone gets home safely. Keep these tips in mind.</p><p><strong>Go with friends and agree on a meeting point</strong> in case you get separated or phones die.</p><p><strong>Carry a valid photo ID</strong> and keep your ticket QR code ready on your phone.</p><p><strong>Stay hydrated.</strong> Drink water between drinks and take breaks from the dance floor.</p><p><strong>Never leave your drink unattended</strong> and only accept drinks from the bar.</p><p><strong>Know your way home</strong> before you leave — book a trusted cab or plan a designated driver.</p><p>If anything feels wrong, speak to the event staff or security straight away.</p>"
+  }
+ ],
+ "ticket_desc": "Free entry pass. Show the ticket QR code at the entrance.",
+ "settings": {
+  "privacy_policy_organizer": "<h3>Privacy Policy</h3><p><em>Last updated: 21 November 2026</em></p><p>Way2Party (\"Way2Party\", \"we\", \"us\") runs the website way2party.com and its mobile apps, where people can discover parties and events and book tickets, and where organizers can list and manage their events. This policy explains what personal data we collect, why we collect it and the choices you have. It is published in line with the Information Technology Act, 2000, its rules, and the Digital Personal Data Protection Act, 2023.</p><h4>1. Information we collect</h4><ul><li><strong>Account details</strong> — your name, email address, phone number, password (stored encrypted) and profile photo.</li><li><strong>Booking details</strong> — the events and tickets you book, attendee names, order history and check-in records.</li><li><strong>Payment details</strong> — payments are processed by licensed third-party payment gateways. We receive the payment status and a transaction reference; we do not store your card, UPI PIN or net-banking credentials.</li><li><strong>Organizer details</strong> — organization name, contact details, event information and payout or bank details needed to settle ticket sales.</li><li><strong>Device and usage data</strong> — IP address, browser and device type, pages visited, and approximate location (for example, to show events in your city).</li><li><strong>Messages</strong> — anything you send us through the contact form, support tickets or reviews.</li></ul><h4>2. How we use your information</h4><ul><li>To create and manage your account and let you log in.</li><li>To process bookings, issue tickets and QR codes, and handle cancellations and refunds.</li><li>To share the attendee details an organizer needs to run and check in to their event.</li><li>To send booking confirmations, event updates and important service messages by email, SMS or push notification.</li><li>To send offers and recommendations, only where you have agreed. You can opt out at any time.</li><li>To keep the platform secure, prevent fraud and meet our legal obligations.</li><li>To understand how the platform is used and improve it.</li></ul><h4>3. Sharing your information</h4><p>We do not sell your personal data. We share it only with:</p><ul><li><strong>Event organizers</strong> — for the events you book, so they can manage entry and contact you about the event.</li><li><strong>Service providers</strong> — payment gateways, hosting, email, SMS and notification services that work for us under confidentiality obligations.</li><li><strong>Authorities</strong> — when required by law, court order or to protect the rights and safety of our users.</li></ul><h4>4. Cookies</h4><p>We use cookies to keep you logged in, remember your preferences such as language and city, and understand site usage. You can block or delete cookies in your browser settings, but some features may then stop working.</p><h4>5. Data retention</h4><p>We keep account data while your account is active. Booking and payment records are kept for as long as tax and accounting laws require. When data is no longer needed, we delete or anonymise it.</p><h4>6. Security</h4><p>We use HTTPS encryption, hashed passwords and access controls to protect your data. No online service can be completely secure, so please keep your password private and tell us straight away if you notice anything unusual.</p><h4>7. Your rights</h4><p>You can access and update your profile at any time. You may also ask us to correct or delete your personal data, withdraw consent for marketing, or raise a grievance, by writing to us through our <a href=\"https://way2party.com/contact\">Contact page</a>. We will respond within the time required by law.</p><h4>8. Children</h4><p>Way2Party is meant for users aged 18 and above. Some events have higher age limits, which are shown on the event page. We do not knowingly collect data from children without verifiable parental consent.</p><h4>9. Changes to this policy</h4><p>We may update this policy from time to time. The latest version will always be on this page, with the date it was last updated.</p><h4>10. Contact us</h4><p>For any question or grievance about this policy or your data, please reach us through our <a href=\"https://way2party.com/contact\">Contact page</a>.</p>",
+  "appuser_privacy_policy": "<h3>Privacy Policy</h3><p><em>Last updated: 21 November 2026</em></p><p>Way2Party (\"Way2Party\", \"we\", \"us\") runs the website way2party.com and its mobile apps, where people can discover parties and events and book tickets, and where organizers can list and manage their events. This policy explains what personal data we collect, why we collect it and the choices you have. It is published in line with the Information Technology Act, 2000, its rules, and the Digital Personal Data Protection Act, 2023.</p><h4>1. Information we collect</h4><ul><li><strong>Account details</strong> — your name, email address, phone number, password (stored encrypted) and profile photo.</li><li><strong>Booking details</strong> — the events and tickets you book, attendee names, order history and check-in records.</li><li><strong>Payment details</strong> — payments are processed by licensed third-party payment gateways. We receive the payment status and a transaction reference; we do not store your card, UPI PIN or net-banking credentials.</li><li><strong>Organizer details</strong> — organization name, contact details, event information and payout or bank details needed to settle ticket sales.</li><li><strong>Device and usage data</strong> — IP address, browser and device type, pages visited, and approximate location (for example, to show events in your city).</li><li><strong>Messages</strong> — anything you send us through the contact form, support tickets or reviews.</li></ul><h4>2. How we use your information</h4><ul><li>To create and manage your account and let you log in.</li><li>To process bookings, issue tickets and QR codes, and handle cancellations and refunds.</li><li>To share the attendee details an organizer needs to run and check in to their event.</li><li>To send booking confirmations, event updates and important service messages by email, SMS or push notification.</li><li>To send offers and recommendations, only where you have agreed. You can opt out at any time.</li><li>To keep the platform secure, prevent fraud and meet our legal obligations.</li><li>To understand how the platform is used and improve it.</li></ul><h4>3. Sharing your information</h4><p>We do not sell your personal data. We share it only with:</p><ul><li><strong>Event organizers</strong> — for the events you book, so they can manage entry and contact you about the event.</li><li><strong>Service providers</strong> — payment gateways, hosting, email, SMS and notification services that work for us under confidentiality obligations.</li><li><strong>Authorities</strong> — when required by law, court order or to protect the rights and safety of our users.</li></ul><h4>4. Cookies</h4><p>We use cookies to keep you logged in, remember your preferences such as language and city, and understand site usage. You can block or delete cookies in your browser settings, but some features may then stop working.</p><h4>5. Data retention</h4><p>We keep account data while your account is active. Booking and payment records are kept for as long as tax and accounting laws require. When data is no longer needed, we delete or anonymise it.</p><h4>6. Security</h4><p>We use HTTPS encryption, hashed passwords and access controls to protect your data. No online service can be completely secure, so please keep your password private and tell us straight away if you notice anything unusual.</p><h4>7. Your rights</h4><p>You can access and update your profile at any time. You may also ask us to correct or delete your personal data, withdraw consent for marketing, or raise a grievance, by writing to us through our <a href=\"https://way2party.com/contact\">Contact page</a>. We will respond within the time required by law.</p><h4>8. Children</h4><p>Way2Party is meant for users aged 18 and above. Some events have higher age limits, which are shown on the event page. We do not knowingly collect data from children without verifiable parental consent.</p><h4>9. Changes to this policy</h4><p>We may update this policy from time to time. The latest version will always be on this page, with the date it was last updated.</p><h4>10. Contact us</h4><p>For any question or grievance about this policy or your data, please reach us through our <a href=\"https://way2party.com/contact\">Contact page</a>.</p>",
+  "terms_use_organizer": "<h3>Terms of Use</h3><p><em>Last updated: 21 November 2026</em></p><p>By using way2party.com or the Way2Party apps you agree to these terms. If you do not agree, please do not use the platform.</p><h4>1. The platform</h4><p>Way2Party is a marketplace that connects event organizers with guests. Each event is organized by the organizer named on the event page, who is responsible for the event, the venue, its timing and its content.</p><h4>2. Accounts</h4><p>You must be 18 or older and give accurate information. You are responsible for activity on your account and for keeping your password safe.</p><h4>3. Tickets and bookings</h4><ul><li>A ticket is valid only for the event, date and ticket type shown on it.</li><li>Entry may require a valid photo ID, and organizers can refuse entry for age limits, dress codes or behaviour.</li><li>Tickets may not be resold without the organizer's permission.</li></ul><h4>4. Cancellations and refunds</h4><p>Cancellation and refund rules are set per event and shown on the event page. If an organizer cancels an event, the refund is processed to the original payment method or wallet as described on the event page.</p><h4>5. Organizers</h4><p>Organizers must provide true event information, hold all permissions and licences needed for their event, and honour the tickets sold. Events may be reviewed and approved by Way2Party before they go live.</p><h4>6. Acceptable use</h4><p>Do not misuse the platform, post false or offensive content, attempt to break its security or use it for anything unlawful.</p><h4>7. Liability</h4><p>Way2Party is not responsible for the conduct of organizers or guests, or for loss or injury at an event, to the extent permitted by law. Our total liability for any booking is limited to the amount paid for it.</p><h4>8. Governing law</h4><p>These terms are governed by the laws of India.</p><h4>9. Contact</h4><p>Questions about these terms? Reach us through our <a href=\"https://way2party.com/contact\">Contact page</a>.</p>",
+  "terms_services": "<h3>Terms of Use</h3><p><em>Last updated: 21 November 2026</em></p><p>By using way2party.com or the Way2Party apps you agree to these terms. If you do not agree, please do not use the platform.</p><h4>1. The platform</h4><p>Way2Party is a marketplace that connects event organizers with guests. Each event is organized by the organizer named on the event page, who is responsible for the event, the venue, its timing and its content.</p><h4>2. Accounts</h4><p>You must be 18 or older and give accurate information. You are responsible for activity on your account and for keeping your password safe.</p><h4>3. Tickets and bookings</h4><ul><li>A ticket is valid only for the event, date and ticket type shown on it.</li><li>Entry may require a valid photo ID, and organizers can refuse entry for age limits, dress codes or behaviour.</li><li>Tickets may not be resold without the organizer's permission.</li></ul><h4>4. Cancellations and refunds</h4><p>Cancellation and refund rules are set per event and shown on the event page. If an organizer cancels an event, the refund is processed to the original payment method or wallet as described on the event page.</p><h4>5. Organizers</h4><p>Organizers must provide true event information, hold all permissions and licences needed for their event, and honour the tickets sold. Events may be reviewed and approved by Way2Party before they go live.</p><h4>6. Acceptable use</h4><p>Do not misuse the platform, post false or offensive content, attempt to break its security or use it for anything unlawful.</p><h4>7. Liability</h4><p>Way2Party is not responsible for the conduct of organizers or guests, or for loss or injury at an event, to the extent permitted by law. Our total liability for any booking is limited to the amount paid for it.</p><h4>8. Governing law</h4><p>These terms are governed by the laws of India.</p><h4>9. Contact</h4><p>Questions about these terms? Reach us through our <a href=\"https://way2party.com/contact\">Contact page</a>.</p>"
+ }
+}
