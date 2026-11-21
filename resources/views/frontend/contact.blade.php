@@ -21,15 +21,29 @@
             <div class="mt-10 pb-5">
                 <p class="font-poppins font-semibold text-5xl leading-10 text-primary">{{ __('Contact us') }}</p>
             </div>
-            @if (!isset($data->lat))
+            @php
+                $gmapkey = \App\Models\Setting::current()->map_key;
+                $hasCoords = is_numeric($data->lat ?? null) && is_numeric($data->long ?? null);
+                // Google's JS map needs both an API key and coordinates; otherwise fall back to
+                // the key-less embed, which works from the address (or the coordinates) alone.
+                $useJsMap = $hasCoords && !empty($gmapkey);
+                $embedQuery = $hasCoords ? $data->lat . ',' . $data->long : trim($data->address ?? '');
+                $hasContact = !empty($data->email) || !empty($data->phone) || !empty($data->address);
+            @endphp
+            @if (!$hasContact)
                 <div class="font-poppins font-medium text-lg leading-4 text-black mt-5 capitalize ">
                     {{ __('Google Map or Contact Address not configured by the admin yet') }}
                 </div>
             @endif
             <div class="flex sm:space-x-6 msm:space-x-0 xxsm:space-x-0 xxmd:flex-row xmd:flex-col xxsm:flex-col">
                 <div class="xxmd:w-2/3 xmd:w-full xxsm:w-full">
-                    <div id="map" style="width:100%;height:500px;">
-                    </div>
+                    @if ($useJsMap)
+                        <div id="map" style="width:100%;height:500px;"></div>
+                    @elseif ($embedQuery !== '')
+                        <iframe title="{{ __('Map') }}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                            src="https://maps.google.com/maps?q={{ urlencode($embedQuery) }}&z=14&output=embed"
+                            style="width:100%;height:500px;border:0;" class="rounded-md"></iframe>
+                    @endif
                 </div>
                 <div class="xxmd:w-1/3 xmd:w-full xxsm:w-full">
                     <div class="p-4 bg-white shadow-lg rounded-md">
@@ -47,7 +61,9 @@
                                     {{ __('Email') }}</p>
                                 <p
                                     class="font-poppins font-medium 1xl:text-xl xxmd:text-xl lg:text-base sm:text-base xxsm:text-base leading-7 text-gray-200 pt-1">
-                                    {{ $data->email ?? '' }}
+                                    @if (!empty($data->email))
+                                        <a href="mailto:{{ $data->email }}" class="break-all">{{ $data->email }}</a>
+                                    @endif
                                 </p>
                             </div>
                         </div>
@@ -61,7 +77,10 @@
                                     {{ __('Phone') }}</p>
                                 <p
                                     class="font-poppins font-medium 1xl:text-xl xxmd:text-xl lg:text-base sm:text-base xxsm:text-base leading-7 text-gray-200 pt-1">
-                                    {{ $data->phone ?? '' }}</p>
+                                    @if (!empty($data->phone))
+                                        <a href="tel:{{ preg_replace('/[^0-9+]/', '', $data->phone) }}">{{ $data->phone }}</a>
+                                    @endif
+                                </p>
                             </div>
                         </div>
                         <div class="flex pt-8 flex-wrap 1xl:flex-nowrap">
@@ -72,14 +91,25 @@
                                 <p class="font-poppins font-normal 1xl:text-xl xxmd:text-xl lg:text-base sm:text-base xxsm:text-base leading-7 text-gray-200">
                                     {{ __('Address') }}
                                 </p>
-                                <div style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">
-                                    <p class="font-poppins font-medium 1xl:text-xl xxmd:text-xl lg:text-base sm:text-base xxsm:text-base leading-7 text-gray-200 pt-1">
-                                        {{ $data->address ?? '' }}
+                                <div>
+                                    <p class="font-poppins font-medium 1xl:text-xl xxmd:text-xl lg:text-base sm:text-base xxsm:text-base leading-7 text-gray-200 pt-1 break-words">
+                                        {!! nl2br(e($data->address ?? '')) !!}
                                     </p>
                                 </div>
                             </div>
                         </div>
 
+                        @php
+                            $social = \App\Models\Setting::current();
+                            // only links the admin actually filled in — empty ones just reloaded this page
+                            $socialLinks = array_filter([
+                                'fa-brands fa-facebook' => $social->Facebook ?? null,
+                                'fa-brands fa-twitter' => $social->Twitter ?? null,
+                                'fa-brands fa-instagram' => $social->Instagram ?? null,
+                                'fa fa-pinterest-p' => $social->Pinterest ?? null,
+                            ], fn ($url) => filter_var(trim((string) $url), FILTER_VALIDATE_URL));
+                        @endphp
+                        @if (count($socialLinks))
                         <div class="flex pt-8 pb-5 flex-wrap 1xl:flex-nowrap">
                             <div class="mr-5 bg-primary rounded-full h-10 overflow-hidden flex justify-center items-center">
                                 <i class="fa-regular fa-hashtag w-10 text-center align-middle text-white"></i>
@@ -89,21 +119,11 @@
                                     class="font-poppins font-normal 1xl:text-xl xxmd:text-xl lg:text-base sm:text-base xxsm:text-base leading-7 text-gray-200">
                                     {{ __('Social') }}</p>
                                 <div class="flex mt-2">
-                                    @php
-                                        $social = \App\Models\Setting::find(1);
-                                    @endphp
-                                    <a href="{{ $social->Facebook }}" target="blank" class="link-one">
-                                        <i class="fa-brands fa-facebook fa-2x  mr-5 z-20 text-primary"></i>
-                                    </a>
-                                    <a href="{{ $social->Twitter }}" target="blank" class="link-one">
-                                        <i class="fa-brands fa-twitter fa-2x  mr-5 z-20 text-primary"></i>
-                                    </a>
-                                    <a href="{{ $social->Instagram }}" target="blank" class="link-one">
-                                        <i class="fa-brands fa-instagram fa-2x  mr-5 z-20 text-primary"></i>
-                                    </a>
-                                    <a href="{{ $social->Pinterest }}" target="blank" class="link-one">
-                                        <i class="fa fa-pinterest-p text-primary fa-2x " aria-hidden="true"></i>
-                                    </a>
+                                    @foreach ($socialLinks as $icon => $url)
+                                        <a href="{{ trim($url) }}" target="_blank" rel="noopener" class="link-one">
+                                            <i class="{{ $icon }} fa-2x mr-5 z-20 text-primary"></i>
+                                        </a>
+                                    @endforeach
                                     <style>
                                         .fa-2x {
                                             font-size: 24px;
@@ -112,6 +132,7 @@
                                 </div>
                             </div>
                         </div>
+                        @endif
 
                     </div>
 
@@ -170,27 +191,14 @@
             </div>
         </div>
     </div>
-    <script>
-        function initMap() {
-            var map = new google.maps.Map(document.getElementById('map'), {
-                center: {
-                    lat: {{ $data->lat ?? '' }},
-                    lng: {{ $data->long ?? '' }}
-                },
-                zoom: 13
-            });
-            let marker = new google.maps.Marker({
-                position: {
-                    lat: {{ $data->lat ?? '' }},
-                    lng: {{ $data->long ?? '' }}
-                },
-                map: map
-            });
-        }
-    </script>
-
-    @php
-        $gmapkey = \App\Models\Setting::current()->map_key;
-    @endphp
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ $gmapkey }}&loading=async&callback=initMap"></script>
+    @if ($useJsMap)
+        <script>
+            function initMap() {
+                var pos = { lat: {{ (float) $data->lat }}, lng: {{ (float) $data->long }} };
+                var map = new google.maps.Map(document.getElementById('map'), { center: pos, zoom: 13 });
+                new google.maps.Marker({ position: pos, map: map });
+            }
+        </script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ $gmapkey }}&loading=async&callback=initMap"></script>
+    @endif
 @endsection
