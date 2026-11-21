@@ -51,6 +51,7 @@
                             <img src="{{ $logo ? url('images/upload/' . $logo) : asset('/images/logo.png') }}"
                                 alt="" class="z-20 h-20 w-40 object-contain">
                         </div>
+                        @if (!empty($data->email))
                         <div class="flex pt-8 flex-wrap 1xl:flex-nowrap">
                             <div class="mr-5 bg-primary rounded-full h-10 overflow-hidden flex justify-center items-center">
                                 <i class="fa-solid fa-envelope w-10 text-center align-middle text-white"></i>
@@ -67,6 +68,8 @@
                                 </p>
                             </div>
                         </div>
+                        @endif
+                        @if (!empty($data->phone))
                         <div class="flex pt-8 flex-wrap 1xl:flex-nowrap">
                             <div class="mr-5 bg-primary rounded-full h-10 overflow-hidden flex justify-center items-center">
                                 <i class="fa-solid fa-phone w-10 text-center align-middle text-white"></i>
@@ -83,6 +86,8 @@
                                 </p>
                             </div>
                         </div>
+                        @endif
+                        @if (!empty($data->address))
                         <div class="flex pt-8 flex-wrap 1xl:flex-nowrap">
                             <div class="mr-5 bg-primary rounded-full h-10 overflow-hidden flex justify-center items-center">
                                 <i class="fa-solid fa-location-dot w-10 text-center align-middle text-white"></i>
@@ -98,6 +103,7 @@
                                 </div>
                             </div>
                         </div>
+                        @endif
 
                         @php
                             $social = \App\Models\Setting::current();

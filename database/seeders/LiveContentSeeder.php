@@ -40,6 +40,7 @@ class LiveContentSeeder extends Seeder
         $this->blogs();
         $this->hidePlaceholderBrands();
         $this->policies();
+        $this->contact();
 
         $this->command?->info('Live content seeded: ' . count($events) . ' events.');
     }
@@ -302,6 +303,27 @@ class LiveContentSeeder extends Seeder
         $data = $this->only('general_settng', $this->content['settings']);
         if ($data) {
             DB::table('general_settng')->where('id', 1)->update($data);
+        }
+    }
+
+    /** Contact page details — fills only empty fields, so edits made in admin are never overwritten. */
+    private function contact(): void
+    {
+        if (!Schema::hasTable('admin_contact') || empty($this->content['contact'])) {
+            return;
+        }
+        $row = DB::table('admin_contact')->where('id', 1)->first();
+        if (!$row) {
+            DB::table('admin_contact')->insert(['id' => 1] + $this->only('admin_contact', $this->content['contact']));
+            return;
+        }
+        $fill = array_filter(
+            $this->only('admin_contact', $this->content['contact']),
+            fn ($v, $k) => empty($row->{$k}),
+            ARRAY_FILTER_USE_BOTH
+        );
+        if ($fill) {
+            DB::table('admin_contact')->where('id', 1)->update($fill);
         }
     }
 }
